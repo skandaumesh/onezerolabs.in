@@ -1,0 +1,35 @@
+[
+    {
+      "id": 1,
+      "title": "Full-Stack Web Development",
+      "description": "Custom web applications with modern tech stack",
+      "icon": "🚀",
+      "technologies": ["React", "Node.js", "MongoDB"],
+      "deliveryTime": "6-12 weeks"
+    },
+    {
+      "id": 2,
+      "title": "Mobile App Development",
+      "description": "Native and cross-platform mobile applications",
+      "icon": "📱",
+      "technologies": ["React Native", "Firebase"],
+      "deliveryTime": "8-16 weeks"
+    },
+    {
+      "id": 3,
+      "title": "Educational Technology",
+      "description": "Learning management systems and educational tools",
+      "icon": "📚",
+      "technologies": ["Next.js", "Firebase"],
+      "deliveryTime": "4-10 weeks"
+    },
+    {
+      "id": 4,
+      "title": "Database Design & Optimization",
+      "description": "Schema design, indexing, and performance tuning",
+      "icon": "⚙️",
+      "technologies": ["MongoDB", "Firestore"],
+      "deliveryTime": "2-4 weeks"
+    }
+  ]
+  

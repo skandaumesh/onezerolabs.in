@@ -1,0 +1,130 @@
+/* ---------------------------
+   1. Base Black Background
+--------------------------- */
+.cosmic-bg {
+    position: relative;
+    overflow: hidden;
+    background: #000;
+  }
+  
+  /* ---------------------------
+     2. Radial Purple/Blue Glow
+  --------------------------- */
+  .cosmic-bg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at center bottom,
+      rgba(120, 70, 255, 0.4) 0%,
+      rgba(50, 20, 90, 0.4) 40%,
+      rgba(0, 0, 0, 1) 100%
+    );
+    filter: blur(60px);
+    opacity: 0.7;
+    z-index: 1;
+  }
+  
+  /* ---------------------------
+     3. Planet Curve Highlight
+  --------------------------- */
+  .planet-curve {
+    position: absolute;
+    bottom: -20vh;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 180vw;
+    height: 120vh;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle at 50% 20%,
+      rgba(255, 255, 255, 0.20) 0%,
+      rgba(255, 255, 255, 0.05) 40%,
+      rgba(0, 0, 0, 0) 70%
+    );
+    filter: blur(40px);
+    opacity: 0.4;
+    z-index: 2;
+  }
+  
+  /* ---------------------------
+     4. Floating Stars
+  --------------------------- */
+  .stars {
+    position: absolute;
+    inset: 0;
+    background-image: url('/stars-small.png');
+    background-size: cover;
+    opacity: 0.25;
+    animation: starFloat 40s linear infinite;
+    z-index: 3;
+  }
+  
+  @keyframes starFloat {
+    0%   { transform: translateY(0px); }
+    100% { transform: translateY(-40px); }
+  }
+  
+  /* EXTRA sparkle */
+  .star-twinkles {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+  }
+  
+  .star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: twinkle 3s infinite ease-in-out alternate;
+  }
+  
+  @keyframes twinkle {
+    0% { opacity: 0.1; transform: scale(0.8); }
+    100% { opacity: 0.9; transform: scale(1.3); }
+  }
+  /* ----------------------------------------
+    MINI STARS DRIFTING LEFT (Framer style)
+---------------------------------------- */
+
+.mini-stars-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 4;
+    overflow: hidden;
+  }
+  
+  .mini-star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: miniStarDrift linear infinite;
+    filter: drop-shadow(0 0 4px rgba(255,255,255,0.7));
+  }
+  
+  @keyframes miniStarDrift {
+    0% {
+      transform: translate(0, 0) scale(1);
+      opacity: 0.7;
+    }
+    40% {
+      transform: translate(-20vw, -2vh) scale(1.1);
+      opacity: 1;
+    }
+    80% {
+      transform: translate(-40vw, 1vh) scale(0.9);
+      opacity: 0.6;
+    }
+    100% {
+      transform: translate(-55vw, 0) scale(1);
+      opacity: 0;
+    }
+  }
+  

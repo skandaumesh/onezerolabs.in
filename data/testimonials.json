@@ -1,0 +1,27 @@
+[
+    {
+      "id": 1,
+      "quote": "OneZeroLabs delivered an exceptional attendance system. Students loved the interface and adoption was immediate.",
+      "author": "Dr. Principal",
+      "role": "Principal, Your College",
+      "image": "/images/team/testimonial-1.jpg",
+      "rating": 5
+    },
+    {
+      "id": 2,
+      "quote": "Their full-stack expertise made the entire process smooth. Highly professional and delivered on time.",
+      "author": "Business Owner",
+      "role": "CEO, E-Commerce Startup",
+      "image": "/images/team/testimonial-2.jpg",
+      "rating": 5
+    },
+    {
+      "id": 3,
+      "quote": "Excellent support and technical knowledge. They understand both frontend and backend perfectly.",
+      "author": "Tech Manager",
+      "role": "CTO, Tech Company",
+      "image": "/images/team/testimonial-3.jpg",
+      "rating": 5
+    }
+  ]
+  

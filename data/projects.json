@@ -1,0 +1,56 @@
+[
+    {
+      "id": 1,
+      "title": "Smart College Attendance Management",
+      "slug": "college-attendance-system",
+      "description": "Real-time attendance system with anonymous social features",
+      "image": "/images/projects/attendance.png",
+      "technologies": ["Node.js", "MongoDB", "Firebase", "React", "Cloudinary"],
+      "category": "Web App",
+      "featured": true,
+      "challenge": "College needed modern attendance tracking with student engagement",
+      "solution": "Built full-stack app with real-time updates and social features",
+      "results": {
+        "users": "1000+",
+        "engagement": "40%",
+        "uptime": "99.9%"
+      },
+      "features": [
+        "Real-time attendance sync",
+        "Anonymous social feed",
+        "Upvote/downvote system",
+        "Poll creation",
+        "Image uploads",
+        "Trending posts"
+      ],
+      "demoLink": "https://attendance-demo.example.com",
+      "githubLink": "https://github.com/onezerolabs/attendance"
+    },
+    {
+      "id": 2,
+      "title": "Crop Yield Prediction with AI",
+      "slug": "crop-yield-prediction",
+      "description": "Advanced ML model for forecasting crop yields with interactive visualizations",
+      "image": "/images/projects/crop-yield.png",
+      "technologies": ["React", "Python", "TensorFlow", "Charts.js"],
+      "category": "AI/ML",
+      "featured": true,
+      "challenge": "Farmers needed accurate yield predictions for better planning",
+      "solution": "Integrated ML model with interactive UI for predictions",
+      "results": {
+        "accuracy": "92%",
+        "users": "500+",
+        "regions": "15+"
+      },
+      "features": [
+        "ML-based predictions",
+        "Interactive charts",
+        "Historical data analysis",
+        "Weather integration",
+        "Export reports"
+      ],
+      "demoLink": "https://cropai-demo.example.com",
+      "githubLink": "https://github.com/onezerolabs/cropai"
+    }
+  ]
+  

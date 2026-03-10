@@ -1,0 +1,23 @@
+{
+    "frontend": [
+      { "name": "React", "icon": "⚛️" },
+      { "name": "Next.js", "icon": "▲" },
+      { "name": "Tailwind CSS", "icon": "🎨" },
+      { "name": "Framer Motion", "icon": "✨" }
+    ],
+    "backend": [
+      { "name": "Node.js", "icon": "🟩" },
+      { "name": "Express.js", "icon": "⚡" },
+      { "name": "Firebase", "icon": "🔥" }
+    ],
+    "database": [
+      { "name": "MongoDB", "icon": "🍃" },
+      { "name": "Firestore", "icon": "☁️" }
+    ],
+    "tools": [
+      { "name": "Cloudinary", "icon": "🖼️" },
+      { "name": "GitHub", "icon": "🐙" },
+      { "name": "Vercel", "icon": "▲" }
+    ]
+  }
+  
