@@ -37,12 +37,12 @@ export default function CtaSection() {
                 className="relative w-full max-w-[1050px] p-2 md:p-3 rounded-[48px] bg-[#0c0c0e] border border-white/10"
             >
                 {/* Inner Card content container - double frame effect */}
-                <div className="relative w-full min-h-[380px] md:min-h-[400px] rounded-[40px] overflow-hidden bg-black border border-white/[0.15] flex flex-col items-center justify-center pt-20 pb-12 px-6 text-center z-10 shadow-[inset_0_0_80px_rgba(255,255,255,0.08)]">
+                <div className="relative w-full min-h-[380px] md:min-h-[400px] rounded-[40px] overflow-hidden bg-black border border-white/[0.15] flex flex-col items-center justify-center pt-20 pb-12 px-6 text-center z-10">
 
                     {/* Background Image Setup */}
                     <div className="absolute inset-0 z-0">
                         <Image
-                            src="/cta_sec.jpg"
+                            src="/cta.jpg"
                             alt="Glowing nature landscape"
                             fill
                             className="object-cover object-center scale-110"
@@ -52,8 +52,7 @@ export default function CtaSection() {
                         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent" />
                     </div>
 
-                    {/* Inner shadow glow - Left, Right Side and Bottom */}
-                    <div className="absolute inset-0 shadow-[inset_-30px_-40px_80px_rgba(255,255,255,0.15),inset_30px_-40px_80px_rgba(255,255,255,0.15)] pointer-events-none z-10" />
+
 
                     {/* Content */}
                     <div className="relative z-20 flex flex-col items-center max-w-2xl mx-auto w-full h-full justify-between mt-10">

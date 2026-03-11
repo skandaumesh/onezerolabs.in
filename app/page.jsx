@@ -25,7 +25,7 @@ export default function Home() {
       <div className={`relative z-10 ${syne.className}`}>
         <Hero
           eyebrow="A Modern Digital Atelier"
-          title="Digital Infrastructure for Colleges & Growing Businesses."
+          title="Designing the Future of Digital Infrastructure"
           subtitle="Building scalable websites, intelligent applications, and AI systems for institutions and modern businesses."
           ctaLabel="Get Started"
           ctaHref="/contact"
@@ -34,7 +34,8 @@ export default function Home() {
 
       {/* 2. Text Reveal & Position Section */}
       <div className="relative z-10">
-        <VisionSection />
+    <VisionSection image="/vision.jpg" />
+
       </div>
 
       {/* 3. Service Showcase */}

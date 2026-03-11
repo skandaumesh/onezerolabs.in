@@ -51,7 +51,8 @@ export default function Footer() {
     const pathname = usePathname();
     const excludedPaths = ['/about', '/contact', '/services'];
 
-    if (excludedPaths.includes(pathname)) {
+    // Hide footer if path is in excluded list OR starts with /portfolio
+    if (excludedPaths.includes(pathname) || pathname.startsWith('/portfolio')) {
         return null;
     }
 

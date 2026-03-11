@@ -100,7 +100,7 @@ export default function LmsProjectPage() {
          </div>
 
          {/* --- 1. HERO SECTION --- */}
-         <section className="relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 py-24 overflow-hidden">
+         <section className="relative min-h-[80vh] md:min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 py-16 md:py-24 overflow-hidden">
             <div className="absolute top-0 inset-x-0 h-[70vh] bg-gradient-to-b from-white/10 via-white/[0.02] to-transparent blur-[120px] pointer-events-none opacity-50"></div>
 
             <motion.div
@@ -159,7 +159,7 @@ export default function LmsProjectPage() {
          </section>
 
          {/* --- 2. THE TEACHING MODULE --- */}
-         <section className="py-32 px-4 md:px-12 relative z-10 border-t border-white/[0.03]">
+         <section className="py-20 md:py-32 px-4 md:px-12 relative z-10 border-t border-white/[0.03]">
             <div className="max-w-7xl mx-auto">
                <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 mb-32 items-center">
                   <div>
@@ -190,7 +190,7 @@ export default function LmsProjectPage() {
          </section>
 
          {/* --- 3. THE ADMIN COMMAND CENTER --- */}
-         <section className="py-32 px-4 md:px-12 relative z-10 bg-white/[0.01] border-y border-white/[0.03]">
+         <section className="py-20 md:py-32 px-4 md:px-12 relative z-10 bg-white/[0.01] border-y border-white/[0.03]">
             <div className="max-w-7xl mx-auto">
                <div className="text-center mb-28">
                   <span className="text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] text-white/30 mb-8 block">02 / COMMAND CENTER</span>

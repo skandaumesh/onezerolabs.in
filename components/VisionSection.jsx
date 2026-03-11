@@ -3,6 +3,7 @@
 import { useRef } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 import { Instrument_Serif } from 'next/font/google'
+import Image from "next/image"
 
 const seasonFont = Instrument_Serif({
   subsets: ['latin'],
@@ -11,7 +12,7 @@ const seasonFont = Instrument_Serif({
   display: 'swap',
 })
 
-export default function VisionSection() {
+export default function VisionSection({ image }) {
   const containerRef = useRef(null)
 
   const { scrollYProgress } = useScroll({
@@ -86,37 +87,48 @@ export default function VisionSection() {
         >
           {/* LEFT COLUMN: The Visual Object Container (replicating the rounded visual box) */}
           <div className="w-full lg:w-[45%] aspect-square rounded-[2rem] bg-[linear-gradient(to_bottom_right,#1c1c1c_0%,#09090C_100%)] relative overflow-hidden flex flex-col items-center justify-center border border-white/10 shadow-[inner_0_0_20px_rgba(255,255,255,0.05)]">
-            {/* Subtle glow effect behind */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] h-[70%] bg-white rounded-full blur-[80px] opacity-[0.08]" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30%] h-[30%] bg-white rounded-full blur-[40px] opacity-[0.12]" />
+            {image ? (
+              <Image
+                src={image}
+                alt="Vision Visual"
+                fill
+                className="object-cover opacity-90"
+              />
+            ) : (
+              <>
+                {/* Subtle glow effect behind */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] h-[70%] bg-white rounded-full blur-[80px] opacity-[0.08]" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30%] h-[30%] bg-white rounded-full blur-[40px] opacity-[0.12]" />
 
-            {/* Clouds / Bottom shapes mimicking the reference visual */}
-            <div className="absolute bottom-0 w-full h-[60%] flex items-end justify-center pointer-events-none opacity-50">
-              <motion.div animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }} className="absolute bottom-[-10%] w-[60%] h-[80%] bg-white/10 blur-[40px] rounded-t-full" />
-              <motion.div animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 9, ease: "easeInOut", delay: 1 }} className="absolute bottom-[-20%] left-[-10%] w-[50%] h-[70%] bg-white/5 blur-[30px] rounded-t-full" />
-              <motion.div animate={{ y: [0, -15, 0] }} transition={{ repeat: Infinity, duration: 10, ease: "easeInOut", delay: 2 }} className="absolute bottom-[-25%] right-[-10%] w-[60%] h-[80%] bg-white/10 blur-[30px] rounded-t-full" />
-            </div>
+                {/* Clouds / Bottom shapes mimicking the reference visual */}
+                <div className="absolute bottom-0 w-full h-[60%] flex items-end justify-center pointer-events-none opacity-50">
+                  <motion.div animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }} className="absolute bottom-[-10%] w-[60%] h-[80%] bg-white/10 blur-[40px] rounded-t-full" />
+                  <motion.div animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 9, ease: "easeInOut", delay: 1 }} className="absolute bottom-[-20%] left-[-10%] w-[50%] h-[70%] bg-white/5 blur-[30px] rounded-t-full" />
+                  <motion.div animate={{ y: [0, -15, 0] }} transition={{ repeat: Infinity, duration: 10, ease: "easeInOut", delay: 2 }} className="absolute bottom-[-25%] right-[-10%] w-[60%] h-[80%] bg-white/10 blur-[30px] rounded-t-full" />
+                </div>
 
-            {/* Inner Rotating Abstract Mandala/Lotus */}
-            <motion.div
-              animate={{
-                rotateZ: [0, 360],
-              }}
-              transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-              className="w-48 h-48 md:w-64 md:h-64 flex items-center justify-center relative z-10 mb-16 mt-4"
-            >
-              {/* The 4 overlapping capsules/petals */}
-              <div className="absolute w-20 h-36 md:w-28 md:h-48 border-[1.5px] border-white/50 rounded-[50%] rotate-0 shadow-[0_0_15px_rgba(255,255,255,0.05)]" />
-              <div className="absolute w-20 h-36 md:w-28 md:h-48 border-[1.5px] border-white/50 rounded-[50%] rotate-[45deg] shadow-[0_0_15px_rgba(255,255,255,0.05)]" />
-              <div className="absolute w-20 h-36 md:w-28 md:h-48 border-[1.5px] border-white/50 rounded-[50%] rotate-[90deg] shadow-[0_0_15px_rgba(255,255,255,0.05)]" />
-              <div className="absolute w-20 h-36 md:w-28 md:h-48 border-[1.5px] border-white/50 rounded-[50%] rotate-[135deg] shadow-[0_0_15px_rgba(255,255,255,0.05)]" />
+                {/* Inner Rotating Abstract Mandala/Lotus */}
+                <motion.div
+                  animate={{
+                    rotateZ: [0, 360],
+                  }}
+                  transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+                  className="w-48 h-48 md:w-64 md:h-64 flex items-center justify-center relative z-10 mb-16 mt-4"
+                >
+                  {/* The 4 overlapping capsules/petals */}
+                  <div className="absolute w-20 h-36 md:w-28 md:h-48 border-[1.5px] border-white/50 rounded-[50%] rotate-0 shadow-[0_0_15px_rgba(255,255,255,0.05)]" />
+                  <div className="absolute w-20 h-36 md:w-28 md:h-48 border-[1.5px] border-white/50 rounded-[50%] rotate-[45deg] shadow-[0_0_15px_rgba(255,255,255,0.05)]" />
+                  <div className="absolute w-20 h-36 md:w-28 md:h-48 border-[1.5px] border-white/50 rounded-[50%] rotate-[90deg] shadow-[0_0_15px_rgba(255,255,255,0.05)]" />
+                  <div className="absolute w-20 h-36 md:w-28 md:h-48 border-[1.5px] border-white/50 rounded-[50%] rotate-[135deg] shadow-[0_0_15px_rgba(255,255,255,0.05)]" />
 
-              {/* Inner ring overlay */}
-              <div className="absolute w-24 h-24 md:w-32 md:h-32 border-[1.5px] border-white/40 rounded-full" />
+                  {/* Inner ring overlay */}
+                  <div className="absolute w-24 h-24 md:w-32 md:h-32 border-[1.5px] border-white/40 rounded-full" />
 
-              {/* Center diamond */}
-              <div className="w-3 h-3 md:w-4 md:h-4 bg-white rounded-[2px] shadow-[0_0_20px_rgba(255,255,255,1)] rotate-45 relative z-10" />
-            </motion.div>
+                  {/* Center diamond */}
+                  <div className="w-3 h-3 md:w-4 md:h-4 bg-white rounded-[2px] shadow-[0_0_20px_rgba(255,255,255,1)] rotate-45 relative z-10" />
+                </motion.div>
+              </>
+            )}
           </div>
 
           {/* RIGHT COLUMN: The Features List */}

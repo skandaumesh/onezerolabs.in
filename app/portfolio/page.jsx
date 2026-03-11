@@ -155,7 +155,7 @@ export default function WorkGrid() {
       {/* ============================================= */}
       {/* HERO */}
       {/* ============================================= */}
-      <section className="relative max-w-[1300px] mx-auto px-6 md:px-12 pt-44 pb-20 text-center overflow-hidden">
+      <section className="relative max-w-[1300px] mx-auto px-6 md:px-12 pt-24 md:pt-44 pb-12 md:pb-20 text-center overflow-hidden">
 
         {/* Ambient Glow Orbs */}
         <div className="absolute top-[10%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[radial-gradient(ellipse,rgba(255,255,255,0.04)_0%,transparent_70%)] rounded-full blur-[100px] pointer-events-none" />
@@ -167,7 +167,7 @@ export default function WorkGrid() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-[14px] text-neutral-500 tracking-widest uppercase mb-10 font-medium relative z-10"
+          className="text-[12px] md:text-[14px] text-neutral-500 tracking-widest uppercase mb-4 md:mb-10 font-medium relative z-10"
         >
           Portfolio
         </motion.p>
@@ -177,7 +177,7 @@ export default function WorkGrid() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.2 }}
-          className={`text-5xl md:text-6xl lg:text-7xl text-white leading-[1.1] tracking-[-0.02em] relative z-10 mb-8 ${serif.className}`}
+          className={`text-4xl md:text-6xl lg:text-7xl text-white leading-[1.1] tracking-[-0.02em] relative z-10 mb-6 md:mb-8 ${serif.className}`}
           style={{ textShadow: '0 0 30px rgba(255,255,255,0.35), 0 0 80px rgba(255,255,255,0.15), 0 0 140px rgba(255,255,255,0.08)' }}
         >
           Our <span className="italic text-white/50">Work</span>
@@ -194,7 +194,7 @@ export default function WorkGrid() {
           if (categoryProjects.length === 0) return null;
 
           return (
-            <section key={category} className="mb-32">
+            <section key={category} className="mb-16 md:mb-32">
 
               {/* Category Header */}
               <motion.div
@@ -202,7 +202,7 @@ export default function WorkGrid() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.7 }}
-                className="py-8 border-t border-white/[0.08] mb-14"
+                className="py-4 md:py-8 border-t border-white/[0.08] mb-8 md:mb-14"
               >
                 <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-4">
                   <h2
@@ -221,7 +221,7 @@ export default function WorkGrid() {
               </motion.div>
 
               {/* Project Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
                 {categoryProjects.map((project, index) => {
                   const isFeatured = project.id === 1;
                   return (
@@ -247,7 +247,7 @@ export default function WorkGrid() {
         {/* CTA Background Glow */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.05)_0%,transparent_70%)] rounded-full blur-[80px] pointer-events-none" />
 
-        <div className="max-w-[1000px] mx-auto px-6 py-36 text-center relative z-10">
+        <div className="max-w-[1000px] mx-auto px-6 py-20 md:py-36 text-center relative z-10">
 
           <motion.h2
             initial={{ opacity: 0, y: 24 }}
@@ -328,17 +328,17 @@ const HeroProjectCard = ({ project, index }) => {
         <div className="relative w-full rounded-[32px] overflow-hidden bg-[#050505] flex flex-col z-10">
 
           {/* Clean Typography Header Area */}
-          <div className="p-6 md:p-10 w-full relative z-20">
+          <div className="p-4 md:p-10 w-full relative z-20">
             {/* Featured Platform Badge Removed */}
 
-            <h3 className={`text-[36px] md:text-[54px] text-white leading-[1.05] mb-6 transition-all duration-500 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] ${serif.className}`}>
+            <h3 className={`text-[32px] md:text-[54px] text-white leading-[1.05] mb-4 md:mb-6 transition-all duration-500 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] ${serif.className}`}>
               {project.title}
             </h3>
 
-            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 md:gap-8">
               <div className="max-w-xl">
                 {project.description && (
-                  <p className="text-[16px] md:text-[18px] text-white/50 font-light leading-[1.6]">
+                  <p className="text-[15px] md:text-[18px] text-white/50 font-light leading-[1.6]">
                     {project.description}
                   </p>
                 )}
@@ -346,7 +346,7 @@ const HeroProjectCard = ({ project, index }) => {
 
               {isLink && (
                 <div className="shrink-0">
-                  <div className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-transparent border border-white/[0.15] text-white font-medium rounded-full text-[14px] transition-all duration-500 group-hover/card:bg-white group-hover/card:text-black group-hover/card:border-white shadow-[0_0_30px_rgba(255,255,255,0)] group-hover/card:shadow-[0_0_30px_rgba(255,255,255,0.3)]">
+                  <div className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 md:px-8 md:py-4 bg-transparent border border-white/[0.15] text-white font-medium rounded-full text-[13px] md:text-[14px] transition-all duration-500 group-hover/card:bg-white group-hover/card:text-black group-hover/card:border-white shadow-[0_0_30px_rgba(255,255,255,0)] group-hover/card:shadow-[0_0_30px_rgba(255,255,255,0.3)]">
                     Explore Platform <ArrowUpRight size={18} />
                   </div>
                 </div>
@@ -355,7 +355,7 @@ const HeroProjectCard = ({ project, index }) => {
           </div>
 
           {/* Massive Media Frame */}
-          <div className="w-full relative px-6 md:px-14 pb-6 overflow-hidden flex items-end justify-center min-h-[300px] md:min-h-[500px]">
+          <div className="w-full relative px-3 md:px-14 pb-3 md:pb-6 overflow-hidden flex items-end justify-center min-h-[160px] md:min-h-[500px]">
             <div className="relative w-full translate-y-3">
               <img
                 src={project.src}
