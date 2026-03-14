@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion"
 import { useState } from "react"
-import Image from 'next/image'
 import { Instrument_Serif, Inter } from 'next/font/google'
 
 const seasonFont = Instrument_Serif({
@@ -20,46 +19,34 @@ const sans = Inter({
 
 const differences = [
     {
-        title: "Built From Real Problems",
-        description: "Real-world challenges, real solutions.",
-        gradient: "from-white/[0.08] to-white/[0.02]",
-        shadow: "shadow-[0_0_20px_rgba(255,255,255,0.15)]",
-        image: "/glow2.jpg"
+        number: "01",
+        title: "Production-Grade Systems",
+        description: "Moving beyond demos. We ship reliable, high-performance systems with security and monitoring built-in from day one.",
     },
     {
-        title: "Engineering Over Templates",
-        description: "Architected for scale and performance.",
-        gradient: "from-white/[0.08] to-white/[0.02]",
-        shadow: "shadow-[0_0_20px_rgba(255,255,255,0.15)]",
-        image: "/glow3.jpg"
+        number: "02",
+        title: "Architecture Before Code",
+        description: "We design first. Precise database, API, and scaling strategies ensure your product remains stable as it grows.",
     },
     {
-        title: "Technology That Works",
-        description: "Intuitive, fast, and dependable.",
-        gradient: "from-white/[0.08] to-white/[0.02]",
-        shadow: "shadow-[0_0_20px_rgba(255,255,255,0.15)]",
-        image: "/glow4.jpg"
+        number: "03",
+        title: "AI That Actually Solves Problems",
+        description: "No hype. We integrate intelligent LLM workflows and automation that reduce manual work and drive operational impact.",
     },
     {
-        title: "Modern Systems",
-        description: "AI-powered platforms for tomorrow.",
-        gradient: "from-white/[0.08] to-white/[0.02]",
-        shadow: "shadow-[0_0_20px_rgba(255,255,255,0.15)]",
-        image: "/glow2.jpg"
+        number: "04",
+        title: "Systems Built to Scale",
+        description: "Designed for growth. Our architecture supports seamless horizontal scaling from 100 to 1 million users.",
     },
     {
-        title: "Clarity in Complexity",
-        description: "Complexity turned into smart flow.",
-        gradient: "from-white/[0.08] to-white/[0.02]",
-        shadow: "shadow-[0_0_20px_rgba(255,255,255,0.15)]",
-        image: "/glow3.jpg"
+        number: "05",
+        title: "Full Ownership & Independence",
+        description: "You own the code and data. No hidden dependencies, platform lock-ins, or forced subscriptions to maintain control.",
     },
     {
-        title: "Focused on Impact",
-        description: "Measurable efficiency gains.",
-        gradient: "from-white/[0.08] to-white/[0.02]",
-        shadow: "shadow-[0_0_20px_rgba(255,255,255,0.15)]",
-        image: "/glow4.jpg"
+        number: "06",
+        title: "Engineer-Led Development",
+        description: "Direct collaboration with senior engineers. Faster decisions, cleaner systems, and higher technical standards throughout.",
     },
 ]
 
@@ -72,10 +59,10 @@ const containerVariants = {
 }
 
 const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, scale: 0.96 },
     visible: {
         opacity: 1,
-        y: 0,
+        scale: 1,
         transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
     }
 }
@@ -84,81 +71,86 @@ export default function DifferenceSection() {
     const [hoveredIndex, setHoveredIndex] = useState(null)
 
     return (
-        <section className={`relative w-full py-20 md:py-28 bg-black text-white overflow-hidden ${sans.className}`}>
+        <section className={`relative w-full py-12 md:py-16 bg-black text-white overflow-hidden ${sans.className}`}>
 
-            {/* Ambient Background Glow (White) */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[800px] bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_30%,transparent_65%)] pointer-events-none blur-[80px]" />
-
-            <div className="absolute inset-0 opacity-[0.015]"
-                style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }} />
+            {/* Ambient Background Glow */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[800px] bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.03)_0%,transparent_70%)] pointer-events-none blur-[100px]" />
 
             <motion.div
                 variants={containerVariants}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
-                className="relative z-10 w-full max-w-[1100px] mx-auto px-4 md:px-8"
+                className="relative z-10 w-full max-w-6xl mx-auto px-6 md:px-8 pt-8 md:pt-12"
             >
-                {/* Section Header */}
-                <motion.div variants={itemVariants} className="text-center mb-16 md:mb-20">
+                {/* Section Header - Centered & Compact */}
+                <motion.div variants={itemVariants} className="text-center mb-8 md:mb-12">
                     <span className="text-[10px] font-mono tracking-[0.4em] text-neutral-500 uppercase block mb-4">
-                        Why OneZeroLabs
+                        The Standard
                     </span>
-                    <h2 className={`text-4xl md:text-5xl lg:text-6xl text-white tracking-wide leading-[1.1] ${seasonFont.className}`}>
+                    <h2 className={`text-4xl md:text-6xl text-white tracking-wide leading-[1.1] ${seasonFont.className}`}>
                         The OneZeroLabs{' '}
                         <span className="italic text-neutral-500">Difference.</span>
                     </h2>
                 </motion.div>
 
-                {/* Cards Grid — 3 Columns */}
+                {/* Compact Double Layer Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 items-stretch">
                     {differences.map((item, index) => (
-                        <motion.div
-                            key={index}
-                            variants={itemVariants}
-                            className="relative bg-white/[0.03] backdrop-blur-xl
-                                       border border-white/[0.08]
-                                       rounded-[28px] p-5 md:p-6 h-full
-                                       flex items-center gap-5 md:gap-6
-                                       shadow-[0_0_30px_rgba(255,255,255,0.04)]
-                                       cursor-default overflow-hidden"
-                        >
-                            {/* Glowing Icon Box */}
-                            <div className={`relative flex-shrink-0 w-[88px] h-[88px] md:w-[100px] md:h-[100px]
-                                           rounded-[20px] bg-gradient-to-br ${item.gradient}
-                                           flex items-center justify-center overflow-hidden
-                                           ${item.shadow}`}
+                        <div key={index} className="relative p-1.5 md:p-2 rounded-[2rem] border border-white/[0.04] bg-white/[0.01]">
+                            <motion.div
+                                variants={itemVariants}
+                                onMouseEnter={() => setHoveredIndex(index)}
+                                onMouseLeave={() => setHoveredIndex(null)}
+                                whileHover={{ scale: 1.01 }}
+                                className="group relative bg-[#090909] backdrop-blur-3xl border border-white/[0.07] rounded-[1.6rem] p-5 md:p-6 h-full flex flex-col transition-all duration-700 hover:border-white/15 hover:bg-[#0b0b0b] cursor-default overflow-hidden"
                             >
-                                {/* Inner glass depth */}
-                                <div className="absolute inset-0 shadow-[inset_0_0_20px_rgba(0,0,0,0.25)] rounded-[20px] pointer-events-none" />
+                                {/* Inner Ambient Glow */}
+                                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
-                                {/* Abstract geometric shape replaced with unique images - Removed padding to bring close to border */}
-                                <div className="relative w-full h-full p-0">
-                                    <Image
-                                        src={item.image}
-                                        alt={item.title}
-                                        fill
-                                        className="object-cover rounded-[20px] group-hover:scale-110 transition-transform duration-500"
-                                    />
+                                <div className="relative z-10 flex flex-col h-full">
+                                    {/* Number Row with Line */}
+                                    <div className="flex items-center gap-3 mb-5">
+                                        <motion.span
+                                            className="text-[9px] font-mono font-bold text-neutral-500 tracking-[0.2em]"
+                                            animate={hoveredIndex === index ? { color: "#ffffff" } : { color: "#666666" }}
+                                        >
+                                            {item.number}
+                                        </motion.span>
+                                        <div className="h-px w-8 bg-white/5 group-hover:w-12 group-hover:bg-white/20 transition-all duration-500" />
+                                    </div>
+
+                                    {/* Title - Optimized for Readability with better spacing */}
+                                    <h3 className={`text-xl md:text-2xl font-medium text-white mb-3 tracking-wide group-hover:text-white transition-colors duration-500 leading-tight ${seasonFont.className}`}>
+                                        {item.title}
+                                    </h3>
+
+                                    {/* Description - High Contrast with better spacing */}
+                                    <p className="text-[14px] md:text-[15px] text-neutral-300 group-hover:text-neutral-100 leading-relaxed font-light tracking-wide transition-colors duration-500 pr-2">
+                                        {item.description}
+                                    </p>
+
+                                    {/* Subtle Bottom Signal */}
+                                    <div className="mt-auto pt-4 overflow-hidden">
+                                        <motion.div
+                                            animate={hoveredIndex === index ? { x: 0, opacity: 1 } : { x: -15, opacity: 0 }}
+                                            transition={{ duration: 0.4, ease: "easeOut" }}
+                                            className="text-white/30 text-lg"
+                                        >
+                                            →
+                                        </motion.div>
+                                    </div>
                                 </div>
-
-                                {/* Subtle inner glow */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-white/20 rounded-[20px] pointer-events-none" />
-                            </div>
-
-                            {/* Text Content */}
-                            <div className="flex-1 min-w-0">
-                                <h3 className="text-[15px] md:text-[16px] font-semibold text-white/85 mb-1 leading-snug tracking-tight">
-                                    {item.title}
-                                </h3>
-                                <p className="text-[12px] md:text-[13px] text-neutral-500 leading-relaxed font-light">
-                                    {item.description}
-                                </p>
-                            </div>
-                        </motion.div>
+                            </motion.div>
+                        </div>
                     ))}
                 </div>
             </motion.div>
+
+            {/* Grainy Texture */}
+            <div className="absolute inset-0 opacity-[0.015] pointer-events-none mix-blend-overlay"
+                style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}
+            />
         </section>
     )
 }

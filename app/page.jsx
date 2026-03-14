@@ -34,7 +34,7 @@ export default function Home() {
 
       {/* 2. Text Reveal & Position Section */}
       <div className="relative z-10">
-    <VisionSection image="/vision.jpg" />
+        <VisionSection image="/vision.jpg" />
 
       </div>
 

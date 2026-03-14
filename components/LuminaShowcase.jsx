@@ -178,9 +178,7 @@ const ContentPane = ({ service }) => {
             ))}
           </div>
 
-          <button className="mt-6 self-start px-6 py-2.5 rounded-full border border-white/10 bg-white/5 text-xs text-white uppercase tracking-wider hover:bg-white/10 transition-colors">
-            Learn More
-          </button>
+
         </motion.div>
       </AnimatePresence>
     </div>
