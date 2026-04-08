@@ -1,38 +1,31 @@
 // app/sitemap.js
-export default function sitemap() {
-  const baseUrl = 'https://onezerolabs.in'
+const baseUrl = 'https://onezerolabs.in';
 
-  return [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',  // Changed from monthly → weekly (homepage changes more)
-      priority: 1,
-    },
-    {
-      url: `${baseUrl}/services`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.9,  // Increased from 0.8 (important for conversions)
-    },
-    {
-      url: `${baseUrl}/portfolio`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',  // Changed (portfolio updates often)
-      priority: 0.9,  // Increased (shows your work)
-    },
-    {
-      url: `${baseUrl}/about`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',  // Changed from yearly
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/contact`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.8,
-    },
+// Defines how many sitemaps to generate (id 0-3 = 4 sitemaps)
+export function generateSitemaps() {
+  return [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }];
+}
 
-  ]
+const sitemapData = {
+  0: [
+    { url: baseUrl, changeFrequency: 'weekly', priority: 1 },
+    { url: `${baseUrl}/services`, changeFrequency: 'monthly', priority: 0.9 },
+  ],
+  1: [
+    { url: `${baseUrl}/portfolio`, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/about`, changeFrequency: 'monthly', priority: 0.8 },
+  ],
+  2: [
+    { url: `${baseUrl}/contact`, changeFrequency: 'yearly', priority: 0.8 },
+  ],
+  3: [
+    // Reserved for future pages — blog, case studies, etc.
+  ],
+};
+
+export default function sitemap({ id }) {
+  return sitemapData[id].map((entry) => ({
+    ...entry,
+    lastModified: new Date(),
+  }));
 }
