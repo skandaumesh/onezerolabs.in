@@ -1,9 +1,8 @@
 // app/sitemap.js
 const baseUrl = 'https://onezerolabs.in';
 
-// Defines how many sitemaps to generate (id 0-3 = 4 sitemaps)
 export function generateSitemaps() {
-  return [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }];
+  return [{ id: 0 }, { id: 1 }, { id: 2 }];
 }
 
 const sitemapData = {
@@ -17,9 +16,6 @@ const sitemapData = {
   ],
   2: [
     { url: `${baseUrl}/contact`, changeFrequency: 'yearly', priority: 0.8 },
-  ],
-  3: [
-    // Reserved for future pages — blog, case studies, etc.
   ],
 };
 
