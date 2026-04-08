@@ -1,13 +1,20 @@
 // app/robots.js
 export default function robots() {
+  const baseUrl = 'https://onezerolabs.in';
+
   return {
-    rules: [  // ← CHANGE: Use array [] instead of object {}
+    rules: [
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/private/', '/admin/'],  // Block multiple paths
+        disallow: ['/private/', '/admin/'],
       },
     ],
-    sitemap: 'https://onezerolabs.in/sitemap.xml',
+    sitemap: [
+      `${baseUrl}/sitemap/0.xml`,
+      `${baseUrl}/sitemap/1.xml`,
+      `${baseUrl}/sitemap/2.xml`,
+      `${baseUrl}/sitemap/3.xml`,
+    ],
   }
 }
