@@ -14,7 +14,7 @@ export default function robots() {
       `${baseUrl}/sitemap/0.xml`,
       `${baseUrl}/sitemap/1.xml`,
       `${baseUrl}/sitemap/2.xml`,
-      `${baseUrl}/sitemap/3.xml`,
+    
     ],
   }
 }
