@@ -10,11 +10,6 @@ export default function robots() {
         disallow: ['/private/', '/admin/'],
       },
     ],
-    sitemap: [
-      `${baseUrl}/sitemap/0.xml`,
-      `${baseUrl}/sitemap/1.xml`,
-      `${baseUrl}/sitemap/2.xml`,
-    
-    ],
+    sitemap: `${baseUrl}/sitemap.xml`,
   }
 }

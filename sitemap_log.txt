@@ -1,0 +1,50 @@
+commit 4e3c1fa12e8e653e7feff5057c7fd882095cc019
+Author: skanda umesh <skandaumesh82@gmail.com>
+Date:   Tue Mar 10 12:50:31 2026 +0530
+
+    update website design and components
+
+diff --git a/app/sitemap.js b/app/sitemap.js
+new file mode 100644
+index 0000000..23d5528
+--- /dev/null
++++ b/app/sitemap.js
+@@ -0,0 +1,38 @@
++// app/sitemap.js
++export default function sitemap() {
++  const baseUrl = 'https://onezerolabs.in'
++
++  return [
++    {
++      url: baseUrl,
++      lastModified: new Date(),
++      changeFrequency: 'weekly',  // Changed from monthly → weekly (homepage changes more)
++      priority: 1,
++    },
++    {
++      url: `${baseUrl}/services`,
++      lastModified: new Date(),
++      changeFrequency: 'monthly',
++      priority: 0.9,  // Increased from 0.8 (important for conversions)
++    },
++    {
++      url: `${baseUrl}/portfolio`,
++      lastModified: new Date(),
++      changeFrequency: 'weekly',  // Changed (portfolio updates often)
++      priority: 0.9,  // Increased (shows your work)
++    },
++    {
++      url: `${baseUrl}/about`,
++      lastModified: new Date(),
++      changeFrequency: 'monthly',  // Changed from yearly
++      priority: 0.8,
++    },
++    {
++      url: `${baseUrl}/contact`,
++      lastModified: new Date(),
++      changeFrequency: 'yearly',
++      priority: 0.8,
++    },
++
++  ]
++}

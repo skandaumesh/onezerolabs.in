@@ -78,7 +78,6 @@ export const metadata = {
   robots: {
     index: true,
     follow: true,
-    nocache: true,
     googleBot: {
       index: true,
       follow: true,
@@ -92,7 +91,7 @@ export const metadata = {
   classification: 'Software Development',
 
   verification: {
-    google: 'google-site-verification-placeholder', // User should replace this with actual token
+    google: 'google-site-verification-placeholder', 
   },
 }
 
@@ -103,6 +102,21 @@ export const viewport = {
 }
 
 export default function RootLayout({ children }) {
+  /* ===============================
+     WEBSITE SCHEMA (For Sitelinks)
+     =============================== */
+  const websiteSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'OneZeroLabs',
+    url: 'https://onezerolabs.in',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: 'https://onezerolabs.in/search?q={search_term_string}',
+      'query-input': 'required name=search_term_string'
+    }
+  }
+
   /* ===============================
      ORGANIZATION SCHEMA
      =============================== */
@@ -203,6 +217,10 @@ export default function RootLayout({ children }) {
         {/* Structured Data */}
         <script
           type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
+        <script
+          type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
         <script
@@ -210,6 +228,7 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
         />
       </head>
+
 
       <body className="antialiased bg-black text-white">
         <SmoothScroll>
