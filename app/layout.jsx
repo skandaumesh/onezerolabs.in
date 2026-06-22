@@ -91,7 +91,7 @@ export const metadata = {
   classification: 'Software Development',
 
   verification: {
-    google: 'google-site-verification-placeholder', 
+    google: 'KpgQoDDeGFSzTxXSZD4tVk6uSsjDyNojaIg_c_c9zqE', 
   },
 }
 

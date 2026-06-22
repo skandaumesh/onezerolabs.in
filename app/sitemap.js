@@ -1,5 +1,5 @@
 // app/sitemap.js
-const baseUrl = 'https://onezerolabs.in';
+const baseUrl = 'https://www.onezerolabs.in';
 
 export default function sitemap() {
   return [
