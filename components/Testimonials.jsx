@@ -11,24 +11,17 @@ const serif = Instrument_Serif({
   weight: '400',
   style: ['normal', 'italic'],
   display: 'swap',
+  adjustFontFallback: false,
 })
 
 const sans = Inter({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600'],
   display: 'swap',
+  adjustFontFallback: false,
 })
 
 const testimonials = [
-  {
-    company: "Praasa Consultancy",
-    quote: "Collaborating with One Zero Labs to build the Praasa Consultancy website was a phenomenal experience. They translated our mission into a professional, user-friendly platform where researchers can easily access our services. Skanda's technical expertise and attention to detail ensured every feature works flawlessly. The communication was prompt and transparent throughout. I highly recommend them to anyone looking for a talented team that brings a vision to life.",
-    author: "Dr. Sandesh Bhat",
-    role: "Founder",
-    dept: "",
-    image: "/praasa.jpeg",
-    imagePosition: "50% 10%",
-  },
   {
     company: "MLA Academy of Higher Learning",
     quote: "The AI-Powered Academic Management Platform developed by OneZeroLabs has brought a remarkable improvement in the way attendance is managed within the department and the institution. The system is simple, efficient, and well-designed to meet the practical needs of faculty members. It has helped reduce manual effort, improved accuracy in attendance tracking, and made the overall process much more organized and reliable.",
@@ -36,7 +29,7 @@ const testimonials = [
     role: "Head of Department & Assistant Professor",
     dept: "Dept. of Computer Applications",
     image: "/kamala.png",
-    imagePosition: "30% 20%",
+    imagePosition: "45% 65%",
   },
   {
     company: "Vetaas Education",
@@ -63,7 +56,7 @@ export default function Testimonials() {
     if (!isAutoPlaying) return
     const timer = setInterval(() => {
       paginate(1)
-    }, 2000)
+    }, 5000)
     return () => clearInterval(timer)
   }, [isAutoPlaying, paginate])
 
@@ -111,7 +104,7 @@ export default function Testimonials() {
             className="relative bg-white/[0.03] backdrop-blur-xl border border-white/[0.08]
                        rounded-[24px] md:rounded-[32px] p-5 md:p-10 lg:p-12
                        shadow-[0_0_80px_rgba(255,255,255,0.06),0_0_40px_rgba(255,255,255,0.04)]
-                       overflow-hidden flex flex-col h-[460px] md:h-[440px]"
+                       overflow-hidden flex flex-col h-[440px] md:h-[420px]"
           >
             {/* Top-left white glow */}
             <div

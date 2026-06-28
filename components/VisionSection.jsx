@@ -2,15 +2,7 @@
 
 import { useRef } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
-import { Instrument_Serif } from 'next/font/google'
 import Image from "next/image"
-
-const seasonFont = Instrument_Serif({
-  subsets: ['latin'],
-  weight: '400',
-  style: ['normal', 'italic'],
-  display: 'swap',
-})
 
 export default function VisionSection({ image }) {
   const containerRef = useRef(null)
@@ -26,15 +18,15 @@ export default function VisionSection({ image }) {
   const features = [
     {
       title: 'Sovereign by design',
-      description: 'Build, deploy, and run full-stack systems with complete control, crafted entirely for your institution.'
+      description: 'Full-stack systems built entirely around your operation — no third-party lock-ins, no forced subscriptions, no hidden dependencies.'
     },
     {
       title: 'State of the art Architecture',
-      description: "Industry-leading frameworks built for scale, speed, and real-world operational context."
+      description: "Production-grade frameworks chosen for real-world scale, not resume padding. We ship systems that hold as you grow."
     },
     {
       title: 'Human at the core',
-      description: 'Forward deployed engineers work alongside your teams to deliver production-ready software.'
+      description: 'You work directly with the engineers and strategists building your product. No account managers. No handoffs.'
     }
   ]
 
@@ -72,10 +64,9 @@ export default function VisionSection({ image }) {
         viewport={{ once: true, margin: "-100px" }}
         className="max-w-[1050px] w-full relative z-10 flex flex-col items-center"
       >
-        {/* Centered Top Heading */}
         <motion.h2
           variants={itemVariants}
-          className={`text-3xl md:text-4xl lg:text-5xl tracking-wide mb-8 md:mb-12 text-center text-white/90 ${seasonFont.className}`}
+          className="text-3xl md:text-4xl lg:text-5xl tracking-wide mb-8 md:mb-12 text-center text-white/90 font-[family-name:var(--font-instrument-serif)]"
         >
           Powering the digital-first future
         </motion.h2>

@@ -10,6 +10,7 @@ const seasonFont = Instrument_Serif({
   weight: '400',
   style: ['normal', 'italic'],
   display: 'swap',
+  adjustFontFallback: false,
 })
 
 // --- 1. DATA: SERVICES ---

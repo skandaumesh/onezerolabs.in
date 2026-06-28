@@ -12,12 +12,14 @@ const serif = Instrument_Serif({
     weight: '400',
     style: ['normal', 'italic'],
     display: 'swap',
+  adjustFontFallback: false,
 })
 
 const sans = Inter({
     subsets: ['latin'],
     weight: ['300', '400', '500', '600', '700'],
     display: 'swap',
+  adjustFontFallback: false,
 })
 
 const FOOTER_LINKS = [
@@ -49,10 +51,9 @@ const FOOTER_LINKS = [
 
 export default function Footer() {
     const pathname = usePathname();
-    const excludedPaths = ['/about', '/contact', '/services'];
 
-    // Hide footer if path is in excluded list OR starts with /portfolio
-    if (excludedPaths.includes(pathname) || pathname.startsWith('/portfolio')) {
+    // Show the old glowing footer ONLY on the home page
+    if (pathname !== '/') {
         return null;
     }
 
@@ -130,10 +131,6 @@ export default function Footer() {
                             <a href="#" className="flex flex-nowrap shrink-0 items-center justify-center gap-2 border border-white/20 rounded-full px-4 py-2 hover:bg-white/10 transition-colors duration-300 pointer-events-auto">
                                 <Linkedin size={14} className="text-white/60" />
                                 <span className="text-[11px] font-mono text-white/80 uppercase tracking-widest leading-none mt-[2px]">LinkedIn</span>
-                            </a>
-                            <a href="mailto:hello@onezerolabs.in" className="flex flex-nowrap shrink-0 items-center justify-center gap-2 border border-white/20 rounded-full px-5 py-3 hover:bg-white/10 transition-colors duration-300 pointer-events-auto">
-                                <Mail size={14} className="text-white/60" />
-                                <span className="text-[11px] font-mono text-white/80 uppercase tracking-widest leading-none mt-[2px]">Email</span>
                             </a>
                         </div>
                     </div>

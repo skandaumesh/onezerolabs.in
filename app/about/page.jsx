@@ -13,12 +13,14 @@ const serif = Instrument_Serif({
   weight: '400',
   style: ['normal', 'italic'],
   display: 'swap',
+  adjustFontFallback: false,
 })
 
 const sans = Inter({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600'],
   display: 'swap',
+  adjustFontFallback: false,
 })
 
 const founders = [
@@ -87,48 +89,102 @@ export default function AboutPage() {
 
             <div className="w-full">
               <h2 className={`text-4xl sm:text-5xl lg:text-[56px] text-white leading-tight mb-8 tracking-wide drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] ${serif.className}`}>
-                About OneZeroLabs
+                Building the Infrastructure Behind Growth
               </h2>
               <div className="text-neutral-300 text-[17px] sm:text-[19px] leading-[1.8] font-light space-y-6">
-                <p>OneZeroLabs is a technology studio focused on building practical digital systems for modern institutions and businesses. We design and develop platforms that simplify operations, improve efficiency, and bring intelligent technology into real-world environments.</p>
-                <p>Our work spans across institutional software, modern web platforms, custom applications, and AI-powered systems. Every solution we create is engineered with performance, scalability, and usability in mind.</p>
-                <p>At OneZeroLabs, our goal is not just to build software — but to build systems that organizations can rely on every day.</p>
+                <p>Organizations today don't struggle because they lack tools. They struggle because their systems are disconnected.</p>
+                <p>Marketing operates separately from operations. Data lives in multiple places. Teams rely on manual processes. Growth becomes difficult because the infrastructure supporting the business isn't designed to scale.</p>
+                <p>OneZeroLabs was founded to solve this problem. We help organizations build the systems, technology, and digital infrastructure required to operate efficiently, make better decisions, and grow with confidence.</p>
               </div>
             </div>
 
             <div className="w-full">
               <h2 className={`text-4xl sm:text-5xl lg:text-[56px] text-white leading-tight mb-8 tracking-wide drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] ${serif.className}`}>
-                Our Vision
-              </h2>
-              <p className="text-neutral-300 text-[17px] sm:text-[19px] leading-[1.8] font-light">
-                To create intelligent digital systems that empower institutions and organizations to operate more efficiently, adapt to technological change, and thrive in the evolving digital world.
-              </p>
-            </div>
-
-            <div className="w-full">
-              <h2 className={`text-4xl sm:text-5xl lg:text-[56px] text-white leading-tight mb-8 tracking-wide drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] ${serif.className}`}>
-                Our Mission
-              </h2>
-              <div className="text-neutral-300 text-[17px] sm:text-[19px] leading-[1.8] font-light space-y-6">
-                <p>To design and deliver practical, reliable, and scalable digital solutions that solve real operational challenges for institutions and businesses.</p>
-                <p>We aim to bridge the gap between modern technology and real-world needs by building systems that are simple to use, powerful in capability, and built for long-term value.</p>
-              </div>
-            </div>
-
-            <div className="w-full">
-              <h2 className={`text-4xl sm:text-5xl lg:text-[56px] text-white leading-tight mb-8 tracking-wide drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] ${serif.className}`}>
-                Our Philosophy
+                What We Do
               </h2>
               <div className="text-neutral-300 text-[17px] sm:text-[19px] leading-[1.8] font-light space-y-6 flex flex-col items-center">
-                <p>Technology should simplify complexity, not add to it.</p>
-                <p>At OneZeroLabs, we believe the best systems are those that:</p>
+                <p>OneZeroLabs works at the intersection of technology, operations, automation, and growth. We design and build:</p>
                 <div className="text-left w-fit space-y-1 my-2">
-                  <p>• solve real problems</p>
-                  <p>• integrate naturally into existing workflows</p>
-                  <p>• remain reliable as organizations grow</p>
-                  <p>• combine modern technology with practical usability</p>
+                  <p>• Digital Platforms</p>
+                  <p>• Business Websites</p>
+                  <p>• Internal Systems</p>
+                  <p>• AI & Automation Workflows</p>
+                  <p>• Analytics Dashboards</p>
+                  <p>• Operational Infrastructure</p>
+                  <p>• Brand & Growth Systems</p>
                 </div>
-                <p>Our approach is grounded in thoughtful engineering, clarity in design, and a commitment to building solutions that create lasting impact.</p>
+                <p>Our goal is simple: Create systems that help organizations work smarter, move faster, and scale sustainably.</p>
+              </div>
+            </div>
+
+            <div className="w-full">
+              <h2 className={`text-4xl sm:text-5xl lg:text-[56px] text-white leading-tight mb-8 tracking-wide drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] ${serif.className}`}>
+                How We Think
+              </h2>
+              <div className="text-neutral-300 text-[17px] sm:text-[19px] leading-[1.8] font-light space-y-6">
+                <p>Technology alone doesn't solve problems.</p>
+                <p>A beautiful website won't fix broken processes. An AI tool won't improve operations without the right workflows. A dashboard won't create growth without meaningful insights.</p>
+                <p>That's why we focus on the entire system. Every solution we build is designed to support real business outcomes, not just deliver features.</p>
+              </div>
+            </div>
+
+            <div className="w-full">
+              <h2 className={`text-4xl sm:text-5xl lg:text-[56px] text-white leading-tight mb-8 tracking-wide drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] ${serif.className}`}>
+                Our Approach
+              </h2>
+              <div className="text-neutral-300 text-[17px] sm:text-[19px] leading-[1.8] font-light space-y-6">
+                <p><strong>Discover:</strong> Understand the organization, challenges, and opportunities.</p>
+                <p><strong>Design:</strong> Create systems and strategies tailored to specific goals.</p>
+                <p><strong>Build:</strong> Develop the technology, workflows, and infrastructure required.</p>
+                <p><strong>Optimize:</strong> Continuously improve performance through data and iteration.</p>
+              </div>
+            </div>
+
+            <div className="w-full">
+              <h2 className={`text-4xl sm:text-5xl lg:text-[56px] text-white leading-tight mb-8 tracking-wide drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] ${serif.className}`}>
+                Our Work
+              </h2>
+              <div className="text-neutral-300 text-[17px] sm:text-[19px] leading-[1.8] font-light space-y-6 flex flex-col items-center">
+                <p>From educational institutions and startups to growing organizations, we help clients build the foundations that support long-term growth.</p>
+                <div className="text-left w-fit space-y-1 my-2">
+                  <p>• Educational Operations Platforms</p>
+                  <p>• Parent & Student Portals</p>
+                  <p>• Business Websites</p>
+                  <p>• AI Automation Systems</p>
+                  <p>• Analytics Platforms</p>
+                  <p>• Operational Dashboards</p>
+                  <p>• Community Platforms</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="w-full">
+              <h2 className={`text-4xl sm:text-5xl lg:text-[56px] text-white leading-tight mb-8 tracking-wide drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] ${serif.className}`}>
+                Our Vision & Mission
+              </h2>
+              <div className="text-neutral-300 text-[17px] sm:text-[19px] leading-[1.8] font-light space-y-6">
+                <p><strong>Vision:</strong> To become the trusted infrastructure partner behind the next generation of ambitious organizations.</p>
+                <p><strong>Mission:</strong> To help organizations build scalable systems that improve how they operate, grow, and serve their communities.</p>
+              </div>
+            </div>
+
+            <div className="w-full">
+              <h2 className={`text-4xl sm:text-5xl lg:text-[56px] text-white leading-tight mb-8 tracking-wide drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] ${serif.className}`}>
+                Built by Builders
+              </h2>
+              <div className="text-neutral-300 text-[17px] sm:text-[19px] leading-[1.8] font-light space-y-6">
+                <p>OneZeroLabs is led by people who actively design, develop, and deploy the systems they recommend.</p>
+                <p>We believe the best solutions come from understanding both strategy and execution. Every project is approached with a focus on long-term value, operational clarity, and measurable impact.</p>
+              </div>
+            </div>
+
+            <div className="w-full">
+              <h2 className={`text-4xl sm:text-5xl lg:text-[56px] text-white leading-tight mb-8 tracking-wide drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] ${serif.className}`}>
+                The Future
+              </h2>
+              <div className="text-neutral-300 text-[17px] sm:text-[19px] leading-[1.8] font-light space-y-6">
+                <p>As organizations become increasingly digital, the need for connected systems, intelligent workflows, and scalable infrastructure will only grow.</p>
+                <p>OneZeroLabs exists to help organizations navigate that future with confidence.</p>
               </div>
             </div>
 
@@ -153,15 +209,16 @@ export default function AboutPage() {
           </motion.div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mt-12 max-w-[1050px] mx-auto"
-        >
-          {founders.map((f) => (
-            <div key={f.name} className="group relative rounded-[32px] border border-white/10 bg-[#08080a] p-3 transition-all duration-500 hover:border-white/20 overflow-hidden shadow-[0_0_30px_rgba(255,255,255,0.02)] hover:shadow-[0_0_50px_rgba(255,255,255,0.08)] max-w-[340px] sm:max-w-none mx-auto w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mt-12 max-w-[1050px] mx-auto">
+          {founders.map((f, i) => (
+            <motion.div
+              key={f.name}
+              initial={{ opacity: 0, scale: 0.7, y: 30 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
+              className="group relative rounded-[32px] border border-white/10 bg-[#08080a] p-3 transition-all duration-500 hover:border-white/20 overflow-hidden shadow-[0_0_30px_rgba(255,255,255,0.02)] hover:shadow-[0_0_50px_rgba(255,255,255,0.08)] max-w-[340px] sm:max-w-none mx-auto w-full"
+            >
               <div className="absolute inset-0 bg-gradient-to-b from-white/[0.04] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
               <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[24px] bg-white/5 mb-6">
                 <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#08080a] via-transparent to-transparent opacity-60" />
@@ -175,9 +232,9 @@ export default function AboutPage() {
               <div className="px-4 pb-5 text-center relative z-10">
                 <p className={`text-2xl text-white tracking-wide group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] transition-all duration-500 ${serif.className}`}>{f.name}</p>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </motion.div>
+        </div>
       </section>
 
       {/* FINAL CTA */}

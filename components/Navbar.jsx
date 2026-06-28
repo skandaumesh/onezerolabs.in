@@ -4,162 +4,391 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Syne, Manrope } from 'next/font/google'
-import { Instrument_Serif } from 'next/font/google'
+import { Syne } from 'next/font/google'
 
-// --- FONTS ---
-const syne = Syne({ subsets: ['latin'], weight: ['700', '800'] })
-const manrope = Manrope({ subsets: ['latin'], weight: ['400', '500'] })
-const seasonFont = Instrument_Serif({
+const syne = Syne({
   subsets: ['latin'],
-  weight: '400',
-  style: ['normal', 'italic'],
+  weight: ['400', '500', '600', '700', '800'],
   display: 'swap',
 })
 
-// --- DATA ---
-const menuItems = [
-  { label: 'Work', href: '/portfolio' },
-  { label: 'Services', href: '/services' },
-  { label: 'About', href: '/about' },
-  { label: 'Contact', href: '/contact' },
+const navigationData = [
+  {
+    label: 'Services',
+    href: '/services',
+    links: [
+      { label: 'Digital Infrastructure', href: '/services/digital-infrastructure' },
+      { label: 'AI & Automation', href: '/services/ai-automation' },
+      { label: 'Operations & Systems', href: '/services/operations-systems' },
+      { label: 'Analytics & Intelligence', href: '/services/analytics-intelligence' },
+      { label: 'Brand & Growth', href: '/services/brand-growth' },
+    ]
+  },
+  {
+    label: 'Solutions',
+    href: '/solutions',
+    links: [
+      { label: 'Educational Institutions', href: '/solutions/education' },
+      { label: 'Startups', href: '/solutions/startups' },
+      { label: 'SMEs', href: '/solutions/smes' },
+      { label: 'Healthcare', href: '/solutions/healthcare' },
+      { label: 'Consultants', href: '/solutions/consultants' },
+    ]
+  },
+  {
+    label: 'SAAME',
+    href: '/products/saame',
+  },
+  {
+    label: 'About',
+    href: '/about',
+  },
+  {
+    label: 'Contact',
+    href: '/contact',
+  },
 ]
 
-// --- VARIANTS ---
-const menuVariants = {
-  initial: { y: "-100%" },
-  animate: {
-    y: "0%",
-    transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] }
-  },
-  exit: {
-    y: "-100%",
-    transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] }
-  }
+function NavItem({ item, handleScrollClick }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const hasDropdown = item.links && item.links.length > 0;
+
+  return (
+    <div 
+      className="relative group"
+      onMouseEnter={() => setIsOpen(true)}
+      onMouseLeave={() => setIsOpen(false)}
+    >
+      {hasDropdown ? (
+        <button 
+          onClick={(e) => e.preventDefault()}
+          className="text-white/70 group-hover:text-white transition-colors text-[14px] xl:text-[15px] font-medium tracking-wide flex items-center gap-1.5 py-2 cursor-default"
+        >
+          {item.label}
+        </button>
+      ) : (
+        <Link 
+          href={item.href}
+          onClick={(e) => handleScrollClick(e, item.href)}
+          className="text-white/70 group-hover:text-white transition-colors text-[14px] xl:text-[15px] font-medium tracking-wide flex items-center gap-1.5 py-2"
+        >
+          {item.label}
+        </Link>
+      )}
+
+      {hasDropdown && (
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 5, scale: 0.95 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="absolute top-full left-1/2 -translate-x-1/2 pt-2 pb-4"
+            >
+              <div className="bg-[#090909] border border-white/10 rounded-2xl p-2 w-[240px] shadow-[0_15px_40px_rgba(0,0,0,0.8)] backdrop-blur-xl">
+                {item.links.map((sub, sIdx) => (
+                  <Link
+                    key={sIdx}
+                    href={sub.href}
+                    onClick={(e) => {
+                      setIsOpen(false);
+                      handleScrollClick(e, sub.href);
+                    }}
+                    className="block px-4 py-3 text-[14px] text-white/70 hover:text-white hover:bg-white/[0.04] rounded-xl transition-all"
+                  >
+                    {sub.label}
+                  </Link>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
+    </div>
+  )
 }
 
-// --- MENU ITEM ---
-const MenuItem = ({ item, index, closeMenu }) => {
+function MobileAccordionItem({ group, handleScrollClick, delay }) {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95, y: 30 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: 0.1 + (index * 0.1) }}
-      className="w-full mb-3 md:mb-5"
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay, duration: 0.4 }}
+      className="flex flex-col min-w-[200px]"
     >
-      <Link
-        href={item.href}
-        onClick={closeMenu}
-        className={`group relative flex items-center justify-between w-full p-4 md:p-6 
-                   rounded-[32px] border border-white/5 bg-[#0a0a0c] 
-                   shadow-[0_0_20px_rgba(255,255,255,0.02)]
-                   transition-all duration-500 ease-out overflow-hidden
-                   hover:border-white/20 hover:bg-[#0f0f12] hover:-translate-y-1 
-                   hover:shadow-[0_0_40px_rgba(255,255,255,0.08)]`}
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="font-[family-name:var(--font-instrument-serif)] text-3xl md:text-4xl text-white mb-4 hover:text-white/80 transition-colors flex items-center justify-between w-full text-left"
       >
-        {/* Subtle inner white glow on hover */}
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-0">
-          <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[300%] bg-white/[0.03] blur-[40px]`} />
-        </div>
-
-        {/* Left Side: Text only */}
-        <div className="flex items-center gap-4 md:gap-6 relative z-10 w-full text-left pl-2 md:pl-4">
-          <span className={`text-4xl md:text-5xl text-white/50 group-hover:text-white transition-all duration-500 tracking-wide group-hover:translate-x-2 ${seasonFont.className}`}>
-            {item.label}
-          </span>
-
-          {/* Right Side: Arrow */}
-          <div className="ml-auto relative z-10 pr-2 md:pr-4 text-white/20 group-hover:text-white/80 transition-all duration-500 group-hover:translate-x-2">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </div>
-        </div>
-      </Link>
+        {group.label}
+        <svg 
+          width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+          className={`transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+        >
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
+      
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <div className="flex flex-col gap-3 border-l border-white/20 pl-4 pb-4">
+              <Link 
+                href={group.href}
+                onClick={(e) => handleScrollClick(e, group.href)}
+                className="text-white/90 font-medium text-sm md:text-[15px] hover:text-white transition-colors tracking-wide block mb-1"
+              >
+                Overview
+              </Link>
+              {group.links.map((link, linkIdx) => (
+                <Link 
+                  key={linkIdx}
+                  href={link.href}
+                  onClick={(e) => handleScrollClick(e, link.href)}
+                  className="text-white/60 text-sm md:text-[15px] hover:text-white transition-colors tracking-wide block"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }
 
-// --- MAIN COMPONENT ---
-export default function NavbarResponsive() {
+export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  const handleScrollClick = (e, href) => {
+    if (href.startsWith('/#')) {
+      if (window.location.pathname === '/') {
+        e.preventDefault();
+        setIsOpen(false);
+        const targetId = href.replace('/#', '');
+        const element = document.getElementById(targetId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    } else {
+      setIsOpen(false);
+    }
+  }
 
   useEffect(() => {
-    if (isOpen) document.body.style.overflow = 'hidden'
-    else document.body.style.overflow = 'unset'
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    return () => { document.body.style.overflow = 'unset' }
   }, [isOpen])
 
   return (
     <>
-      {/* --- HEADER --- */}
-      <header className={`fixed top-0 left-0 w-full z-[100] pt-6 pb-20 px-6 md:px-12 flex justify-between items-start text-white bg-gradient-to-b from-[#000]/80 via-[#000]/40 to-transparent pointer-events-none ${manrope.className}`}>
-
-        {/* LEFT: LOGO */}
-        <Link href="/" className="relative z-[110] flex items-center gap-3 pointer-events-auto hover:opacity-80 transition-opacity mt-1">
-          <div className="relative w-12 h-12 md:w-16 md:h-16">
-            <Image
-              src="/logo.png"
-              alt="Logo"
-              fill
-              className="object-contain invert brightness-0 grayscale"
-              priority
-            />
-          </div>
-          <span className={`text-xl md:text-2xl font-bold tracking-tight text-white ${syne.className}`}>
-            OneZeroLabs
-          </span>
-        </Link>
-
-        {/* RIGHT: TRIGGER */}
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="z-[110] pointer-events-auto focus:outline-none group px-7 py-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-xl hover:bg-white/10 transition-colors shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
+      {/* Floating Pill Navbar Wrapper */}
+      <div className="fixed top-2 md:top-3 left-1/2 -translate-x-1/2 w-[95%] max-w-[1400px] z-[100]">
+        <motion.div
+          initial={{ y: -100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className={`relative flex items-center justify-between px-6 md:px-8 py-1.5 md:py-2 rounded-full transition-all duration-300 ${
+            scrolled ? 'bg-black/80 backdrop-blur-md border border-white/20 shadow-lg shadow-black/50' : 'bg-black/40 backdrop-blur-sm border border-white/10'
+          }`}
         >
-          <span className={`text-[11px] md:text-xs text-white font-medium uppercase tracking-[0.2em]`}>
-            {isOpen ? 'Close' : 'Menu'}
-          </span>
-        </button>
+          {/* Left: Logo */}
+          <Link href="/" className="flex items-center gap-3 relative z-10 shrink-0">
+            <div className="relative w-12 h-12 md:w-14 md:h-14">
+              <Image
+                src="/logo.png"
+                alt="OneZeroLabs"
+                fill
+                className="object-contain invert brightness-0 grayscale"
+                priority
+              />
+            </div>
+            <span className={`text-white text-xl md:text-2xl font-bold tracking-tight ${syne.className}`}>
+              OneZeroLabs
+            </span>
+          </Link>
 
-      </header>
+          {/* Center: Inline Links (Desktop Only) */}
+          <div className="hidden lg:flex items-center justify-center gap-6 xl:gap-8 absolute left-1/2 -translate-x-1/2 w-max">
+            {navigationData.map((item, idx) => (
+              <NavItem key={idx} item={item} handleScrollClick={handleScrollClick} />
+            ))}
+          </div>
 
-      {/* --- MENU OVERLAY --- */}
+          {/* Right: CTA and Mobile Menu Toggle */}
+          <div className="flex items-center gap-4 shrink-0">
+            {/* Primary CTA */}
+            <Link 
+              href="/contact" 
+              className="hidden md:flex items-center gap-2 bg-white text-black px-5 lg:px-6 py-2.5 rounded-full text-[13px] uppercase tracking-wider font-semibold hover:bg-white/90 transition-colors"
+            >
+              Book a Call
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14"></path>
+                <path d="M12 5l7 7-7 7"></path>
+              </svg>
+            </Link>
+            
+
+
+            {/* Hamburger Menu (visible on mobile only) */}
+            <button 
+              onClick={() => setIsOpen(true)}
+              className="text-white lg:hidden flex items-center justify-center w-10 h-10 rounded-full border border-white/20 hover:bg-white/10 transition-colors"
+              aria-label="Open menu"
+            >
+              <svg width="20" height="14" viewBox="0 0 22 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                <line x1="0" y1="1" x2="22" y2="1" />
+                <line x1="0" y1="7" x2="22" y2="7" />
+                <line x1="0" y1="13" x2="22" y2="13" />
+              </svg>
+            </button>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Full-Screen Overlay Menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            variants={menuVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="fixed inset-0 bg-[#050505]/98 backdrop-blur-2xl z-[90] flex flex-col justify-center items-center pt-24 pb-12"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="fixed inset-0 z-[200] bg-black text-white flex flex-col overflow-y-auto"
           >
-            {/* Subtle Texture */}
-            <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }} />
+            {/* Top Bar for Overlay */}
+            <div className="flex items-center justify-between px-6 md:px-12 h-[88px] shrink-0 border-b border-white/10">
+              <button 
+                onClick={() => setIsOpen(false)}
+                className="text-white flex items-center justify-center w-8 h-8 rounded-full border border-white/20 hover:bg-white/10 transition-colors"
+                aria-label="Close menu"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
 
-            <div className="w-full max-w-2xl flex flex-col relative z-20 px-4">
-              {menuItems.map((item, index) => (
-                <MenuItem
-                  key={index}
-                  item={item}
-                  index={index}
-                  closeMenu={() => setIsOpen(false)}
-                />
-              ))}
+              <Link href="/" onClick={() => setIsOpen(false)} className="absolute left-1/2 -translate-x-1/2 flex items-center gap-3">
+                <div className="relative w-12 h-12 md:w-14 md:h-14">
+                  <Image
+                    src="/logo.png"
+                    alt="OneZeroLabs"
+                    fill
+                    className="object-contain invert brightness-0 grayscale"
+                  />
+                </div>
+                <span className={`text-white text-xl md:text-2xl font-bold tracking-tight ${syne.className}`}>
+                  OneZeroLabs
+                </span>
+              </Link>
             </div>
 
-            {/* Footer */}
-            <motion.div
+            {/* Menu Content Grid */}
+            <div className="flex-1 px-6 md:px-12 py-8 md:py-24 max-w-7xl mx-auto w-full flex flex-col md:flex-row md:flex-wrap gap-8 md:gap-24">
+              {navigationData.map((group, idx) => {
+                // Skip contact in the loop since it has a dedicated block below
+                if (group.label === 'Contact') return null;
+
+                if (!group.links) {
+                  return (
+                    <motion.div 
+                      key={idx}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 + idx * 0.05, duration: 0.4 }}
+                      className="flex flex-col min-w-[200px]"
+                    >
+                      <Link 
+                        href={group.href}
+                        onClick={(e) => handleScrollClick(e, group.href)}
+                        className="font-[family-name:var(--font-instrument-serif)] text-3xl md:text-4xl text-white mb-4 hover:text-white/80 transition-colors"
+                      >
+                        {group.label}
+                      </Link>
+                    </motion.div>
+                  )
+                }
+                
+                return (
+                  <MobileAccordionItem 
+                    key={idx} 
+                    group={group} 
+                    handleScrollClick={handleScrollClick} 
+                    delay={0.1 + idx * 0.05} 
+                  />
+                )
+              })}
+              
+              {/* Contact Group */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 + navigationData.length * 0.05, duration: 0.4 }}
+                className="flex flex-col min-w-[200px]"
+              >
+                <Link 
+                  href="/contact"
+                  onClick={() => setIsOpen(false)}
+                  className="font-[family-name:var(--font-instrument-serif)] text-3xl md:text-4xl text-white mb-4 hover:text-white/80 transition-colors"
+                >
+                  Book a Discovery Call
+                </Link>
+                <div className="flex flex-col gap-3 border-l border-white/20 pl-4">
+                  <Link 
+                    href="/contact"
+                    onClick={() => setIsOpen(false)}
+                    className="text-white/60 text-sm md:text-[15px] hover:text-white transition-colors tracking-wide"
+                  >
+                    Start a Project
+                  </Link>
+                  <a 
+                    href="mailto:hello@onezerolabs.in"
+                    className="text-white/60 text-sm md:text-[15px] hover:text-white transition-colors tracking-wide"
+                  >
+                    hello@onezerolabs.in
+                  </a>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Overlay Bottom Row */}
+            <motion.div 
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1, transition: { delay: 0.5 } }}
-              className={`absolute bottom-6 md:bottom-8 w-full px-6 md:px-12 flex flex-col md:flex-row justify-between items-center md:items-end gap-4 text-white/30 text-[10px] md:text-xs font-semibold uppercase tracking-widest ${manrope.className}`}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.4 }}
+              className="px-6 md:px-12 py-8 mt-auto shrink-0 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs tracking-wider text-white/50"
             >
-              <div className="order-2 md:order-1">OneZeroLabs © {new Date().getFullYear()}</div>
-              <div className="flex gap-6 order-1 md:order-2">
-
-                <a href="https://www.linkedin.com/company/onezerolabs/" className="hover:text-white transition-colors">LinkedIn</a>
-
+              <div className="flex items-center gap-6">
+                <a href="https://www.linkedin.com/company/onezerolabs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">LinkedIn</a>
               </div>
+              <div>© 2026 OneZeroLabs · Bengaluru</div>
             </motion.div>
-
           </motion.div>
         )}
       </AnimatePresence>

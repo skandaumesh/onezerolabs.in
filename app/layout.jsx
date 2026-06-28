@@ -1,3 +1,5 @@
+import { GeistSans } from 'geist/font/sans';
+import { Instrument_Serif } from 'next/font/google';
 import '../styles/globals.css'
 import Navbar from '../components/Navbar'
 import SmoothScroll from '../components/SmoothScroll'
@@ -5,39 +7,46 @@ import Footer from '../components/Footer'
 import Script from 'next/script'
 import { Suspense } from 'react'
 
-export const metadata = {
-  metadataBase: new URL('https://onezerolabs.in'),
+const instrumentSerif = Instrument_Serif({
+  subsets: ['latin'],
+  weight: '400',
+  style: ['normal', 'italic'],
+  display: 'swap',
+  adjustFontFallback: false,
+  variable: '--font-instrument-serif',
+});
 
-  title: {
-    default: 'OneZeroLabs | Enterprise Software for Educational Institutions',
-    template: '%s | OneZeroLabs',
-  },
+export const metadata = {
+  metadataBase: new URL('https://www.onezerolabs.in'),
+
+  title: 'OneZeroLabs | Business Infrastructure Studio — Bengaluru',
 
   description:
-    'OneZeroLabs builds high-performance digital infrastructure for educational institutions. We specialize in AI-powered attendance systems, automated student management, and scalable institutional platforms.',
+    'OneZeroLabs is a business infrastructure studio from Bengaluru — building brand systems, web platforms, AI integrations, and operational infrastructure for founders, SMEs, and institutions.',
 
   keywords: [
-    'smart attendance system',
-    'college management software',
-    'educational ERP system',
-    'institutional digital transformation',
-    'LMS for colleges India',
-    'student data analytics',
-    'custom EdTech solutions',
-    'educational software development Bengaluru',
+    'business infrastructure studio',
+    'software studio Bengaluru',
+    'web development India',
+    'institutional software',
+    'Next.js development',
+    'AI automation India',
+    'branding agency Bengaluru',
+    'custom SaaS',
+    'educational ERP',
+    'full-stack development India',
     'OneZeroLabs',
-    'academic workflow automation',
   ],
 
   applicationName: 'OneZeroLabs',
-  authors: [{ name: 'OneZeroLabs', url: 'https://onezerolabs.in' }],
+  authors: [{ name: 'OneZeroLabs', url: 'https://www.onezerolabs.in' }],
   generator: 'Next.js',
   referrer: 'origin-when-cross-origin',
   creator: 'OneZeroLabs',
   publisher: 'OneZeroLabs',
 
   alternates: {
-    canonical: 'https://onezerolabs.in',
+    canonical: 'https://www.onezerolabs.in',
   },
 
   icons: {
@@ -49,17 +58,17 @@ export const metadata = {
   manifest: '/site.webmanifest',
 
   openGraph: {
-    title: 'OneZeroLabs | Digital Infrastructure for Education',
+    title: 'OneZeroLabs | Business Infrastructure Studio',
     description:
-      'Digitizing academic workflows with AI-powered attendance, student management, and high-performance institutional applications.',
-    url: 'https://onezerolabs.in',
+      'Brand, technology, marketing, and operations — built as one integrated system. OneZeroLabs is the growth partner for founders and institutions who are done managing fragmented vendors.',
+    url: 'https://www.onezerolabs.in',
     siteName: 'OneZeroLabs',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'OneZeroLabs – Software Solutions for Educational Institutions',
+        alt: 'OneZeroLabs | Business Infrastructure Studio',
       },
     ],
     locale: 'en_IN',
@@ -68,9 +77,9 @@ export const metadata = {
 
   twitter: {
     card: 'summary_large_image',
-    title: 'OneZeroLabs | Enterprise EdTech Solutions',
+    title: 'OneZeroLabs | Business Infrastructure Studio — Bengaluru',
     description:
-      'Engineering the future of institutional digital infrastructure with scalable web and mobile applications.',
+      'Brand, technology, marketing, and operations — built as one integrated system.',
     creator: '@OneZeroLabs',
     images: ['/og-image.jpg'],
   },
@@ -122,32 +131,34 @@ export default function RootLayout({ children }) {
      =============================== */
   const organizationSchema = {
     '@context': 'https://schema.org',
-    '@type': 'Organization',
-    '@id': 'https://onezerolabs.in/#organization',
+    '@type': ['Organization', 'LocalBusiness'],
+    '@id': 'https://www.onezerolabs.in/#organization',
     name: 'OneZeroLabs',
-    url: 'https://onezerolabs.in',
+    url: 'https://www.onezerolabs.in',
+    email: 'hello@onezerolabs.in',
     logo: {
       '@type': 'ImageObject',
-      url: 'https://onezerolabs.in/web-app-manifest-512x512.png',
+      url: 'https://www.onezerolabs.in/web-app-manifest-512x512.png',
       width: 512,
       height: 512
     },
     description:
-      'OneZeroLabs develops high-performance software solutions for institutions, specializing in attendance management, student data ecosystems, and academic workflow automation.',
+      'Business infrastructure studio from Bengaluru building brand systems, web platforms, AI integrations, and operational infrastructure for founders, SMEs, and institutions.',
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Bengaluru',
       addressRegion: 'Karnataka',
       postalCode: '560064',
-      addressCountry: 'India'
+      addressCountry: 'IN'
     },
     contactPoint: {
       '@type': 'ContactPoint',
       telephone: '+91-7483729869',
       contactType: 'Business Enquiries',
-      email: 'onezerolabs82@gmail.com',
+      email: 'hello@onezerolabs.in',
       availableLanguage: ['English', 'Kannada', 'Hindi']
     },
+    foundingDate: '2023',
     sameAs: [
       'https://www.linkedin.com/company/onezerolabs',
       'https://github.com/skandaumesh'
@@ -202,18 +213,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Fonts */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          rel="stylesheet"
-          href="https://fonts.cdnfonts.com/css/neue-haas-grotesk-display-pro"
-        />
-        <link
-          rel="stylesheet"
-          href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap"
-        />
-
         {/* Structured Data */}
         <script
           type="application/ld+json"
@@ -278,9 +277,7 @@ export default function RootLayout({ children }) {
           }}
         />
       </head>
-
-
-      <body className="antialiased bg-black text-white">
+      <body className={`antialiased bg-black text-white ${GeistSans.className} ${instrumentSerif.variable}`}>
         <SmoothScroll>
           <Navbar />
           <div className="relative z-10 w-full bg-black shadow-[0_20px_50px_rgba(0,0,0,0.5)]">

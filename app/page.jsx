@@ -2,63 +2,59 @@
 
 import React from 'react'
 import { Hero } from '@/components/ui/hero-1'
-import { Syne } from 'next/font/google'
-
 import VisionSection from '@/components/VisionSection'
-import LuminaShowcase from '@/components/LuminaShowcase'
+import ServicesSection from '@/components/ServicesSection'
+
 import DifferenceSection from '@/components/DifferenceSection'
+
 import Testimonials from '@/components/Testimonials'
 import CtaSection from '@/components/CtaSection'
 
-// Configure the font
-const syne = Syne({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  display: 'swap',
-})
-
 export default function Home() {
   return (
-    <main className="relative bg-black min-h-screen flex flex-col">
+    <main className="relative bg-black min-h-screen flex flex-col font-[family-name:var(--font-geist-sans)]">
 
-      {/* 1. Hero Section */}
-      <div className={`relative z-10 ${syne.className}`}>
+      {/* 2. Hero Section */}
+      <div className="relative z-10">
         <Hero
-          eyebrow="A Modern Digital Atelier"
           title="Designing the Future of Digital Infrastructure"
-          subtitle="Building scalable websites, intelligent applications, and AI systems for institutions and modern businesses."
-          ctaLabel="Get Started"
-          ctaHref="/contact"
+          subtitle="A business infrastructure studio from Bengaluru. We build the brand, tech, and operational systems you need to scale without managing multiple vendors."
+          ctaLabel=""
+          ctaHref=""
         />
       </div>
 
-      {/* 2. Text Reveal & Position Section */}
+      {/* 3. Vision Pillars */}
       <div className="relative z-10">
         <VisionSection image="/vision.jpg" />
-
       </div>
 
-      {/* 3. Service Showcase */}
-      <div id="showcase" className="relative z-30 bg-black">
-        <LuminaShowcase />
+      {/* 4. Services Section */}
+      <div className="relative z-20 bg-black">
+        <ServicesSection />
       </div>
 
-      {/* 4. Difference Section */}
+
+
+      {/* 6. The OZL Difference */}
       <div className="relative z-20 bg-black">
         <DifferenceSection />
       </div>
 
-      {/* 5. Testimonials */}
+
+      {/* 8. Testimonials */}
       <div className="relative z-20 bg-black">
         <Testimonials />
       </div>
 
-      {/* 6. CTA Section */}
+
+
+
+
+      {/* 11. CTA Section */}
       <div className="relative z-20 bg-black">
         <CtaSection />
       </div>
-
-
 
     </main>
   )

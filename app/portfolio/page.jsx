@@ -11,12 +11,14 @@ const serif = Instrument_Serif({
   weight: '400',
   style: ['normal', 'italic'],
   display: 'swap',
+  adjustFontFallback: false,
 })
 
 const sans = Inter({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600'],
   display: 'swap',
+  adjustFontFallback: false,
 })
 
 // ----------------------------------------------------------------------

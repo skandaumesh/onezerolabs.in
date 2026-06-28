@@ -4,14 +4,7 @@ import { useRef } from "react"
 import { ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-import { Instrument_Serif } from 'next/font/google'
 
-const seasonFont = Instrument_Serif({
-  subsets: ['latin'],
-  weight: '400',
-  style: ['normal', 'italic'],
-  display: 'swap',
-})
 
 export function Hero({
   eyebrow = "Innovate Without Limits",
@@ -36,7 +29,7 @@ export function Hero({
       className="relative mx-auto w-full px-4 text-center md:px-8 
       min-h-screen overflow-hidden 
       flex flex-col items-center justify-center
-      bg-[#080808] text-white pb-20"
+      bg-[#080808] text-white pb-24 md:pb-32"
     >
       {/* 1. Grid Background */}
       <div
@@ -89,30 +82,14 @@ export function Hero({
       {/* 3. Content */}
       <div className="relative z-10 max-w-5xl flex flex-col items-center px-2 md:px-4">
 
-        {/* Eyebrow */}
-        {eyebrow && (
-          <a href="#" className="group mb-6 mt-10 md:mt-0 block">
-            <span
-              className={`text-sm md:text-sm text-gray-400 mx-auto px-5 py-2 
-              bg-gradient-to-tr from-zinc-300/5 via-gray-400/5 to-transparent  
-              border-[2px] border-white/5 
-              rounded-3xl w-fit tracking-wide uppercase flex items-center justify-center
-              ${seasonFont.className}`}
-            >
-              {eyebrow}
-              <ChevronRight className="inline w-3 h-3 md:w-4 md:h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
-            </span>
-          </a>
-        )}
-
         {/* Title */}
         <h1
-          className={`animate-fade-in text-balance 
+          className="animate-fade-in text-balance 
           bg-gradient-to-br from-white to-white/40
           bg-clip-text py-2 
           text-[2.75rem] sm:text-5xl md:text-6xl lg:text-7xl
           leading-[1.1] tracking-wide 
-          text-transparent ${seasonFont.className}`}
+          text-transparent font-[family-name:var(--font-instrument-serif)]"
         >
           {title}
         </h1>
@@ -128,37 +105,31 @@ export function Hero({
           {subtitle}
         </p>
 
-        {/* CTA Button */}
-        {ctaLabel && (
-          <div
-            className="animate-fade-in"
-            style={{ animationDelay: "0.4s", animationFillMode: "both" }}
+        {/* CTAs */}
+        <div
+          className="animate-fade-in flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto"
+          style={{ animationDelay: "0.4s", animationFillMode: "both" }}
+        >
+          <Button
+            asChild
+            className="w-full sm:w-fit md:min-w-[160px] h-12 px-8
+            bg-white text-black hover:bg-white/90
+            rounded-full transition-all duration-300
+            font-medium font-[family-name:var(--font-geist-sans)] uppercase tracking-wide text-xs"
           >
-            <Button
-              asChild
-              variant="default"
-              className={`mb-12 w-full sm:w-fit md:min-w-[180px] 
-              text-lg tracking-normal font-medium
-              h-14 px-8
-              bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0))]
-              text-white
-              border border-white/10 backdrop-blur-md
-              rounded-full group relative overflow-hidden
-              transition-all duration-300
-              hover:bg-white/5 hover:border-white/20
-              ${seasonFont.className}`}
-            >
-              <a
-                ref={btnRef}
-                onMouseMove={handleMouseMove}
-                href={ctaHref}
-                className="flex items-center justify-center relative w-full h-full"
-              >
-                <span className="relative z-10">{ctaLabel}</span>
-              </a>
-            </Button>
-          </div>
-        )}
+            <a href="/#work">See Our Work</a>
+          </Button>
+
+          <Button
+            asChild
+            className="w-full sm:w-fit md:min-w-[160px] h-12 px-8
+            bg-transparent text-white border border-white/20 hover:bg-white/5 hover:border-white/40
+            rounded-full transition-all duration-300
+            font-medium font-[family-name:var(--font-geist-sans)] uppercase tracking-wide text-xs"
+          >
+            <a href="/contact">Start a Project</a>
+          </Button>
+        </div>
       </div>
 
       {/* 4. Bottom Fade */}
