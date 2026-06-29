@@ -1,7 +1,7 @@
 export const solutionsData = {
   "education": {
     title: "Educational Institutions",
-    image: "",
+    image: "/so2.jpg",
     hero: {
       headline: "Modern Digital Infrastructure for Educational Institutions",
       subheadline: "Empower students, parents, faculty, and administrators with systems designed for efficiency, communication, and growth.",
@@ -57,7 +57,7 @@ export const solutionsData = {
   },
   "startups": {
     title: "Startups",
-    image: "",
+    image: "/so2.jpg",
     hero: {
       headline: "Build Faster. Scale Smarter.",
       subheadline: "From MVPs to operational systems, we help startups build the infrastructure required for sustainable growth.",
@@ -110,7 +110,7 @@ export const solutionsData = {
   },
   "smes": {
     title: "SMEs",
-    image: "",
+    image: "/so2.jpg",
     hero: {
       headline: "Systems That Help Small Businesses Grow Like Large Businesses",
       subheadline: "We help growing businesses implement the technology and processes needed to operate efficiently.",
@@ -163,7 +163,7 @@ export const solutionsData = {
   },
   "healthcare": {
     title: "Healthcare",
-    image: "",
+    image: "/so2.jpg",
     hero: {
       headline: "Technology That Supports Better Healthcare Operations",
       subheadline: "Digital systems designed to improve efficiency, communication, and patient experience.",
@@ -216,7 +216,7 @@ export const solutionsData = {
   },
   "consultants": {
     title: "Consultants",
-    image: "",
+    image: "/so2.jpg",
     hero: {
       headline: "Build a Consulting Business That Runs Like a Company",
       subheadline: "We help consultants move beyond spreadsheets, manual follow-ups, and disconnected tools.",
