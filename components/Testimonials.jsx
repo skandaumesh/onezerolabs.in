@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion"
 import { useState, useEffect, useCallback } from "react"
 import { Instrument_Serif, Inter } from 'next/font/google'
-import { Quote } from 'lucide-react'
+import { Quote, ChevronLeft, ChevronRight } from 'lucide-react'
 import Image from 'next/image'
 
 const serif = Instrument_Serif({
@@ -165,6 +165,24 @@ export default function Testimonials() {
                       <p className="text-neutral-500 text-[13px] md:text-[13px] font-light">{t.role}</p>
                       {t.dept && <p className="text-neutral-600 text-[12px] md:text-[12px] font-light">{t.dept}</p>}
                     </div>
+                  </div>
+
+                  {/* Navigation Buttons */}
+                  <div className="flex items-center gap-2 md:gap-3 shrink-0">
+                    <button 
+                      onClick={() => paginate(-1)}
+                      className="w-9 h-9 md:w-10 md:h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors text-white/50 hover:text-white/90"
+                      aria-label="Previous testimonial"
+                    >
+                      <ChevronLeft size={18} />
+                    </button>
+                    <button 
+                      onClick={() => paginate(1)}
+                      className="w-9 h-9 md:w-10 md:h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors text-white/50 hover:text-white/90"
+                      aria-label="Next testimonial"
+                    >
+                      <ChevronRight size={18} />
+                    </button>
                   </div>
                 </div>
               </motion.div>

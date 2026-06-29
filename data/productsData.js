@@ -169,7 +169,7 @@ export const productsData = {
   },
   "studio": {
     title: "OZL Studio",
-    image: "/images/products/studio.jpg",
+    image: "",
     hero: {
       headline: "OZL Studio",
       subheadline: "Where we experiment with next-generation interfaces, branding, and digital experiences.",

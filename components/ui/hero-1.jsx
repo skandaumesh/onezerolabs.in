@@ -110,15 +110,7 @@ export function Hero({
           className="animate-fade-in flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto"
           style={{ animationDelay: "0.4s", animationFillMode: "both" }}
         >
-          <Button
-            asChild
-            className="w-full sm:w-fit md:min-w-[160px] h-12 px-8
-            bg-white text-black hover:bg-white/90
-            rounded-full transition-all duration-300
-            font-medium font-[family-name:var(--font-geist-sans)] uppercase tracking-wide text-xs"
-          >
-            <a href="/#work">See Our Work</a>
-          </Button>
+
 
           <Button
             asChild

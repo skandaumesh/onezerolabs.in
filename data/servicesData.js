@@ -1,7 +1,7 @@
 export const servicesData = {
   "digital-infrastructure": {
     title: "Digital Infrastructure",
-    image: "/se2.jpg",
+    image: "",
     hero: {
       headline: "Build the Digital Foundation of Your Business",
       subheadline: "Modern organizations need more than a website. They need scalable digital systems that support operations, customer experience, and long-term growth.",
@@ -33,7 +33,7 @@ export const servicesData = {
   },
   "ai-automation": {
     title: "AI & Automation",
-    image: "/se2.jpg",
+    image: "",
     hero: {
       headline: "Automate Repetitive Work. Focus on Growth.",
       subheadline: "Transform manual processes into intelligent workflows powered by automation and AI.",
@@ -65,7 +65,7 @@ export const servicesData = {
   },
   "operations-systems": {
     title: "Operations & Systems",
-    image: "/se2.jpg",
+    image: "",
     hero: {
       headline: "Create Systems That Scale With Your Business",
       subheadline: "Growth becomes difficult when processes depend on memory, spreadsheets, and manual coordination.",
@@ -97,7 +97,7 @@ export const servicesData = {
   },
   "analytics-intelligence": {
     title: "Analytics & Intelligence",
-    image: "/se2.jpg",
+    image: "",
     hero: {
       headline: "Turn Data Into Better Decisions",
       subheadline: "Visibility drives growth. Without accurate data, organizations struggle to identify opportunities and solve problems.",
@@ -129,7 +129,7 @@ export const servicesData = {
   },
   "brand-growth": {
     title: "Brand & Growth",
-    image: "/se2.jpg",
+    image: "",
     hero: {
       headline: "Build a Brand That Creates Momentum",
       subheadline: "Strong brands create trust, attract opportunities, and accelerate growth.",

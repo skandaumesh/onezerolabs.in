@@ -14,6 +14,10 @@ const syne = Syne({
 
 const navigationData = [
   {
+    label: 'Home',
+    href: '/',
+  },
+  {
     label: 'Services',
     href: '/services',
     links: [
@@ -206,14 +210,16 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Floating Pill Navbar Wrapper */}
-      <div className="fixed top-2 md:top-3 left-1/2 -translate-x-1/2 w-[95%] max-w-[1400px] z-[100]">
+      {/* Floating Pill Navbar Wrapper (Edge-to-edge on mobile) */}
+      <div className="fixed top-0 md:top-3 left-1/2 -translate-x-1/2 w-full md:w-[95%] max-w-[1400px] z-[100]">
         <motion.div
           initial={{ y: -100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
-          className={`relative flex items-center justify-between px-6 md:px-8 py-1.5 md:py-2 rounded-full transition-all duration-300 ${
-            scrolled ? 'bg-black/80 backdrop-blur-md border border-white/20 shadow-lg shadow-black/50' : 'bg-black/40 backdrop-blur-sm border border-white/10'
+          className={`relative flex items-center justify-between px-6 md:px-8 py-3 md:py-2 transition-all duration-300 md:rounded-full ${
+            scrolled 
+              ? 'bg-black/50 backdrop-blur-md md:bg-black/80 md:backdrop-blur-md border-transparent md:border border-transparent md:border-white/20 shadow-none md:shadow-lg md:shadow-black/50' 
+              : 'bg-transparent md:bg-black/40 md:backdrop-blur-sm border-transparent md:border-white/10'
           }`}
         >
           {/* Left: Logo */}
@@ -258,14 +264,10 @@ export default function Navbar() {
             {/* Hamburger Menu (visible on mobile only) */}
             <button 
               onClick={() => setIsOpen(true)}
-              className="text-white lg:hidden flex items-center justify-center w-10 h-10 rounded-full border border-white/20 hover:bg-white/10 transition-colors"
+              className="text-white lg:hidden flex items-center justify-center px-4 h-9 rounded-full border border-white/20 hover:bg-white/10 transition-colors text-[12px] font-medium tracking-widest uppercase"
               aria-label="Open menu"
             >
-              <svg width="20" height="14" viewBox="0 0 22 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-                <line x1="0" y1="1" x2="22" y2="1" />
-                <line x1="0" y1="7" x2="22" y2="7" />
-                <line x1="0" y1="13" x2="22" y2="13" />
-              </svg>
+              Menu
             </button>
           </div>
         </motion.div>
@@ -282,19 +284,10 @@ export default function Navbar() {
             className="fixed inset-0 z-[200] bg-black text-white flex flex-col overflow-y-auto"
           >
             {/* Top Bar for Overlay */}
-            <div className="flex items-center justify-between px-6 md:px-12 h-[88px] shrink-0 border-b border-white/10">
-              <button 
-                onClick={() => setIsOpen(false)}
-                className="text-white flex items-center justify-center w-8 h-8 rounded-full border border-white/20 hover:bg-white/10 transition-colors"
-                aria-label="Close menu"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-
-              <Link href="/" onClick={() => setIsOpen(false)} className="absolute left-1/2 -translate-x-1/2 flex items-center gap-3">
+            <div className="flex items-center justify-between px-6 md:px-12 h-[88px] shrink-0 border-b border-white/10 relative">
+              
+              {/* Logo on Left */}
+              <Link href="/" onClick={() => setIsOpen(false)} className="flex items-center gap-3 relative z-10 shrink-0">
                 <div className="relative w-12 h-12 md:w-14 md:h-14">
                   <Image
                     src="/logo.png"
@@ -307,6 +300,15 @@ export default function Navbar() {
                   OneZeroLabs
                 </span>
               </Link>
+
+              {/* Close Button on Right */}
+              <button 
+                onClick={() => setIsOpen(false)}
+                className="text-white flex items-center justify-center px-4 h-9 rounded-full border border-white/20 hover:bg-white/10 transition-colors text-[12px] font-medium tracking-widest uppercase relative z-10 shrink-0"
+                aria-label="Close menu"
+              >
+                Close
+              </button>
             </div>
 
             {/* Menu Content Grid */}
