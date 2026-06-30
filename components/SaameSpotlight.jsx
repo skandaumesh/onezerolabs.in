@@ -75,11 +75,11 @@ export default function SaameSpotlight() {
         </div>
         
         {/* CTA */}
-        <Link 
-          href="/work/saame"
+        <Link
+          href="/portfolio/LMS"
           className="text-white/40 text-sm md:text-base tracking-wide hover:text-white/70 transition-colors"
         >
-          Full case study coming soon →
+          Read the full case study →
         </Link>
 
       </motion.div>

@@ -87,12 +87,13 @@ export const productsData = {
       }
     ],
     screenshots: [
-      { label: "Admin Web Dashboard", image: "", type: "desktop" },
-      { label: "Parent App Home", image: "", type: "mobile" },
-      { label: "Teacher Portal", image: "", type: "mobile" },
-      { label: "Attendance Tracker", image: "", type: "mobile" },
-      { label: "Student Reports", image: "", type: "mobile" },
-      { label: "Instant Communication", image: "", type: "mobile" }
+      { label: "Admin Web Dashboard", image: "/saame/admin1.png", type: "desktop" },
+      { label: "Teacher Portal", image: "/saame/atd1.jpeg", type: "mobile" },
+      { label: "Attendance Tracker", image: "/saame/atd2.jpeg", type: "mobile" },
+      { label: "Class Management", image: "/saame/atd3.jpeg", type: "mobile" },
+      { label: "Parent App Home", image: "/saame/parent1.jpeg", type: "mobile" },
+      { label: "Student Reports", image: "/saame/parent2.jpeg", type: "mobile" },
+      { label: "Instant Communication", image: "/saame/parent3.jpeg", type: "mobile" }
     ],
     capabilitiesHeadline: "Everything Your Institution Needs",
     capabilities: [

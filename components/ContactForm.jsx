@@ -25,9 +25,16 @@ export default function ContactForm() {
     setLoading(true)
     setError('')
 
+    const formspreeId = process.env.NEXT_PUBLIC_FORMSPREE_ID
+    if (!formspreeId) {
+      setError('Form is not configured. Please email us at hello@onezerolabs.in.')
+      setLoading(false)
+      return
+    }
+
     try {
       const response = await fetch(
-        `https://formspree.io/f/${process.env.NEXT_PUBLIC_FORMSPREE_ID}`,
+        `https://formspree.io/f/${formspreeId}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

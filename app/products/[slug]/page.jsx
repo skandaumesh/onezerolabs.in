@@ -2,7 +2,8 @@
 
 import { notFound } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { Instrument_Serif } from 'next/font/google'
 import { productsData } from '@/data/productsData'
 import ServiceCta from '@/components/ServiceCta'
@@ -18,9 +19,14 @@ const seasonFont = Instrument_Serif({
 export default function ProductPage({ params }) {
   const data = productsData[params.slug];
   const scrollRef = useRef(null);
+  const dragMoved = useRef(false);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
+  const [lightbox, setLightbox] = useState(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   if (!data) {
     notFound();
@@ -28,6 +34,7 @@ export default function ProductPage({ params }) {
 
   const handleMouseDown = (e) => {
     setIsDragging(true);
+    dragMoved.current = false;
     setStartX(e.pageX - scrollRef.current.offsetLeft);
     setScrollLeft(scrollRef.current.scrollLeft);
   };
@@ -45,8 +52,25 @@ export default function ProductPage({ params }) {
     e.preventDefault();
     const x = e.pageX - scrollRef.current.offsetLeft;
     const walk = (x - startX) * 2;
+    if (Math.abs(walk) > 6) dragMoved.current = true;
     scrollRef.current.scrollLeft = scrollLeft - walk;
   };
+
+  const openLightbox = (shot) => {
+    if (dragMoved.current) return; // ignore clicks that were drags
+    setLightbox(shot);
+  };
+
+  useEffect(() => {
+    if (!lightbox) return;
+    const onKey = (e) => e.key === 'Escape' && setLightbox(null);
+    window.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [lightbox]);
 
   return (
     <main className="min-h-screen bg-black text-white selection:bg-white/20 selection:text-white">
@@ -293,12 +317,24 @@ export default function ProductPage({ params }) {
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
                 className="flex-shrink-0 snap-center flex flex-col gap-4"
               >
-                <div className={`h-[350px] md:h-[450px] lg:h-[500px] ${isDesktop ? 'aspect-[16/10]' : 'aspect-[9/16]'} rounded-2xl bg-[#111] border border-white/10 flex items-center justify-center overflow-hidden relative select-none`}>
+                <div
+                  onClick={() => shot.image && openLightbox(shot)}
+                  onKeyDown={(e) => {
+                    if (shot.image && (e.key === 'Enter' || e.key === ' ')) {
+                      e.preventDefault()
+                      setLightbox(shot)
+                    }
+                  }}
+                  role={shot.image ? 'button' : undefined}
+                  tabIndex={shot.image ? 0 : undefined}
+                  aria-label={shot.image ? `View ${shot.label} full size` : undefined}
+                  className={`h-[300px] md:h-[370px] lg:h-[420px] ${shot.image ? 'w-auto cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70' : isDesktop ? 'aspect-[16/10]' : 'aspect-[9/16]'} rounded-2xl bg-[#111] border border-white/10 flex items-center justify-center overflow-hidden relative select-none transition-transform duration-300 hover:scale-[1.02]`}
+                >
                   {shot.image ? (
-                    <img 
-                      src={shot.image} 
-                      alt={shot.label} 
-                      className="w-full h-full object-cover pointer-events-none" 
+                    <img
+                      src={shot.image}
+                      alt={shot.label}
+                      className="h-full w-auto object-contain pointer-events-none"
                       draggable={false}
                     />
                   ) : (
@@ -314,6 +350,35 @@ export default function ProductPage({ params }) {
             )})}
           </div>
         </section>
+      )}
+
+      {/* Lightbox / full-size image viewer (portaled to body to escape stacking context) */}
+      {mounted && lightbox && createPortal(
+        <div
+          onClick={() => setLightbox(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${lightbox.label} preview`}
+          className="fixed inset-0 z-[300] flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm p-4 md:p-10 cursor-zoom-out"
+        >
+          <button
+            onClick={() => setLightbox(null)}
+            aria-label="Close"
+            className="absolute top-5 right-5 text-white/60 hover:text-white text-3xl leading-none w-10 h-10 flex items-center justify-center"
+          >
+            ×
+          </button>
+          <img
+            src={lightbox.image}
+            alt={lightbox.label}
+            onClick={(e) => e.stopPropagation()}
+            className="max-w-full max-h-[85vh] w-auto h-auto object-contain rounded-xl cursor-default"
+          />
+          <span className="mt-4 text-neutral-300 font-[family-name:var(--font-satoshi)] text-sm uppercase tracking-wider">
+            {lightbox.label}
+          </span>
+        </div>,
+        document.body
       )}
 
       {/* 6. Everything Your Institution Needs (Capabilities) */}

@@ -68,44 +68,11 @@ const projects = [
     year: "2025",
     src: "/llm1.jpg",
   },
-  {
-    id: 6,
-    title: "Praasa Identity",
-    description: "Brand identity and visual communication for Praasa Consultancy",
-    category: "Graphic Design",
-    year: "2024",
-    src: "/graphic-designs/Picsart_25-03-16_18-07-44-231.jpg",
-  },
-  {
-    id: 7,
-    title: "Tech Week Poster",
-    description: "Event poster design for college technology week",
-    category: "Graphic Design",
-    year: "2024",
-    src: "/graphic-designs/Picsart_25-03-09_17-30-39-120.jpg",
-  },
-  {
-    id: 8,
-    title: "Nordic Brand",
-    description: "Minimal brand identity with Nordic design language",
-    category: "Graphic Design",
-    year: "2024",
-    src: "/graphic-designs/Picsart_25-03-01_19-03-26-625.jpg",
-  },
-  {
-    id: 9,
-    title: "Urban Typography",
-    description: "Bold typographic poster series for urban culture",
-    category: "Graphic Design",
-    year: "2024",
-    src: "/graphic-designs/Picsart_25-01-04_14-20-24-939.jpg",
-  },
 ]
 
 const CATEGORIES = [
   { name: "Web Development", tagline: "Scalable platforms and full-stack products" },
   { name: "LLM & Gen AI", tagline: "Intelligent systems powered by language models" },
-  { name: "Graphic Design", tagline: "Brand identity, print, and visual communication" },
 ]
 
 // ----------------------------------------------------------------------

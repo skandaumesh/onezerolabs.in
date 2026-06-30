@@ -238,37 +238,37 @@ export default function RootLayout({ children }) {
                     {
                       "@type": "SiteNavigationElement",
                       "position": 1,
-                      "name": "About Us",
+                      "name": "Services",
+                      "description": "Explore our digital infrastructure, AI automation, operations, analytics, and brand services.",
+                      "url": "https://www.onezerolabs.in/services"
+                    },
+                    {
+                      "@type": "SiteNavigationElement",
+                      "position": 2,
+                      "name": "Solutions",
+                      "description": "Tailored solutions for educational institutions, startups, SMEs, healthcare, and consultants.",
+                      "url": "https://www.onezerolabs.in/solutions"
+                    },
+                    {
+                      "@type": "SiteNavigationElement",
+                      "position": 3,
+                      "name": "SAAME",
+                      "description": "Our flagship institutional platform — attendance, academics, and AI, live on the Google Play Store.",
+                      "url": "https://www.onezerolabs.in/products/saame"
+                    },
+                    {
+                      "@type": "SiteNavigationElement",
+                      "position": 4,
+                      "name": "About",
                       "description": "Learn about OneZeroLabs and our mission to build high-performance digital infrastructure.",
                       "url": "https://www.onezerolabs.in/about"
                     },
                     {
                       "@type": "SiteNavigationElement",
-                      "position": 2,
-                      "name": "Our Services",
-                      "description": "Explore our AI-powered attendance systems, SIS, and custom educational software.",
-                      "url": "https://www.onezerolabs.in/services"
-                    },
-                    {
-                      "@type": "SiteNavigationElement",
-                      "position": 3,
-                      "name": "Portfolio",
-                      "description": "View our portfolio of successful digital transformations for educational institutions.",
-                      "url": "https://www.onezerolabs.in/portfolio"
-                    },
-                    {
-                      "@type": "SiteNavigationElement",
-                      "position": 4,
-                      "name": "Contact Us",
+                      "position": 5,
+                      "name": "Contact",
                       "description": "Get in touch with OneZeroLabs for business enquiries and software solutions.",
                       "url": "https://www.onezerolabs.in/contact"
-                    },
-                    {
-                      "@type": "SiteNavigationElement",
-                      "position": 5,
-                      "name": "Privacy Protocol",
-                      "description": "Read our privacy policy and data security commitments.",
-                      "url": "https://www.onezerolabs.in/privacy-policy"
                     }
                   ]
                 }
