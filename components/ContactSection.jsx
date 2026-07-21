@@ -146,8 +146,9 @@ export default function ContactSection() {
             {/* LinkedIn Pill */}
             {/* CHANGED: Borders and text colors adapted for white background */}
             <motion.a
-              href="https://linkedin.com/..."
+              href="https://www.linkedin.com/company/onezerolabs"
               target="_blank"
+              rel="noopener noreferrer"
               whileHover={{ y: -3, boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)" }}
               className="flex items-center gap-3 border border-black/10 px-5 py-2.5 rounded-full hover:border-black transition-colors group bg-white"
             >

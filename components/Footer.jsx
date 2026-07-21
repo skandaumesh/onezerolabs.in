@@ -42,7 +42,7 @@ const FOOTER_LINKS = [
     {
         title: 'SOCIALS',
         links: [
-            { label: 'LinkedIn', href: '#' },
+            { label: 'LinkedIn', href: 'https://www.linkedin.com/company/onezerolabs' },
             { label: 'X (Twitter)', href: '#' },
             { label: 'Instagram', href: '#' },
         ],
@@ -128,7 +128,7 @@ export default function Footer() {
                         </a>
 
                         <div className="flex items-center gap-3">
-                            <a href="#" className="flex flex-nowrap shrink-0 items-center justify-center gap-2 border border-white/20 rounded-full px-4 py-2 hover:bg-white/10 transition-colors duration-300 pointer-events-auto">
+                            <a href="https://www.linkedin.com/company/onezerolabs" target="_blank" rel="noopener noreferrer" className="flex flex-nowrap shrink-0 items-center justify-center gap-2 border border-white/20 rounded-full px-4 py-2 hover:bg-white/10 transition-colors duration-300 pointer-events-auto">
                                 <Linkedin size={14} className="text-white/60" />
                                 <span className="text-[11px] font-mono text-white/80 uppercase tracking-widest leading-none mt-[2px]">LinkedIn</span>
                             </a>
