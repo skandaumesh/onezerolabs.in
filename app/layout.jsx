@@ -6,6 +6,7 @@ import SmoothScroll from '../components/SmoothScroll'
 import Footer from '../components/Footer'
 import Script from 'next/script'
 import { Suspense } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 
 const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
@@ -285,6 +286,9 @@ export default function RootLayout({ children }) {
           </div>
           <Footer />
         </SmoothScroll>
+
+        {/* Vercel Web Analytics */}
+        <Analytics />
 
         {/* Google Analytics */}
         <Script
