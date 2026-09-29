@@ -18,8 +18,10 @@ export default function HomePage() {
       {/* 1. Hero + proof strip share the first screen: the strip sits at the
              foot and the hero flexes to fill the rest, with its content centred
              in that space. `svh` is the height with the phone's address bar
-             showing, so the strip is never pushed below the fold on mobile. */}
-      <div className="relative z-10 flex min-h-svh flex-col">
+             showing, so the strip is never pushed below the fold on mobile.
+             Phones use 92% of it, so the strip sits a little above the bottom
+             edge instead of against it. */}
+      <div className="relative z-10 flex min-h-[92svh] flex-col md:min-h-svh">
         <div className="flex flex-1 flex-col">
         <Hero
           eyebrow="BENGALURU · SINCE 2025"
