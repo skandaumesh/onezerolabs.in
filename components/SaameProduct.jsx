@@ -156,7 +156,7 @@ export default function SaameProduct() {
 
           <div className="grid lg:grid-cols-[1fr_330px]">
             {/* Stage */}
-            <div className="relative flex flex-col items-center overflow-hidden px-6 pt-7">
+            <div className="relative flex flex-col items-center overflow-hidden px-4 pt-7 sm:px-6">
               <div
                 aria-hidden
                 className="pointer-events-none absolute inset-0"
