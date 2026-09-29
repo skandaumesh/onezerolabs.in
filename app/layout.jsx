@@ -76,13 +76,18 @@ export const metadata = {
   // these, and prefers one that is 48px or larger. Every favicon size is a
   // white disc with the logo inside it, which also survives the round crop
   // search results apply.
+  //
+  // `?v=2`: browsers keep favicons in their own store, keyed by URL, and a
+  // normal refresh doesn't replace them -- returning visitors kept seeing the
+  // old black icon. A new query string is a new URL, so they fetch the new
+  // one. Bump it whenever the icon changes.
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: '48x48' },
-      { url: '/favicon-96x96.png', type: 'image/png', sizes: '96x96' },
+      { url: '/favicon.ico?v=2', sizes: '48x48' },
+      { url: '/favicon-96x96.png?v=2', type: 'image/png', sizes: '96x96' },
     ],
-    shortcut: '/favicon-96x96.png',
-    apple: '/apple-touch-icon.png',
+    shortcut: '/favicon-96x96.png?v=2',
+    apple: '/apple-touch-icon.png?v=2',
   },
 
   manifest: '/site.webmanifest',
