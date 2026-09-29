@@ -1,6 +1,6 @@
 import JsonLd from '@/components/JsonLd'
 import { productsData } from '@/data/productsData'
-import { breadcrumbs, ORG_ID, pageMetadata, SITE_URL } from '@/lib/seo'
+import { breadcrumbs, ORG_ID, pageMetadata, SAAME_ID, SITE_URL } from '@/lib/seo'
 
 export function generateStaticParams() {
   return Object.keys(productsData).map((slug) => ({ slug }))
@@ -38,6 +38,7 @@ export default function ProductSlugLayout({ children, params }) {
     params.slug === 'saame' && {
       '@context': 'https://schema.org',
       '@type': 'SoftwareApplication',
+      '@id': SAAME_ID,
       name: 'SAAME',
       alternateName: 'SAAME college management system',
       applicationCategory: 'EducationalApplication',

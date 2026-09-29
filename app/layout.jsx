@@ -6,7 +6,7 @@ import SmoothScroll from '../components/SmoothScroll'
 import Footer from '../components/Footer'
 import Script from 'next/script'
 import JsonLd from '../components/JsonLd'
-import { DEFAULT_DESCRIPTION, OG_IMAGE, ORG_ID, SITE_NAME, SITE_URL, WEBSITE_ID } from '../lib/seo'
+import { DEFAULT_DESCRIPTION, OG_IMAGE, ORG_ID, SAAME_ID, SITE_NAME, SITE_URL, WEBSITE_ID } from '../lib/seo'
 import { Analytics } from '@vercel/analytics/react'
 
 const ebGaramond = EB_Garamond({
@@ -194,7 +194,7 @@ const siteSchema = {
           itemOffered: { '@type': 'Service', name, description, url: `${SITE_URL}${path}`, provider: { '@id': ORG_ID } },
         })),
       },
-      owns: { '@type': 'SoftwareApplication', name: 'SAAME', url: `${SITE_URL}/products/saame` },
+      owns: { '@id': SAAME_ID },
       sameAs: ['https://www.linkedin.com/company/onezerolabs'],
     },
     {

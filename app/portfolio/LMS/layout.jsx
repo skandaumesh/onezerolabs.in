@@ -1,5 +1,5 @@
 import JsonLd from '@/components/JsonLd'
-import { breadcrumbs, ORG_ID, pageMetadata, SITE_URL } from '@/lib/seo'
+import { breadcrumbs, ORG_ID, pageMetadata, SAAME_ID, SITE_URL } from '@/lib/seo'
 
 export const metadata = pageMetadata({
   title: 'SAAME Case Study: College Attendance & Academic Platform',
@@ -18,7 +18,7 @@ const schema = [
     author: { '@id': ORG_ID },
     publisher: { '@id': ORG_ID },
     about: [
-      { '@type': 'SoftwareApplication', name: 'SAAME', url: `${SITE_URL}/products/saame` },
+      { '@id': SAAME_ID },
       { '@type': 'CollegeOrUniversity', name: 'MLA Academy of Higher Learning' },
     ],
   },
