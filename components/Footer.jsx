@@ -1,150 +1,202 @@
 "use client"
 
 import Link from 'next/link'
-import { Inter, Instrument_Serif } from 'next/font/google'
-import { motion, useScroll, useTransform } from 'framer-motion'
-import { useRef } from 'react'
-import { usePathname } from 'next/navigation'
-import { ArrowRight, Linkedin, Mail } from 'lucide-react'
-
-const serif = Instrument_Serif({
-    subsets: ['latin'],
-    weight: '400',
-    style: ['normal', 'italic'],
-    display: 'swap',
-  adjustFontFallback: false,
-})
+import Image from 'next/image'
+import { Inter } from 'next/font/google'
+import { Linkedin, Mail } from 'lucide-react'
 
 const sans = Inter({
     subsets: ['latin'],
     weight: ['300', '400', '500', '600', '700'],
     display: 'swap',
-  adjustFontFallback: false,
+    adjustFontFallback: false,
 })
 
-const FOOTER_LINKS = [
+// Every href below points at a route that exists. The previous version carried a
+// LEGAL column of `#` placeholders (Terms, Refunds) and socials for accounts
+// that were never set up -- dead links in a footer are worse than a short
+// footer, so these columns are only as long as the site is.
+const COLUMNS = [
     {
-        title: 'COMPANY',
+        title: 'Services',
+        links: [
+            { label: 'Digital Infrastructure', href: '/services/digital-infrastructure' },
+            { label: 'AI & Automation', href: '/services/ai-automation' },
+            { label: 'Operations & Systems', href: '/services/operations-systems' },
+            { label: 'Analytics & Intelligence', href: '/services/analytics-intelligence' },
+            { label: 'Brand & Social Media', href: '/services/brand-growth' },
+        ],
+    },
+    {
+        title: 'Solutions',
+        links: [
+            { label: 'Educational Institutions', href: '/solutions/education' },
+            { label: 'Startups', href: '/solutions/startups' },
+            { label: 'SMEs', href: '/solutions/smes' },
+            { label: 'Healthcare', href: '/solutions/healthcare' },
+            { label: 'Consultants', href: '/solutions/consultants' },
+        ],
+    },
+    {
+        title: 'Products',
+        links: [
+            { label: 'SAAME', href: '/products/saame' },
+            { label: 'OZL Studio', href: '/products/studio' },
+        ],
+    },
+    {
+        title: 'Company',
         links: [
             { label: 'About us', href: '/about' },
-            { label: 'Services', href: '/services' },
+            { label: 'Our work', href: '/portfolio' },
             { label: 'Contact', href: '/contact' },
         ],
     },
     {
-        title: 'LEGAL',
-        links: [
-            { label: 'Privacy Policy', href: '/privacy-policy' },
-            { label: 'Terms & Conditions', href: '#' },
-            { label: 'Refund Policy', href: '#' },
-        ],
-    },
-    {
-        title: 'SOCIALS',
-        links: [
-            { label: 'LinkedIn', href: 'https://www.linkedin.com/company/onezerolabs' },
-            { label: 'X (Twitter)', href: '#' },
-            { label: 'Instagram', href: '#' },
-        ],
+        title: 'Legal',
+        links: [{ label: 'Privacy Policy', href: '/privacy-policy' }],
     },
 ]
 
 export default function Footer() {
-    const pathname = usePathname();
-
-    // Show the old glowing footer ONLY on the home page
-    if (pathname !== '/') {
-        return null;
-    }
-
-    const containerRef = useRef(null);
-    const { scrollYProgress } = useScroll({
-        target: containerRef,
-        offset: ["start end", "end end"]
-    });
-
-    // Intense scrolling reveal effect variables
-    const glowOpacity = useTransform(scrollYProgress, [0, 1], [0, 1]);
-    const glowScale = useTransform(scrollYProgress, [0, 1], [0.6, 1.2]);
-    const glowY = useTransform(scrollYProgress, [0, 1], [150, 0]);
-
     return (
         <footer
-            ref={containerRef}
-            className={`relative w-full h-[680px] lg:h-[600px] bg-[#050505] text-white overflow-hidden ${sans.className}`}
-            style={{ clipPath: "polygon(0% 0, 100% 0%, 100% 100%, 0 100%)" }}
+            className={`relative w-full overflow-hidden text-ozl-ink ${sans.className}`}
+            // Starts at pure white so it meets the white page above with no
+            // seam, then settles into a cool blue-grey by the foot. The stops
+            // are weighted late -- an even ramp would read as a visible band
+            // across the middle of the link columns rather than a slow settle.
+            style={{
+                background:
+                    "linear-gradient(180deg, #FFFFFF 0%, #FAFBFD 22%, #F1F4FA 48%, #E4E9F3 76%, #DCE2EE 100%)",
+            }}
         >
-            {/* The fixed unrolling reveal effect, now enabled for mobile too. */}
-            <div className="fixed bottom-0 left-0 w-full h-[680px] lg:h-[600px] flex flex-col justify-between py-10 px-6 md:px-16 overflow-hidden bg-[#050505]">
-                {/* Scroll-Animated Bottom Source Glow (White) */}
-                <motion.div
-                    style={{ opacity: glowOpacity, scale: glowScale, y: glowY }}
-                    className="absolute bottom-0 left-0 w-full h-full pointer-events-none z-0"
-                >
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[1200px] h-full flex justify-center items-end">
-                        {/* Massive soft rounded glow spreading upwards */}
-                        <div className="absolute bottom-0 w-[1400px] h-[600px] bg-[radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.15)_0%,rgba(255,255,255,0.05)_40%,transparent_70%)] pointer-events-none opacity-30 md:opacity-100" />
+            <div className="mx-auto w-full max-w-[1400px] px-6 pt-16 md:px-16 md:pt-20">
+                <div className="flex flex-col gap-12 lg:flex-row lg:gap-16">
+                    {/* Brand column */}
+                    <div className="shrink-0 lg:w-[260px]">
+                        {/* Rendered well under its native size on purpose.
+                            logo-print.png is only 259x159, and it is the ONLY
+                            OneZeroLabs mark that works on a light background --
+                            logo.png is white-on-transparent (invisible here) and
+                            everything in public/logo/ belongs to clients. At 28px
+                            tall the source still has ~5x headroom, so it stays
+                            sharp even on a 2x display. */}
+                        <Image
+                            src="/logo-print.png"
+                            alt="OneZeroLabs"
+                            width={259}
+                            height={159}
+                            quality={100}
+                            className="h-7 w-auto"
+                        />
 
-                        {/* Intense core round glow at the bottom center */}
-                        <div className="absolute -bottom-[100px] w-[800px] h-[400px] bg-white/10 blur-[80px] rounded-[100%] pointer-events-none opacity-30 md:opacity-100" />
-
-                        {/* Brighter tight center glow */}
-                        <div className="absolute -bottom-[50px] w-[400px] h-[200px] bg-white/20 blur-[60px] rounded-[100%] pointer-events-none opacity-30 md:opacity-100" />
-
-                        {/* Solid base light source line */}
-                        <div className="absolute -bottom-2 w-[300px] h-[4px] bg-white/80 blur-[2px] rounded-full opacity-40 md:opacity-100" />
-                    </div>
-                </motion.div>
-
-                <div className="relative z-10 flex flex-col lg:flex-row justify-between w-full max-w-[1400px] mx-auto gap-12 lg:gap-0 mt-4 md:mt-8 flex-1">
-
-                    {/* Left Side: CTA Content */}
-                    <div className="flex flex-col max-w-[600px]">
-                        <h2 className="text-[40px] md:text-[56px] lg:text-[64px] leading-[1] font-bold text-white tracking-tighter mb-4 md:mb-6 uppercase font-sans">
-                            Let's<br />
-                            Build<br />
-                            The<br />
-                            Future.
-                        </h2>
-
-                        <p className="text-white/60 text-[13px] md:text-[14px] font-light leading-[1.6] max-w-[360px] mb-6 md:mb-8">
-                            Our digital lab is ready to architect your vision. From custom LLMs to high-performance SaaS, let's deploy something significant.
+                        <p className="mt-4 text-[14px] leading-relaxed text-ozl-muted">
+                            The digital side of your business, built and run from Bengaluru.
                         </p>
 
-                        <Link href="/contact" className="group flex items-center justify-center lg:justify-between bg-white text-black px-6 py-3 rounded-full w-fit hover:bg-white/90 transition-colors duration-300 pointer-events-auto">
-                            <span className="text-[11px] font-bold tracking-wider uppercase mr-3">Start a Project</span>
-                            <ArrowRight size={16} className="transform group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                    </div>
-
-                    {/* Right Side: Contact Details */}
-                    <div className="flex flex-col lg:justify-end lg:items-end mt-4 lg:mt-0 pb-10 lg:pb-0">
-                        <span className="text-[10px] font-mono text-white/40 tracking-widest uppercase mb-3 leading-none">
-                            TRANSMISSION PROTOCOL
+                        <span className="mt-8 block text-[13px] font-medium text-ozl-ink">
+                            Find us at
                         </span>
-
-                        <a href="mailto:hello@onezerolabs.in" className="text-[24px] md:text-[32px] font-medium text-white hover:text-white/80 transition-colors duration-300 pointer-events-auto mb-5 md:mb-6 tracking-tight">
-                            hello@onezerolabs.in
-                        </a>
-
-                        <div className="flex items-center gap-3">
-                            <a href="https://www.linkedin.com/company/onezerolabs" target="_blank" rel="noopener noreferrer" className="flex flex-nowrap shrink-0 items-center justify-center gap-2 border border-white/20 rounded-full px-4 py-2 hover:bg-white/10 transition-colors duration-300 pointer-events-auto">
-                                <Linkedin size={14} className="text-white/60" />
-                                <span className="text-[11px] font-mono text-white/80 uppercase tracking-widest leading-none mt-[2px]">LinkedIn</span>
+                        <div className="mt-3 flex items-center gap-4">
+                            <a
+                                href="https://www.linkedin.com/company/onezerolabs"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="OneZeroLabs on LinkedIn"
+                                className="text-ozl-muted transition-colors hover:text-ozl-ink"
+                            >
+                                <Linkedin size={18} />
+                            </a>
+                            <a
+                                href="mailto:hello@onezerolabs.in"
+                                aria-label="Email OneZeroLabs"
+                                className="text-ozl-muted transition-colors hover:text-ozl-ink"
+                            >
+                                <Mail size={18} />
                             </a>
                         </div>
+
+                        <div className="mt-10 rounded-xl border border-ozl-glassBorder p-4">
+                            <p className="text-[13px] leading-relaxed text-ozl-muted">
+                                &copy; {new Date().getFullYear()} OneZeroLabs.
+                                <br />
+                                All rights reserved.
+                            </p>
+                            <p className="mt-4 text-[13px] leading-relaxed text-ozl-muted">
+                                Bengaluru, Karnataka 560064
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Link columns */}
+                    <div className="grid flex-1 grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-5">
+                        {COLUMNS.map((col) => (
+                            <nav key={col.title} aria-label={col.title}>
+                                <h3 className="mb-5 text-[11px] font-semibold uppercase tracking-[0.12em] text-ozl-ink">
+                                    {col.title}
+                                </h3>
+                                <ul className="space-y-3">
+                                    {col.links.map((link) => (
+                                        <li key={link.href}>
+                                            <Link
+                                                href={link.href}
+                                                className="text-[14px] leading-snug text-ozl-muted transition-colors hover:text-ozl-ink"
+                                            >
+                                                {link.label}
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </nav>
+                        ))}
                     </div>
                 </div>
+            </div>
 
-                {/* Bottom Bar: Copyright and Location */}
-                <div className="relative z-10 w-full max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-start md:items-end pb-8 lg:pb-2 mt-8 md:mt-auto">
-                    <p className="text-[13px] text-white/40 tracking-wide font-medium">
-                        Copyright OneZeroLabs 2026
-                    </p>
-                    <p className="text-[13px] text-white/40 tracking-wide font-medium text-left md:text-right">
-                        All rights reserved, Bengaluru - 560064
-                    </p>
-                </div>
+            {/* Wordmark, full-bleed. Drawn as SVG rather than styled text
+                because a `vw` font-size cannot guarantee an exact fit: the word
+                is 11 characters, and any size that fills the frame at one
+                viewport overflows or falls short at another. Here `textLength`
+                with `lengthAdjust="spacingAndGlyphs"` forces the glyphs to span
+                the viewBox exactly, so it is edge-to-edge at every width.
+
+                The image is clipped to the letterforms with a clipPath, which
+                also sidesteps the background-clip:text trap -- no transparent
+                text fill, so nothing can render invisible. */}
+            <div aria-hidden className="mx-auto mt-12 w-full max-w-[1150px] px-5 md:mt-16 md:px-10">
+                <svg
+                    viewBox="0 0 1200 186"
+                    className={`block w-full ${sans.className}`}
+                    role="presentation"
+                >
+                    <defs>
+                        <clipPath id="ozl-wordmark-clip">
+                            {/* Baseline sits below the viewBox so the feet of the
+                                letters are cropped by the frame. */}
+                            <text
+                                x="0"
+                                y="188"
+                                fontSize="210"
+                                fontWeight="700"
+                                letterSpacing="-6"
+                                textLength="1200"
+                                lengthAdjust="spacingAndGlyphs"
+                            >
+                                OneZeroLabs
+                            </text>
+                        </clipPath>
+                    </defs>
+                    <image
+                        href="/cta.jpg"
+                        x="0"
+                        y="0"
+                        width="1200"
+                        height="186"
+                        preserveAspectRatio="xMidYMid slice"
+                        clipPath="url(#ozl-wordmark-clip)"
+                    />
+                </svg>
             </div>
         </footer>
     )

@@ -11,7 +11,7 @@ const stats = [
 ]
 
 const features = [
-  "AI-powered NLP chatbot — Groq pipeline with MongoDB query generation",
+  "AI-powered NLP chatbot with a Groq pipeline and MongoDB query generation",
   "FCM push notifications for parent alerts",
   "Biometric attendance integration (eSSL push model)",
   "JWT auth with jwtVersion invalidation for secure password resets",
@@ -41,7 +41,7 @@ export default function SaameSpotlight() {
         
         {/* Body */}
         <p className="text-white/70 text-base md:text-lg leading-relaxed max-w-3xl mb-16 font-normal">
-          SAAME — Smart Attendance & Academic Management Ecosystem — is a production institutional platform built for MLA Academy of Higher Learning, Bengaluru. What began as a viral social app during our founder's BCA final year evolved into a fully-fledged institutional system and OneZeroLabs' first flagship product. It is now a blueprint for how we build at scale.
+          SAAME (Smart Attendance & Academic Management Ecosystem) is a production institutional platform built for MLA Academy of Higher Learning, Bengaluru. What began as a viral social app during our founder's BCA final year evolved into a fully-fledged institutional system and OneZeroLabs' first flagship product. It is now a blueprint for how we build at scale.
         </p>
         
         {/* Stats Row */}

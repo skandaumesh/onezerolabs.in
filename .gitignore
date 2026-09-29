@@ -6,3 +6,10 @@ build/
 .DS_Store
 *.log
 nul
+
+# Generated agreement documents
+generated/
+
+# Real client and employee documents (fees, salary, IDs). This repository is
+# public, so these stay local. The placeholder example is fine to publish.
+examples/*.mjs

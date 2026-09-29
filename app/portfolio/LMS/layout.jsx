@@ -1,27 +1,35 @@
-const baseUrl = 'https://www.onezerolabs.in'
+import JsonLd from '@/components/JsonLd'
+import { breadcrumbs, ORG_ID, pageMetadata, SITE_URL } from '@/lib/seo'
 
-export const metadata = {
-  title: 'SAAME LMS — Institutional Attendance & Academic Platform | OneZeroLabs',
+export const metadata = pageMetadata({
+  title: 'SAAME Case Study: College Attendance & Academic Platform',
   description:
-    'A deep dive into SAAME: a production LMS with offline-first attendance, 0.1s zero-latency marking, automated batch promotion, compliance reporting, and a cognitive AI assistant — built by OneZeroLabs.',
-  alternates: { canonical: `${baseUrl}/portfolio/LMS` },
-  openGraph: {
-    title: 'SAAME LMS Case Study | OneZeroLabs',
-    description:
-      'Offline-first attendance, zero-latency marking, and an AI assistant — inside the SAAME institutional platform.',
-    url: `${baseUrl}/portfolio/LMS`,
-    siteName: 'OneZeroLabs',
-    type: 'article',
-    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'SAAME LMS Case Study' }],
+    'How OneZeroLabs built SAAME for MLA Academy of Higher Learning: offline attendance, semester promotion, compliance reports and an AI assistant.',
+  path: '/portfolio/LMS',
+  type: 'article',
+})
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: 'SAAME case study: a college attendance and academic platform',
+    url: `${SITE_URL}/portfolio/LMS`,
+    author: { '@id': ORG_ID },
+    publisher: { '@id': ORG_ID },
+    about: [
+      { '@type': 'SoftwareApplication', name: 'SAAME', url: `${SITE_URL}/products/saame` },
+      { '@type': 'CollegeOrUniversity', name: 'MLA Academy of Higher Learning' },
+    ],
   },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'SAAME LMS Case Study | OneZeroLabs',
-    description: 'Offline-first attendance, zero-latency marking, and an AI assistant.',
-    images: ['/og-image.jpg'],
-  },
-}
+  breadcrumbs(['Portfolio', '/portfolio'], ['SAAME case study', '/portfolio/LMS']),
+]
 
 export default function LmsLayout({ children }) {
-  return <>{children}</>
+  return (
+    <>
+      <JsonLd data={schema} />
+      {children}
+    </>
+  )
 }

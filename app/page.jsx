@@ -1,61 +1,53 @@
-'use client'
+import HomePage from '@/components/HomePage'
+import JsonLd from '@/components/JsonLd'
+import { FAQS } from '@/data/faqData'
+import { CLIENTS, DEFAULT_DESCRIPTION, ORG_ID, SITE_URL, WEBSITE_ID } from '@/lib/seo'
 
-import React from 'react'
-import { Hero } from '@/components/ui/hero-1'
-import VisionSection from '@/components/VisionSection'
-import ServicesSection from '@/components/ServicesSection'
+/* The page itself is a client component (components/HomePage.jsx); this
+   server wrapper exists so the home page can declare its own canonical URL
+   and structured data, which client components can't. */
 
-import DifferenceSection from '@/components/DifferenceSection'
+export const metadata = {
+  alternates: { canonical: SITE_URL },
+}
 
-import Testimonials from '@/components/Testimonials'
-import CtaSection from '@/components/CtaSection'
+const homeSchema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      '@id': `${SITE_URL}/#webpage`,
+      url: SITE_URL,
+      name: 'OneZeroLabs | Website, Software & Branding Studio in Bengaluru',
+      description: DEFAULT_DESCRIPTION,
+      isPartOf: { '@id': WEBSITE_ID },
+      about: { '@id': ORG_ID },
+      inLanguage: 'en-IN',
+      // The organisations in the page's logo strip.
+      mentions: CLIENTS.map((c) => ({
+        '@type': 'Organization',
+        name: c.name,
+        ...(c.url ? { url: c.url } : {}),
+      })),
+    },
+    {
+      '@type': 'FAQPage',
+      '@id': `${SITE_URL}/#faq`,
+      isPartOf: { '@id': `${SITE_URL}/#webpage` },
+      mainEntity: FAQS.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    },
+  ],
+}
 
-export default function Home() {
+export default function Page() {
   return (
-    <main className="relative bg-black min-h-screen flex flex-col font-[family-name:var(--font-geist-sans)]">
-
-      {/* 2. Hero Section */}
-      <div className="relative z-10">
-        <Hero
-          title="Designing the Future of Digital Infrastructure"
-          subtitle="A business infrastructure studio from Bengaluru. We build the brand, tech, and operational systems you need to scale without managing multiple vendors."
-          ctaLabel=""
-          ctaHref=""
-        />
-      </div>
-
-      {/* 3. Vision Pillars */}
-      <div className="relative z-10">
-        <VisionSection image="/vision.jpg" />
-      </div>
-
-      {/* 4. Services Section */}
-      <div className="relative z-20 bg-black">
-        <ServicesSection />
-      </div>
-
-
-
-      {/* 6. The OZL Difference */}
-      <div className="relative z-20 bg-black">
-        <DifferenceSection />
-      </div>
-
-
-      {/* 8. Testimonials */}
-      <div className="relative z-20 bg-black">
-        <Testimonials />
-      </div>
-
-
-
-
-
-      {/* 11. CTA Section */}
-      <div className="relative z-20 bg-black">
-        <CtaSection />
-      </div>
-
-    </main>
+    <>
+      <JsonLd data={homeSchema} />
+      <HomePage />
+    </>
   )
 }

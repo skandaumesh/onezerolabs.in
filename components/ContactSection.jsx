@@ -64,7 +64,7 @@ export default function ContactSection() {
       {/* CHANGED: text-white to text-neutral-100 for subtle grey on white bg */}
       <div className="absolute top-1/2 -translate-y-1/2 left-0 w-full opacity-100 pointer-events-none select-none z-0">
         <VelocityText baseVelocity={1} className="text-[20vw] md:text-[12vw] font-black font-syne leading-none text-neutral-100/50">
-          ONEZEROLABS — INNOVATE — DEPLOY —
+          ONEZEROLABS · INNOVATE · DEPLOY ·
         </VelocityText>
       </div>
 

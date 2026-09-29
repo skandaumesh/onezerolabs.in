@@ -18,7 +18,7 @@ export default function VisionSection({ image }) {
   const features = [
     {
       title: 'Sovereign by design',
-      description: 'Full-stack systems built entirely around your operation — no third-party lock-ins, no forced subscriptions, no hidden dependencies.'
+      description: 'Full-stack systems built entirely around your operation, with no third-party lock-ins, no forced subscriptions, no hidden dependencies.'
     },
     {
       title: 'State of the art Architecture',

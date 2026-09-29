@@ -4,17 +4,10 @@ import { notFound } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { useRef, useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { Instrument_Serif } from 'next/font/google'
 import { productsData } from '@/data/productsData'
 import ServiceCta from '@/components/ServiceCta'
-
-const seasonFont = Instrument_Serif({
-  subsets: ['latin'],
-  weight: '400',
-  style: ['normal', 'italic'],
-  display: 'swap',
-  adjustFontFallback: false,
-})
+import SaameProduct from '@/components/SaameProduct'
+import { Band, BODY, EYEBROW, GlassCard, HEADING, INK, MUTED, SkyHero } from '@/components/ui/light-kit'
 
 export default function ProductPage({ params }) {
   const data = productsData[params.slug];
@@ -28,8 +21,27 @@ export default function ProductPage({ params }) {
 
   useEffect(() => setMounted(true), []);
 
+  // Declared before the early returns below: a hook after a conditional
+  // return breaks React's rule that hooks run in the same order every render.
+  useEffect(() => {
+    if (!lightbox) return;
+    const onKey = (e) => e.key === 'Escape' && setLightbox(null);
+    window.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [lightbox]);
+
   if (!data) {
     notFound();
+  }
+
+  /* SAAME has its own page, built from components/SaameProduct.jsx. Every
+     other product uses the template below. */
+  if (params.slug === 'saame') {
+    return <SaameProduct />;
   }
 
   const handleMouseDown = (e) => {
@@ -61,89 +73,39 @@ export default function ProductPage({ params }) {
     setLightbox(shot);
   };
 
-  useEffect(() => {
-    if (!lightbox) return;
-    const onKey = (e) => e.key === 'Escape' && setLightbox(null);
-    window.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      window.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
-    };
-  }, [lightbox]);
-
   return (
-    <main className="min-h-screen bg-black text-white selection:bg-white/20 selection:text-white">
+    <main className="min-h-screen bg-ozl-base text-ozl-ink">
       {/* 1. Hero Section */}
-      <section className="relative w-full pb-12">
-        <div className="w-full relative">
+      <SkyHero eyebrow="Product" title={data.hero.headline}>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="mt-6 max-w-3xl text-lg font-light leading-relaxed text-white/90 md:text-xl"
+          style={{ textShadow: "0 1px 16px rgba(12,40,90,0.3)" }}
+        >
+          {data.hero.subheadline}
+        </motion.p>
+
+        {data.hero.badge && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.0 }}
-            className="relative w-full min-h-[60vh] md:min-h-[75vh] overflow-hidden flex flex-col items-center justify-center text-center px-6 pt-36 pb-12"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="mt-8 rounded-full border border-white/60 bg-white/25 px-6 py-3 text-sm text-white backdrop-blur-sm md:text-base"
           >
-            {/* Background Image */}
-            <div 
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-              style={{ backgroundImage: `url(${data.image})` }}
-            />
-            
-            {/* Dark Overlays for readability */}
-            <div className="absolute inset-0 bg-black/10" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
-
-            {/* Content */}
-            <div className="relative z-10 max-w-4xl flex flex-col items-center w-full">
-              <motion.span 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-[10px] md:text-[11px] tracking-[0.4em] font-mono text-white/80 uppercase block mb-6 md:mb-8 font-semibold"
-              >
-                {data.title}
-              </motion.span>
-              
-              <motion.h1 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className={`text-4xl md:text-5xl lg:text-6xl max-w-5xl text-white font-normal mb-8 leading-tight ${seasonFont.className}`}
-              >
-                {data.hero.headline}
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="text-lg md:text-xl lg:text-2xl text-neutral-300 font-light max-w-3xl leading-relaxed font-[family-name:var(--font-satoshi)] mb-8"
-              >
-                {data.hero.subheadline}
-              </motion.p>
-              
-              {data.hero.badge && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: 0.5 }}
-                  className="px-6 py-3 rounded-full bg-white/5 border border-white/10 text-neutral-300 text-sm md:text-base font-[family-name:var(--font-satoshi)]"
-                >
-                  {data.hero.badge}
-                </motion.div>
-              )}
-            </div>
+            {data.hero.badge}
           </motion.div>
-        </div>
-      </section>
+        )}
+      </SkyHero>
 
       {/* 2. Metrics Bar */}
       {data.metrics && data.metrics.length > 0 && (
-        <section className="relative w-full pb-16 px-6 md:px-12 lg:px-24">
-          <div className="max-w-7xl mx-auto w-full">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 w-full pt-12 border-t border-white/10">
+        <Band className="px-6 pb-16 md:px-12 lg:px-24">
+          <div className="mx-auto w-full max-w-7xl">
+            <div className="grid w-full grid-cols-2 gap-8 border-t border-[#0E1A33]/10 pt-12 md:grid-cols-4 md:gap-12">
               {data.metrics.map((metric, idx) => (
-                <motion.div 
+                <motion.div
                   key={idx}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -151,95 +113,95 @@ export default function ProductPage({ params }) {
                   transition={{ duration: 0.5, delay: idx * 0.1 }}
                   className="flex flex-col items-center text-center"
                 >
-                  <span className={`text-4xl md:text-5xl text-white mb-2 ${seasonFont.className}`}>
+                  <span className={`${HEADING} mb-2 text-4xl md:text-5xl`}>
                     {metric.value}
                   </span>
-                  <span className="text-base md:text-lg text-white font-medium mb-2 font-[family-name:var(--font-satoshi)]">
+                  <span className={`mb-2 text-base font-medium md:text-lg ${INK}`}>
                     {metric.label}
                   </span>
-                  <span className="text-sm md:text-[15px] font-[family-name:var(--font-satoshi)] text-neutral-500">
+                  <span className={`text-sm md:text-[15px] ${MUTED}`}>
                     {metric.description}
                   </span>
                 </motion.div>
               ))}
             </div>
           </div>
-        </section>
+        </Band>
       )}
 
       {/* 3. The Problem Section */}
       {data.problem && (
-        <section className="relative w-full py-24 md:py-32 px-6 md:px-12 lg:px-24 bg-[#050505] border-y border-white/5">
-          <div className="max-w-6xl mx-auto w-full flex flex-col md:flex-row gap-16 items-center">
-            <motion.div 
+        <Band tone="grey" fadeTop fadeBottom className="px-6 py-24 md:px-12 md:py-32 lg:px-24">
+          <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-16 md:flex-row">
+            <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="w-full md:w-1/2 flex flex-col gap-6"
+              className="flex w-full flex-col gap-6 md:w-1/2"
             >
-              <span className="text-[11px] md:text-xs font-mono font-bold text-red-500/80 tracking-[0.2em] uppercase block">
-                THE PROBLEM
-              </span>
-              <h2 className={`text-4xl md:text-5xl lg:text-6xl text-white leading-tight ${seasonFont.className}`}>
+              <span className={EYEBROW}>The problem</span>
+              <h2 className={`${HEADING} text-4xl md:text-5xl lg:text-6xl`}>
                 {data.problem.headline}
               </h2>
-              <p className="text-xl text-neutral-400 font-light font-[family-name:var(--font-satoshi)]">
+              <p className={`text-xl font-light ${BODY}`}>
                 {data.problem.description}
               </p>
-              
-              <div className="grid grid-cols-2 gap-4 mt-6">
+
+              <div className="mt-6 grid grid-cols-2 gap-4">
                 {data.problem.painPoints.map((point, idx) => (
                   <div key={idx} className="flex items-center gap-3">
-                    <span className="text-red-500/80 text-lg">✕</span>
-                    <span className="text-neutral-300 font-[family-name:var(--font-satoshi)]">{point}</span>
+                    <span className="text-lg text-rose-500/80">✕</span>
+                    <span className={BODY}>{point}</span>
                   </div>
                 ))}
               </div>
             </motion.div>
-            
-            <motion.div 
+
+            <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="w-full md:w-1/2 bg-[#111] p-10 rounded-3xl border border-white/10"
+              className="w-full md:w-1/2"
             >
-              <h3 className={`text-2xl text-white mb-6 ${seasonFont.className}`}>This Creates:</h3>
-              <div className="flex flex-col gap-4 mb-10">
-                {data.problem.consequences.map((cons, idx) => (
-                  <div key={idx} className="p-4 bg-white/5 rounded-xl text-neutral-300 font-[family-name:var(--font-satoshi)] flex items-center gap-3 border border-white/5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-neutral-500" />
-                    {cons}
-                  </div>
-                ))}
-              </div>
-              <div className="p-6 bg-white/5 rounded-xl border border-white/10">
-                <p className="text-lg text-white font-medium font-[family-name:var(--font-satoshi)] leading-relaxed">
-                  {data.problem.solution}
-                </p>
-              </div>
+              <GlassCard innerClassName="p-8 md:p-10">
+                <h3 className={`mb-6 font-[family-name:var(--font-instrument-serif)] text-2xl ${INK}`}>This Creates:</h3>
+                <div className="mb-10 flex flex-col gap-3">
+                  {data.problem.consequences.map((cons, idx) => (
+                    <div key={idx} className={`flex items-center gap-3 rounded-xl border border-white bg-white/60 p-4 ${BODY}`}>
+                      <div className="h-1.5 w-1.5 rounded-full bg-[#0E1A33]/30" />
+                      {cons}
+                    </div>
+                  ))}
+                </div>
+                <div className="rounded-xl border border-white bg-white/80 p-6">
+                  <p className={`text-lg font-medium leading-relaxed ${INK}`}>
+                    {data.problem.solution}
+                  </p>
+                </div>
+              </GlassCard>
             </motion.div>
           </div>
-        </section>
+        </Band>
       )}
 
       {/* 4. The Ecosystem Apps */}
       {data.ecosystemApps && data.ecosystemApps.length > 0 && (
-        <section className="relative w-full py-24 md:py-32 px-6 md:px-12 lg:px-24">
-          <div className="max-w-6xl mx-auto w-full">
+        <Band className="px-6 py-24 md:px-12 md:py-32 lg:px-24">
+          <div className="mx-auto w-full max-w-6xl">
             {data.ecosystemIntro && (
-              <div className="text-center mb-20">
-                <h2 className={`text-5xl md:text-6xl text-white mb-6 ${seasonFont.className}`}>
+              <div className="mb-16 text-center md:mb-20">
+                <h2 className={`${HEADING} mb-6 text-5xl md:text-6xl`}>
                   {data.ecosystemIntro.headline}
                 </h2>
-                <p className="text-xl text-neutral-400 font-light max-w-2xl mx-auto font-[family-name:var(--font-satoshi)]">
+                <p className={`mx-auto max-w-2xl text-xl font-light ${BODY}`}>
                   {data.ecosystemIntro.subheadline}
                 </p>
               </div>
             )}
 
-            <div className="flex flex-col gap-12 w-full">
+            <div className="flex w-full flex-col gap-10">
               {data.ecosystemApps.map((app, index) => (
                 <motion.div
                   key={index}
@@ -247,75 +209,74 @@ export default function ProductPage({ params }) {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-100px" }}
                   transition={{ duration: 0.7 }}
-                  className="w-full p-8 md:p-12 lg:p-16 rounded-[2.5rem] border border-white/10 bg-[#0a0a0a] flex flex-col md:flex-row gap-12 md:gap-20 items-center overflow-hidden relative group"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-                  
-                  <div className="w-full md:w-5/12 flex flex-col relative z-10">
-                    <span className="text-[11px] font-mono font-bold text-neutral-500 tracking-[0.2em] uppercase mb-4">
-                      {app.title}
-                    </span>
-                    <h3 className={`text-4xl lg:text-5xl text-white mb-6 leading-tight ${seasonFont.className}`}>
-                      {app.tagline}
-                    </h3>
-                    <p className="text-lg text-neutral-400 leading-relaxed font-[family-name:var(--font-satoshi)] mb-8">
-                      {app.description}
-                    </p>
-                    <div className="p-6 bg-white/5 border border-white/10 rounded-2xl">
-                      <p className="text-base text-neutral-300 italic font-[family-name:var(--font-satoshi)]">
-                        "{app.benefits}"
+                  <GlassCard innerClassName="flex flex-col items-center gap-12 p-8 md:flex-row md:gap-20 md:p-12 lg:p-16">
+                    <div className="flex w-full flex-col md:w-5/12">
+                      <span className={`${EYEBROW} mb-4`}>
+                        {app.title}
+                      </span>
+                      <h3 className={`mb-6 font-[family-name:var(--font-instrument-serif)] text-4xl leading-tight lg:text-5xl ${INK}`}>
+                        {app.tagline}
+                      </h3>
+                      <p className={`mb-8 text-lg leading-relaxed ${BODY}`}>
+                        {app.description}
                       </p>
+                      <div className="rounded-2xl border border-white bg-white/70 p-6">
+                        <p className={`text-base italic ${BODY}`}>
+                          "{app.benefits}"
+                        </p>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="w-full md:w-7/12 relative z-10">
-                    <h4 className="text-sm font-mono font-bold text-white uppercase mb-6 tracking-wider">Features</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-                      {app.features.map((feature, idx) => (
-                        <div key={idx} className="flex items-start gap-3">
-                          <svg className="w-5 h-5 text-neutral-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" />
-                          </svg>
-                          <span className="text-neutral-300 font-[family-name:var(--font-satoshi)]">{feature}</span>
-                        </div>
-                      ))}
+                    <div className="w-full md:w-7/12">
+                      <h4 className={`${EYEBROW} mb-6`}>Features</h4>
+                      <div className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
+                        {app.features.map((feature, idx) => (
+                          <div key={idx} className="flex items-start gap-3">
+                            <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#0E1A33]/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span className={BODY}>{feature}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  </GlassCard>
                 </motion.div>
               ))}
             </div>
           </div>
-        </section>
+        </Band>
       )}
 
       {/* 5. Screenshots Gallery */}
       {data.screenshots && data.screenshots.length > 0 && (
-        <section className="relative w-full py-20 bg-[#050505] border-y border-white/5 overflow-hidden">
-          <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24 mb-12">
-            <h2 className={`text-4xl md:text-5xl text-white ${seasonFont.className}`}>
-              See SAAME in Action
+        <Band tone="grey" fadeTop fadeBottom className="overflow-hidden py-20">
+          <div className="mx-auto mb-12 max-w-7xl px-6 md:px-12 lg:px-24">
+            <h2 className={`${HEADING} text-4xl md:text-5xl`}>
+              See {data.title} in Action
             </h2>
           </div>
           {/* Horizontal scrolling gallery setup */}
-          <div 
+          <div
             ref={scrollRef}
             onMouseDown={handleMouseDown}
             onMouseLeave={handleMouseLeave}
             onMouseUp={handleMouseUp}
             onMouseMove={handleMouseMove}
-            className={`flex gap-6 overflow-x-auto pb-8 px-6 md:px-12 lg:px-24 hide-scrollbar items-center ${isDragging ? 'cursor-grabbing select-none' : 'cursor-grab snap-x snap-mandatory scroll-smooth'}`}
+            className={`hide-scrollbar flex items-center gap-6 overflow-x-auto px-6 pb-8 md:px-12 lg:px-24 ${isDragging ? 'cursor-grabbing select-none' : 'cursor-grab snap-x snap-mandatory scroll-smooth'}`}
           >
             {data.screenshots.map((shot, idx) => {
               const isDesktop = shot.type === 'desktop' || idx === 0; // Fallback to desktop for first if type is missing
-              
+
               return (
-              <motion.div 
+              <motion.div
                 key={idx}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="flex-shrink-0 snap-center flex flex-col gap-4"
+                className="flex flex-shrink-0 snap-center flex-col gap-4"
               >
                 <div
                   onClick={() => shot.image && openLightbox(shot)}
@@ -328,43 +289,44 @@ export default function ProductPage({ params }) {
                   role={shot.image ? 'button' : undefined}
                   tabIndex={shot.image ? 0 : undefined}
                   aria-label={shot.image ? `View ${shot.label} full size` : undefined}
-                  className={`h-[300px] md:h-[370px] lg:h-[420px] ${shot.image ? 'w-auto cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70' : isDesktop ? 'aspect-[16/10]' : 'aspect-[9/16]'} rounded-2xl bg-[#111] border border-white/10 flex items-center justify-center overflow-hidden relative select-none transition-transform duration-300 hover:scale-[1.02]`}
+                  className={`h-[300px] md:h-[370px] lg:h-[420px] ${shot.image ? 'w-auto cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0E1A33]/40' : isDesktop ? 'aspect-[16/10]' : 'aspect-[9/16]'} relative flex select-none items-center justify-center overflow-hidden rounded-2xl border border-white bg-white/70 shadow-[0_16px_36px_-20px_rgba(15,23,42,0.35)] transition-transform duration-300 hover:-translate-y-1`}
                 >
                   {shot.image ? (
                     <img
                       src={shot.image}
                       alt={shot.label}
-                      className="h-full w-auto object-contain pointer-events-none"
+                      className="pointer-events-none h-full w-auto object-contain"
                       draggable={false}
                     />
                   ) : (
-                    <div className="text-neutral-600 font-mono text-sm tracking-widest uppercase">
+                    <div className={`font-mono text-sm uppercase tracking-widest ${MUTED}`}>
                       [UI: {shot.label}]
                     </div>
                   )}
                 </div>
-                <span className="text-neutral-400 font-[family-name:var(--font-satoshi)] text-center text-sm uppercase tracking-wider">
+                <span className={`text-center text-sm uppercase tracking-wider ${MUTED}`}>
                   {shot.label}
                 </span>
               </motion.div>
             )})}
           </div>
-        </section>
+        </Band>
       )}
 
-      {/* Lightbox / full-size image viewer (portaled to body to escape stacking context) */}
+      {/* Lightbox / full-size image viewer (portaled to body to escape stacking
+          context). A dark backdrop on purpose: it's a viewer, not a page. */}
       {mounted && lightbox && createPortal(
         <div
           onClick={() => setLightbox(null)}
           role="dialog"
           aria-modal="true"
           aria-label={`${lightbox.label} preview`}
-          className="fixed inset-0 z-[300] flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm p-4 md:p-10 cursor-zoom-out"
+          className="fixed inset-0 z-[300] flex cursor-zoom-out flex-col items-center justify-center bg-black/85 p-4 backdrop-blur-sm md:p-10"
         >
           <button
             onClick={() => setLightbox(null)}
             aria-label="Close"
-            className="absolute top-5 right-5 text-white/60 hover:text-white text-3xl leading-none w-10 h-10 flex items-center justify-center"
+            className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center text-3xl leading-none text-white/60 hover:text-white"
           >
             ×
           </button>
@@ -372,26 +334,26 @@ export default function ProductPage({ params }) {
             src={lightbox.image}
             alt={lightbox.label}
             onClick={(e) => e.stopPropagation()}
-            className="max-w-full max-h-[85vh] w-auto h-auto object-contain rounded-xl cursor-default"
+            className="h-auto max-h-[85vh] w-auto max-w-full cursor-default rounded-xl object-contain"
           />
-          <span className="mt-4 text-neutral-300 font-[family-name:var(--font-satoshi)] text-sm uppercase tracking-wider">
+          <span className="mt-4 text-sm uppercase tracking-wider text-neutral-300">
             {lightbox.label}
           </span>
         </div>,
         document.body
       )}
 
-      {/* 6. Everything Your Institution Needs (Capabilities) */}
+      {/* 6. Capabilities */}
       {data.capabilities && data.capabilities.length > 0 && (
-        <section className="relative w-full py-24 md:py-32 px-6 md:px-12 lg:px-24">
-          <div className="max-w-6xl mx-auto w-full">
-            <div className="text-center mb-16">
-              <h2 className={`text-4xl md:text-5xl lg:text-6xl text-white mb-6 ${seasonFont.className}`}>
+        <Band tone="grey" fadeTop fadeBottom className="px-6 py-24 md:px-12 md:py-32 lg:px-24">
+          <div className="mx-auto w-full max-w-6xl">
+            <div className="mb-12 text-center md:mb-16">
+              <h2 className={`${HEADING} text-4xl md:text-5xl lg:text-6xl`}>
                 {data.capabilitiesHeadline || "Core Capabilities"}
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
               {data.capabilities.map((cap, idx) => (
                 <motion.div
                   key={idx}
@@ -399,35 +361,35 @@ export default function ProductPage({ params }) {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: idx * 0.05 }}
-                  className="p-8 rounded-3xl bg-[#0a0a0a] border border-white/5 hover:border-white/20 transition-colors"
+                  className="h-full"
                 >
-                  <h3 className={`text-2xl text-white mb-4 ${seasonFont.className}`}>
-                    {cap.title}
-                  </h3>
-                  <p className="text-neutral-400 leading-relaxed font-[family-name:var(--font-satoshi)]">
-                    {cap.description}
-                  </p>
+                  <GlassCard interactive className="h-full" innerClassName="p-8">
+                    <h3 className={`mb-4 font-[family-name:var(--font-instrument-serif)] text-2xl ${INK}`}>
+                      {cap.title}
+                    </h3>
+                    <p className={`leading-relaxed ${BODY}`}>
+                      {cap.description}
+                    </p>
+                  </GlassCard>
                 </motion.div>
               ))}
             </div>
           </div>
-        </section>
+        </Band>
       )}
 
-      {/* 7. Why Institutions Choose SAAME */}
+      {/* 7. Why Choose */}
       {data.whyChoose && data.whyChoose.length > 0 && (
-        <section className="relative w-full py-24 bg-white text-black px-6 md:px-12 lg:px-24">
-          <div className="max-w-6xl mx-auto w-full">
-            <div className="mb-16">
-              <span className="text-[11px] md:text-xs font-mono font-bold text-black/50 tracking-[0.2em] uppercase block mb-4">
-                THE DIFFERENCE
-              </span>
-              <h2 className={`text-4xl md:text-5xl lg:text-6xl text-black ${seasonFont.className}`}>
-                Why Institutions Choose SAAME
+        <Band className="px-6 py-24 md:px-12 lg:px-24">
+          <div className="mx-auto w-full max-w-6xl">
+            <div className="mb-14 md:mb-16">
+              <span className={`${EYEBROW} mb-4`}>The difference</span>
+              <h2 className={`${HEADING} text-4xl md:text-5xl lg:text-6xl`}>
+                Why Institutions Choose {data.title}
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
               {data.whyChoose.map((reason, idx) => (
                 <motion.div
                   key={idx}
@@ -437,31 +399,31 @@ export default function ProductPage({ params }) {
                   transition={{ duration: 0.5, delay: idx * 0.1 }}
                   className="flex flex-col gap-4"
                 >
-                  <h3 className={`text-3xl text-black ${seasonFont.className}`}>
+                  <h3 className={`font-[family-name:var(--font-instrument-serif)] text-3xl ${INK}`}>
                     {reason.title}
                   </h3>
-                  <p className="text-lg text-black/70 font-[family-name:var(--font-satoshi)] leading-relaxed">
+                  <p className={`text-lg leading-relaxed ${BODY}`}>
                     {reason.description}
                   </p>
                 </motion.div>
               ))}
             </div>
           </div>
-        </section>
+        </Band>
       )}
 
       {/* 8. Implementation Process */}
       {data.implementation && data.implementation.length > 0 && (
-        <section className="relative w-full py-24 md:py-32 px-6 md:px-12 lg:px-24 bg-black">
-          <div className="max-w-4xl mx-auto w-full">
-            <div className="text-center mb-20">
-              <h2 className={`text-4xl md:text-5xl lg:text-6xl text-white mb-6 ${seasonFont.className}`}>
+        <Band tone="grey" fadeTop fadeBottom className="px-6 py-24 md:px-12 md:py-32 lg:px-24">
+          <div className="mx-auto w-full max-w-4xl">
+            <div className="mb-16 text-center md:mb-20">
+              <h2 className={`${HEADING} text-4xl md:text-5xl lg:text-6xl`}>
                 How Implementation Works
               </h2>
             </div>
-            
-            <div className="flex flex-col gap-8 relative">
-              <div className="absolute left-6 md:left-[3.25rem] top-0 bottom-0 w-px bg-white/10" />
+
+            <div className="relative flex flex-col gap-6">
+              <div className="absolute bottom-0 left-6 top-0 w-px bg-[#0E1A33]/10 md:left-[3.25rem]" />
               {data.implementation.map((step, idx) => (
                 <motion.div
                   key={idx}
@@ -469,90 +431,87 @@ export default function ProductPage({ params }) {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
                   transition={{ duration: 0.5, delay: idx * 0.1 }}
-                  className="flex items-center gap-6 md:gap-10 relative z-10"
+                  className="relative z-10 flex items-center gap-6 md:gap-10"
                 >
-                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-[#111] border border-white/20 flex items-center justify-center flex-shrink-0 text-white font-mono text-sm md:text-base font-bold">
+                  <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border border-white bg-white font-mono text-sm font-bold shadow-[0_4px_12px_-6px_rgba(15,23,42,0.3)] md:h-14 md:w-14 md:text-base ${INK}`}>
                     {idx + 1}
                   </div>
-                  <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 bg-[#0a0a0a] border border-white/5 p-6 rounded-2xl w-full">
-                    <h3 className={`text-2xl text-white md:w-1/3 ${seasonFont.className}`}>
+                  <GlassCard className="w-full" innerClassName="flex flex-col gap-2 p-6 md:flex-row md:items-center md:gap-6">
+                    <h3 className={`font-[family-name:var(--font-instrument-serif)] text-2xl md:w-1/3 ${INK}`}>
                       {step.title}
                     </h3>
-                    <p className="text-neutral-400 font-[family-name:var(--font-satoshi)] md:w-2/3">
+                    <p className={`md:w-2/3 ${BODY}`}>
                       {step.description}
                     </p>
-                  </div>
+                  </GlassCard>
                 </motion.div>
               ))}
             </div>
           </div>
-        </section>
+        </Band>
       )}
 
       {/* 9. Trust Section */}
       {data.trust && (
-        <section className="relative w-full py-24 bg-[#050505] px-6 md:px-12 lg:px-24 border-y border-white/5 text-center">
-          <div className="max-w-4xl mx-auto w-full">
-            <h2 className={`text-3xl md:text-4xl lg:text-5xl text-white mb-8 leading-tight ${seasonFont.className}`}>
+        <Band className="px-6 py-24 text-center md:px-12 lg:px-24">
+          <div className="mx-auto w-full max-w-4xl">
+            <h2 className={`${HEADING} mb-8 text-3xl md:text-4xl lg:text-5xl`}>
               {data.trust.headline}
             </h2>
-            <p className="text-xl text-neutral-400 font-light leading-relaxed font-[family-name:var(--font-satoshi)]">
+            <p className={`text-xl font-light leading-relaxed ${BODY}`}>
               {data.trust.description}
             </p>
           </div>
-        </section>
+        </Band>
       )}
 
       {/* 10. Perfect For */}
       {data.perfectFor && data.perfectFor.length > 0 && (
-        <section className="relative w-full py-24 md:py-32 px-6 md:px-12 lg:px-24 bg-black">
-          <div className="max-w-5xl mx-auto w-full text-center">
-            <span className="text-[11px] md:text-xs font-mono font-bold text-neutral-500 tracking-[0.2em] uppercase block mb-12">
-              PERFECT FOR
-            </span>
+        <Band className="px-6 py-24 md:px-12 md:py-32 lg:px-24">
+          <div className="mx-auto w-full max-w-5xl text-center">
+            <span className={`${EYEBROW} mb-12`}>Perfect for</span>
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-4 md:gap-x-10 md:gap-y-8">
               {data.perfectFor.map((audience, idx) => (
                 <motion.span
                   key={idx}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: idx * 0.1 }}
-                  className={`text-3xl md:text-5xl lg:text-6xl text-neutral-300 hover:text-white transition-colors cursor-default ${seasonFont.className}`}
+                  className={`cursor-default font-[family-name:var(--font-instrument-serif)] text-3xl transition-colors hover:text-[#0E1A33] md:text-5xl lg:text-6xl ${BODY}`}
                 >
                   {audience}
                   {idx !== data.perfectFor.length - 1 && (
-                    <span className="text-white/20 ml-6 md:ml-10 font-sans font-light text-2xl md:text-4xl">/</span>
+                    <span className={`ml-6 font-sans text-2xl font-light opacity-50 md:ml-10 md:text-4xl ${MUTED}`}>/</span>
                   )}
                 </motion.span>
               ))}
             </div>
           </div>
-        </section>
+        </Band>
       )}
 
-      {/* 11. The Future of Educational Operations */}
+      {/* 11. The Future */}
       {data.future && (
-        <section className="relative w-full py-24 md:py-32 px-6 md:px-12 lg:px-24 bg-[#0a0a0a] border-t border-white/10">
-          <div className="max-w-4xl mx-auto w-full">
-            <h2 className={`text-4xl md:text-5xl lg:text-6xl text-white mb-10 ${seasonFont.className}`}>
+        <Band className="border-t border-[#0E1A33]/10 px-6 py-24 md:px-12 md:py-32 lg:px-24">
+          <div className="mx-auto w-full max-w-4xl">
+            <h2 className={`${HEADING} mb-10 text-4xl md:text-5xl lg:text-6xl`}>
               {data.future.headline}
             </h2>
-            <div className="flex flex-col gap-6 pl-6 md:pl-10 border-l border-white/20">
+            <div className="flex flex-col gap-6 border-l border-[#0E1A33]/10 pl-6 md:pl-10">
               {data.future.paragraphs.map((para, idx) => (
-                <p key={idx} className="text-xl md:text-2xl text-neutral-300 font-light leading-relaxed font-[family-name:var(--font-satoshi)]">
+                <p key={idx} className={`text-xl font-light leading-relaxed md:text-2xl ${BODY}`}>
                   {para}
                 </p>
               ))}
             </div>
           </div>
-        </section>
+        </Band>
       )}
 
-      {/* 12. CTA Section */}
-      <div className="relative z-20 bg-black">
-        <ServiceCta title={data.ctaText} />
-      </div>
+      {/* 12. CTA Section. This passed `title`, which ServiceCta doesn't take,
+          so the button rendered with no label. */}
+      <ServiceCta text={data.ctaText} />
 
       <style jsx global>{`
         .hide-scrollbar::-webkit-scrollbar {

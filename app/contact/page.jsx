@@ -2,30 +2,17 @@
 
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowUpRight, Check, Linkedin, Loader2, MapPin, Mail } from 'lucide-react'
+import { ArrowUpRight, Check } from 'lucide-react'
 import Image from 'next/image'
-import { Instrument_Serif, Inter } from 'next/font/google'
-import NavbarResponsive from '@/components/Navbar'
+import { Band, BODY, BTN_PRIMARY, BTN_SECONDARY, GlassCard, HEADING, INK, MUTED } from '@/components/ui/light-kit'
 
 // ----------------------------------------------------------------------
 // 0. CONFIGURATION
 // ----------------------------------------------------------------------
 const WEB3FORMS_ACCESS_KEY = "aeb1e2ea-21fd-44b4-bb0a-366928d410ae";
 
-const serif = Instrument_Serif({
-  subsets: ['latin'],
-  weight: '400',
-  style: ['normal', 'italic'],
-  display: 'swap',
-  adjustFontFallback: false,
-})
-
-const sans = Inter({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600'],
-  display: 'swap',
-  adjustFontFallback: false,
-})
+const FIELD =
+  "w-full rounded-2xl border border-[#0E1A33]/10 bg-white/70 px-6 py-4 text-[16px] text-[#0E1A33] shadow-[inset_0_1px_2px_rgba(15,23,42,0.04)] transition-all placeholder:text-[#94A3B8] focus:border-[#0E1A33]/30 focus:bg-white focus:outline-none"
 
 // ----------------------------------------------------------------------
 // 1. MAIN COMPONENT
@@ -83,170 +70,154 @@ export default function Contact() {
   }
 
   return (
-    <main className={`bg-[#050505] text-white min-h-screen selection:bg-white/20 selection:text-white ${sans.className}`}>
-
-      <NavbarResponsive />
-
-      <section className="relative w-full min-h-[90vh] overflow-hidden px-4 md:px-8 pb-24 pt-32 md:pt-40 flex justify-center">
-        {/* Background ambient glow matching about page */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[45%] w-[150vw] sm:w-[1200px] h-[1200px] bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.12)_0%,rgba(147,51,234,0.08)_30%,transparent_65%)] pointer-events-none blur-[100px] -z-10" />
-
+    <main className="min-h-screen bg-ozl-base text-ozl-ink">
+      <Band tone="grey" fadeTop fadeBottom className="flex min-h-[90vh] justify-center px-4 pb-24 pt-32 md:px-8 md:pt-40">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: "easeOut" }}
-          className="relative w-full max-w-[1200px] bg-[#0c0c0e] border border-white/10 rounded-[40px] md:rounded-[56px] shadow-[0_0_80px_rgba(0,0,0,0.8),0_0_60px_rgba(255,255,255,0.08)] overflow-hidden flex flex-col lg:flex-row"
+          className="w-full max-w-[1200px]"
         >
-          {/* === LEFT SIDE (Visual) === */}
-          <div className="relative w-full lg:w-[48%] h-[250px] lg:h-auto overflow-hidden">
+          <GlassCard innerClassName="flex flex-col lg:flex-row">
+            {/* === LEFT SIDE (Visual) === */}
+            <div className="relative h-[250px] w-full overflow-hidden lg:h-auto lg:w-[48%]">
+              <Image
+                src="/contact_dreamy.jpg"
+                alt="Lone silhouette in a meadow under a day-night transitioning sky"
+                fill
+                className="relative z-10 object-cover brightness-[1.1]"
+                priority
+              />
 
-            <Image
-              src="/contact_dreamy.jpg"
-              alt="Lone silhouette in a meadow under a day-night transitioning sky"
-              fill
-              className="object-cover relative z-10 brightness-[1.15] contrast-[1.05]"
-              priority
-            />
+              {/* Just enough shade at the foot for the white type. */}
+              <div className="absolute inset-0 z-20 bg-gradient-to-t from-black/45 via-black/5 to-transparent" />
 
-            {/* Image Glow Overlays */}
-            <div className="absolute inset-0 z-15 pointer-events-none bg-[radial-gradient(ellipse_at_center,rgba(100,150,255,0.25)_0%,transparent_70%)]" />
-            <div className="absolute inset-0 z-15 pointer-events-none bg-[radial-gradient(ellipse_at_50%_60%,rgba(200,180,255,0.15)_0%,transparent_60%)]" />
-            <div className="absolute inset-0 z-15 pointer-events-none shadow-[inset_0_0_80px_rgba(120,160,255,0.2)]" />
-
-            {/* Subtle Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent z-20" />
-
-
-            {/* Centered Content with Glow */}
-            <div className="absolute inset-0 z-30 flex flex-col items-center justify-center text-center px-6">
-              <h2
-                className={`text-3xl md:text-5xl text-white tracking-tight drop-shadow-[0_0_40px_rgba(255,255,255,0.5)] ${serif.className}`}
-                style={{ textShadow: '0 0 30px rgba(255,255,255,0.6), 0 0 60px rgba(150,180,255,0.4), 0 0 100px rgba(100,150,255,0.2)' }}
-              >
-                Let's start a <br /> <span className="italic opacity-90">project.</span>
-              </h2>
-              <div className="mt-4 flex gap-6 text-[10px] font-mono text-white/50 uppercase tracking-[0.2em]">
-                <span>OneZeroLabs</span>
-                <span>Innovation + Strategy</span>
+              <div className="absolute inset-0 z-30 flex flex-col items-center justify-center px-6 text-center">
+                <h2
+                  className="font-[family-name:var(--font-instrument-serif)] text-3xl tracking-tight text-white md:text-5xl"
+                  style={{ textShadow: '0 2px 24px rgba(12,24,48,0.35)' }}
+                >
+                  Let's start a <br /> <span className="italic opacity-90">project.</span>
+                </h2>
+                <div className="mt-4 flex gap-6 font-mono text-[10px] uppercase tracking-[0.2em] text-white/75">
+                  <span>OneZeroLabs</span>
+                  <span>Innovation + Strategy</span>
+                </div>
               </div>
             </div>
 
+            {/* === RIGHT SIDE (Form Section) === */}
+            <div className="flex w-full flex-col justify-center p-6 md:p-8 lg:w-[52%] lg:p-10">
+              {/* Section Header */}
+              <div className="mb-8">
+                <h1 className={`${HEADING} mb-3 text-4xl md:text-5xl lg:text-[48px]`}>
+                  Bring your <br /> <span className="italic">vision to life.</span>
+                </h1>
+                <p className={`max-w-md text-[15px] font-light leading-relaxed ${BODY}`}>
+                  Partner with OneZeroLabs to build high-performance digital solutions tailored to your brand.
+                </p>
+              </div>
 
-            {/* Circular cutout mimic (subtle) */}
-            <div className="hidden lg:block absolute -right-20 top-1/2 -translate-y-1/2 w-40 h-[110%] bg-[#0c0c0e] rounded-full blur-2xl opacity-40 translate-x-1/2" />
-          </div>
-
-          {/* === RIGHT SIDE (Form Section) === */}
-          <div className="w-full lg:w-[52%] p-6 md:p-8 lg:p-10 flex flex-col justify-center">
-            {/* Section Header */}
-            <div className="mb-8">
-              <h1 className={`text-4xl md:text-5xl lg:text-[48px] text-white leading-tight mb-3 ${serif.className}`}>
-                Bring your <br /> <span className="italic text-white/50">vision to life.</span>
-              </h1>
-              <p className="text-neutral-400 font-light text-[15px] leading-relaxed max-w-md">
-                Partner with OneZeroLabs to build high-performance digital solutions tailored to your brand.
-              </p>
-            </div>
-
-            <AnimatePresence mode='wait'>
-              {status === 'success' ? (
-                /* === SUCCESS STATE === */
-                <motion.div
-                  key="success"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="py-10 text-center flex flex-col items-center"
-                >
-                  <div className="w-20 h-20 bg-white/5 border border-white/10 rounded-full flex items-center justify-center mb-8">
-                    <Check size={32} className="text-white" />
-                  </div>
-                  <h3 className={`text-3xl text-white mb-4 ${serif.className}`}>Message Received.</h3>
-                  <p className="text-neutral-400 mb-10">We'll get back to you within 24 hours.</p>
-                  <button
-                    onClick={() => setStatus(null)}
-                    className="px-8 py-3 bg-white/5 border border-white/10 text-white rounded-full hover:bg-white/10 transition-colors"
+              <AnimatePresence mode='wait'>
+                {status === 'success' ? (
+                  /* === SUCCESS STATE === */
+                  <motion.div
+                    key="success"
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -12 }}
+                    className="flex flex-col items-center py-10 text-center"
                   >
-                    Send another message
-                  </button>
-                </motion.div>
-              ) : (
-                /* === FORM STATE === */
-                <motion.div key="form" exit={{ opacity: 0, y: -20 }}>
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <input
-                      type="text"
-                      name="name"
-                      placeholder="Your Name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-6 py-4 bg-white/[0.02] border border-white/10 rounded-2xl text-white text-[16px] focus:outline-none focus:border-white/30 transition-all placeholder:text-neutral-600"
-                    />
-
-                    <input
-                      type="text"
-                      name="company"
-                      placeholder="Company Name"
-                      value={formData.company}
-                      onChange={handleChange}
-                      className="w-full px-6 py-4 bg-white/[0.02] border border-white/10 rounded-2xl text-white text-[16px] focus:outline-none focus:border-white/30 transition-all placeholder:text-neutral-600"
-                    />
-
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="Email Address"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-6 py-4 bg-white/[0.02] border border-white/10 rounded-2xl text-white text-[16px] focus:outline-none focus:border-white/30 transition-all placeholder:text-neutral-600"
-                    />
-
-                    <textarea
-                      name="message"
-                      placeholder="Tell us about your project..."
-                      value={formData.message}
-                      onChange={handleChange}
-                      rows={3}
-                      required
-                      className="w-full px-6 py-4 bg-white/[0.02] border border-white/10 rounded-2xl text-white text-[16px] focus:outline-none focus:border-white/30 transition-all placeholder:text-neutral-600 resize-none"
-                    />
-
-                    <div className="flex items-start gap-3 pt-2">
-                      <div className="relative flex items-center mt-0.5">
-                        <input
-                          type="checkbox"
-                          name="agreePolicy"
-                          id="agreePolicy"
-                          checked={formData.agreePolicy}
-                          onChange={handleChange}
-                          required
-                          className="peer h-4 w-4 cursor-pointer appearance-none border border-white/20 rounded bg-white/5 checked:bg-white checked:border-white transition-all focus:ring-0"
-                        />
-                        <Check size={10} strokeWidth={4} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-black opacity-0 peer-checked:opacity-100 pointer-events-none" />
-                      </div>
-                      <label htmlFor="agreePolicy" className="text-[14px] text-neutral-500 font-light cursor-pointer select-none">
-                        I agree to the <a href="/privacy-policy" className="text-white/80 hover:text-white underline underline-offset-4 decoration-white/20 transition-colors">privacy policy</a>.
-                      </label>
+                    <div className="mb-8 flex h-20 w-20 items-center justify-center rounded-full border border-white bg-white/80 shadow-[0_8px_24px_-12px_rgba(15,23,42,0.25)]">
+                      <Check size={32} className="text-[#0E1A33]" />
                     </div>
-
-                    <button
-                      type="submit"
-                      disabled={!formData.agreePolicy || status === 'submitting'}
-                      className="group relative w-full px-8 py-4 bg-white text-black rounded-2xl text-[15px] font-medium tracking-wide hover:bg-neutral-200 transition-all duration-300 disabled:opacity-50 flex justify-center items-center gap-2"
-                    >
-                      <span>{status === 'submitting' ? 'Sending...' : 'Send Message'}</span>
-                      <ArrowUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                    <h3 className={`mb-4 font-[family-name:var(--font-instrument-serif)] text-3xl ${INK}`}>Message Received.</h3>
+                    <p className={`mb-10 ${BODY}`}>We'll get back to you within 24 hours.</p>
+                    <button onClick={() => setStatus(null)} className={BTN_SECONDARY}>
+                      Send another message
                     </button>
-                  </form>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </motion.div>
-      </section>
+                  </motion.div>
+                ) : (
+                  /* === FORM STATE === */
+                  <motion.div key="form" exit={{ opacity: 0, y: -20 }}>
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                      <input
+                        type="text"
+                        name="name"
+                        placeholder="Your Name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required
+                        className={FIELD}
+                      />
 
+                      <input
+                        type="text"
+                        name="company"
+                        placeholder="Company Name"
+                        value={formData.company}
+                        onChange={handleChange}
+                        className={FIELD}
+                      />
+
+                      <input
+                        type="email"
+                        name="email"
+                        placeholder="Email Address"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                        className={FIELD}
+                      />
+
+                      <textarea
+                        name="message"
+                        placeholder="Tell us about your project..."
+                        value={formData.message}
+                        onChange={handleChange}
+                        rows={3}
+                        required
+                        className={`${FIELD} resize-none`}
+                      />
+
+                      <div className="flex items-start gap-3 pt-2">
+                        <div className="relative mt-0.5 flex items-center">
+                          <input
+                            type="checkbox"
+                            name="agreePolicy"
+                            id="agreePolicy"
+                            checked={formData.agreePolicy}
+                            onChange={handleChange}
+                            required
+                            // min-h-0/min-w-0: the phone tap-target rule in
+                            // globals.css otherwise inflates this to a 44px
+                            // square. The label is clickable, so the target
+                            // stays large enough.
+                            className="peer h-4 w-4 min-h-0 min-w-0 cursor-pointer appearance-none rounded border border-[#0E1A33]/25 bg-white transition-all checked:border-[#1E293B] checked:bg-[#1E293B] focus:ring-0"
+                          />
+                          <Check size={10} strokeWidth={4} className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100" />
+                        </div>
+                        <label htmlFor="agreePolicy" className={`cursor-pointer select-none text-[14px] font-light ${MUTED}`}>
+                          I agree to the <a href="/privacy-policy" className={`underline decoration-[#0E1A33]/20 underline-offset-4 transition-colors hover:decoration-[#0E1A33]/50 ${INK}`}>privacy policy</a>.
+                        </label>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={!formData.agreePolicy || status === 'submitting'}
+                        className={`${BTN_PRIMARY} group !h-12 w-full`}
+                      >
+                        <span>{status === 'submitting' ? 'Sending...' : 'Send Message'}</span>
+                        <ArrowUpRight size={16} className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                      </button>
+                    </form>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </GlassCard>
+        </motion.div>
+      </Band>
     </main>
   )
 }

@@ -2,24 +2,13 @@
 
 import React, { useRef } from 'react'
 import Link from 'next/link'
-import { motion, useMotionValue, useSpring, useScroll, useTransform, useInView, useAnimation } from 'framer-motion'
+import { motion, useMotionValue, useSpring, useScroll, useTransform } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
-import { Instrument_Serif, Inter } from 'next/font/google'
-
-const serif = Instrument_Serif({
-  subsets: ['latin'],
-  weight: '400',
-  style: ['normal', 'italic'],
-  display: 'swap',
-  adjustFontFallback: false,
-})
-
-const sans = Inter({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600'],
-  display: 'swap',
-  adjustFontFallback: false,
-})
+import CtaSection from '@/components/CtaSection'
+import { Band, BODY, EYEBROW, GlassCard, HEADING, INK, MUTED } from '@/components/ui/light-kit'
+import { CLIENT_NAMES, listNames } from '@/lib/seo'
+import JsonLd from '@/components/JsonLd'
+import { portfolioSchema } from '@/lib/schemas'
 
 // ----------------------------------------------------------------------
 // DATA — UI/UX removed, Marks Management gets description note
@@ -79,188 +68,99 @@ const CATEGORIES = [
 // MAIN
 // ----------------------------------------------------------------------
 export default function WorkGrid() {
-  const ctaRef = useRef(null)
-  const isCtaInView = useInView(ctaRef, { once: false, margin: '-10% 0px' })
-  const glowControls = useAnimation()
-
-  React.useEffect(() => {
-    if (isCtaInView) {
-      glowControls.start('visible')
-    } else {
-      glowControls.start('hidden')
-    }
-  }, [isCtaInView, glowControls])
-
-  const glowVariants = {
-    hidden: {
-      opacity: 0,
-      y: 120,
-      scale: 0.8,
-    },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: {
-        duration: 2.0,
-        ease: [0.16, 1, 0.3, 1],
-        opacity: { duration: 1.4, ease: 'easeOut' },
-        scale: { duration: 2.0, ease: [0.16, 1, 0.3, 1] },
-      },
-    },
-  }
-
   return (
-    <main className={`bg-[#050505] min-h-screen text-white selection:bg-white/20 selection:text-white ${sans.className}`}>
+    <main className="min-h-screen bg-ozl-base text-ozl-ink">
+      <JsonLd data={portfolioSchema} />
 
       {/* ============================================= */}
       {/* HERO */}
       {/* ============================================= */}
-      <section className="relative max-w-[1300px] mx-auto px-6 md:px-12 pt-24 md:pt-44 pb-12 md:pb-20 text-center overflow-hidden">
-
-        <div className="absolute top-[10%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[radial-gradient(ellipse,rgba(255,255,255,0.04)_0%,transparent_70%)] rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute top-[20%] left-[10%] w-[400px] h-[400px] bg-[radial-gradient(circle,rgba(255,255,255,0.03)_0%,transparent_70%)] rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute top-[30%] right-[10%] w-[400px] h-[400px] bg-[radial-gradient(circle,rgba(255,255,255,0.02)_0%,transparent_70%)] rounded-full blur-[120px] pointer-events-none" />
-
-        <motion.p
+      <Band className="px-6 pb-10 pt-32 text-center md:px-12 md:pb-14 md:pt-44">
+        <motion.span
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-[12px] md:text-[14px] text-neutral-500 tracking-widest uppercase mb-4 md:mb-10 font-medium relative z-10"
+          className={`${EYEBROW} mb-5 md:mb-7`}
         >
           Portfolio
-        </motion.p>
+        </motion.span>
 
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.2 }}
-          className={`text-4xl md:text-6xl lg:text-7xl text-white leading-[1.1] tracking-[-0.02em] relative z-10 mb-6 md:mb-8 ${serif.className}`}
-          style={{ textShadow: '0 0 30px rgba(255,255,255,0.35), 0 0 80px rgba(255,255,255,0.15), 0 0 140px rgba(255,255,255,0.08)' }}
+          className={`${HEADING} text-4xl md:text-6xl lg:text-7xl`}
         >
-          Our <span className="italic text-white/50">Work</span>
+          Our <span className="italic">Work</span>
         </motion.h1>
 
-      </section>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.35 }}
+          className={`mx-auto mt-5 max-w-2xl text-[15px] font-light leading-relaxed md:mt-6 md:text-[16px] ${BODY}`}
+        >
+          Websites and software we have built for clients including{' '}
+          {listNames(CLIENT_NAMES)}.
+        </motion.p>
+      </Band>
 
       {/* ============================================= */}
       {/* CATEGORY SECTIONS */}
       {/* ============================================= */}
-      <div className="max-w-[1300px] mx-auto px-6 md:px-12 pb-32">
-        {CATEGORIES.map(({ name: category, tagline }) => {
-          const categoryProjects = projects.filter(p => p.category === category)
-          if (categoryProjects.length === 0) return null
+      <Band tone="grey" fadeTop fadeBottom className="px-6 pb-24 pt-12 md:px-12 md:pb-32 md:pt-16">
+        <div className="mx-auto max-w-[1300px]">
+          {CATEGORIES.map(({ name: category, tagline }) => {
+            const categoryProjects = projects.filter(p => p.category === category)
+            if (categoryProjects.length === 0) return null
 
-          return (
-            <section key={category} className="mb-16 md:mb-32">
+            return (
+              <section key={category} className="mb-16 last:mb-0 md:mb-28">
 
-              <motion.div
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.7 }}
-                className="py-4 md:py-8 border-t border-white/[0.08] mb-8 md:mb-14"
-              >
-                <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-4">
-                  <h2
-                    className={`text-4xl md:text-5xl text-white leading-[1.1] tracking-[-0.02em] ${serif.className}`}
-                    style={{ textShadow: '0 0 30px rgba(255,255,255,0.2), 0 0 80px rgba(255,255,255,0.08)' }}
-                  >
-                    {category}
-                  </h2>
-                  <div className="flex items-center gap-4">
-                    <p className="text-sm text-neutral-500 font-light">{tagline}</p>
-                    <span className="text-xs text-neutral-600 font-mono">
-                      ({String(categoryProjects.length).padStart(2, '0')})
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
-                {categoryProjects.map((project, index) => {
-                  const isFeatured = project.id === 1
-                  return (
-                    <div key={project.id} className={isFeatured ? "col-span-1 md:col-span-2" : ""}>
-                      {isFeatured ? (
-                        <HeroProjectCard project={project} index={index} />
-                      ) : (
-                        <ProjectCard project={project} index={index} />
-                      )}
+                <motion.div
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.7 }}
+                  className="mb-8 border-t border-[#0E1A33]/10 py-4 md:mb-12 md:py-8"
+                >
+                  <div className="flex flex-col justify-between gap-4 md:flex-row md:items-baseline">
+                    <h2 className={`${HEADING} text-4xl md:text-5xl`}>
+                      {category}
+                    </h2>
+                    <div className="flex items-center gap-4">
+                      <p className={`text-sm font-light ${BODY}`}>{tagline}</p>
+                      <span className={`font-mono text-xs ${MUTED}`}>
+                        ({String(categoryProjects.length).padStart(2, '0')})
+                      </span>
                     </div>
-                  )
-                })}
-              </div>
-            </section>
-          )
-        })}
-      </div>
+                  </div>
+                </motion.div>
+
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
+                  {categoryProjects.map((project, index) => {
+                    const isFeatured = project.id === 1
+                    return (
+                      <div key={project.id} className={isFeatured ? "col-span-1 md:col-span-2" : ""}>
+                        {isFeatured ? (
+                          <HeroProjectCard project={project} />
+                        ) : (
+                          <ProjectCard project={project} index={index} />
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </section>
+            )
+          })}
+        </div>
+      </Band>
 
       {/* ============================================= */}
       {/* CTA */}
       {/* ============================================= */}
-      <section ref={ctaRef} className="relative z-10 border-t border-white/[0.05] overflow-hidden min-h-[60vh] flex flex-col items-center justify-center">
-
-        {/* ── SCROLL-TRIGGERED MOON / SEMICIRCLE GLOW ── */}
-        <motion.div
-          className="absolute inset-0 z-0 pointer-events-none"
-          variants={glowVariants}
-          initial="hidden"
-          animate={glowControls}
-          style={{ transformOrigin: 'bottom center' }}
-        >
-          {/* Perfect half circle — mobile */}
-          <div className="block md:hidden">
-            <div className="absolute left-1/2 -translate-x-1/2" style={{ bottom: '-160px', width: '440px', height: '320px', borderRadius: '100%', background: 'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,0.45) 30%, rgba(255,255,255,0.10) 60%, transparent 75%)', filter: 'blur(24px)' }} />
-          </div>
-
-          {/* Perfect half circle — desktop */}
-          <div className="hidden md:block">
-            <div className="absolute left-1/2 -translate-x-1/2" style={{ bottom: '-260px', width: '1000px', height: '520px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,0.42) 28%, rgba(255,255,255,0.08) 58%, transparent 74%)', filter: 'blur(36px)' }} />
-          </div>
-        </motion.div>
-
-        <div className="max-w-[1000px] mx-auto px-6 pt-12 md:pt-16 pb-20 md:pb-36 text-center relative z-10">
-          <motion.h2
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className={`text-5xl sm:text-6xl md:text-7xl text-white leading-[1.1] tracking-[-0.02em] mb-6 ${serif.className}`}
-            style={{ textShadow: '0 0 30px rgba(255,255,255,0.3)' }}
-          >
-            Have a project <span className="italic text-white/50">in mind?</span>
-          </motion.h2>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.15 }}
-            className="text-base md:text-lg text-neutral-400 mb-12 font-light"
-          >
-            Let's turn your idea into a product people love.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.25 }}
-          >
-            <Link
-              href="/contact"
-              className="group inline-flex items-center gap-3 px-8 py-4 bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] text-white text-sm font-medium tracking-wide rounded-full hover:bg-white/[0.07] transition-all duration-500 shadow-[0_0_30px_rgba(255,255,255,0.02)] hover:shadow-[0_0_50px_rgba(255,255,255,0.06)]"
-            >
-              Start a Project
-              <div className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-                <ArrowUpRight size={16} />
-              </div>
-            </Link>
-          </motion.div>
-        </div>
-      </section>
-
+      <CtaSection title="Have a project in mind?" />
     </main>
   )
 }
@@ -268,69 +168,53 @@ export default function WorkGrid() {
 // ----------------------------------------------------------------------
 // HERO PROJECT CARD
 // ----------------------------------------------------------------------
-const HeroProjectCard = ({ project, index }) => {
-  const ref = useRef(null)
-
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"]
-  })
-
+const HeroProjectCard = ({ project }) => {
   const isLink = !!project.href
-  const Wrapper = isLink ? Link : 'div'
-  const wrapperProps = isLink ? { href: project.href } : {}
+  const linkProps = isLink ? { as: Link, href: project.href } : {}
 
   return (
     <motion.div
-      ref={ref}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-10%" }}
       transition={{ duration: 0.8 }}
-      className={`group relative w-full mb-10 ${isLink ? 'cursor-pointer' : 'cursor-default'}`}
+      className={`relative mb-4 w-full md:mb-6 ${isLink ? 'cursor-pointer' : 'cursor-default'}`}
     >
-      <Wrapper {...wrapperProps} className="block relative z-10 w-full p-2.5 rounded-[40px] bg-[#0c0c0e] border border-white/10 transition-all duration-700 hover:border-white/[0.25] hover:shadow-[0_0_60px_rgba(255,255,255,0.05)] group/card overflow-hidden">
+      <GlassCard {...linkProps} interactive={isLink} innerClassName="flex flex-col">
+        <div className="relative z-20 w-full p-5 md:p-10">
+          <h3 className={`mb-4 font-[family-name:var(--font-instrument-serif)] text-[32px] leading-[1.05] md:mb-6 md:text-[54px] ${INK}`}>
+            {project.title}
+          </h3>
 
-        <div className="absolute top-0 left-0 w-full h-[50%] bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.04)_0%,transparent_70%)] opacity-0 group-hover/card:opacity-100 transition-opacity duration-1000 pointer-events-none" />
-
-        <div className="relative w-full rounded-[32px] overflow-hidden bg-[#050505] flex flex-col z-10">
-
-          <div className="p-4 md:p-10 w-full relative z-20">
-            <h3 className={`text-[32px] md:text-[54px] text-white leading-[1.05] mb-4 md:mb-6 transition-all duration-500 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] ${serif.className}`}>
-              {project.title}
-            </h3>
-
-            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 md:gap-8">
-              <div className="max-w-xl">
-                {project.description && (
-                  <p className="text-[15px] md:text-[18px] text-white/50 font-light leading-[1.6]">
-                    {project.description}
-                  </p>
-                )}
-              </div>
-
-              {isLink && (
-                <div className="shrink-0">
-                  <div className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 md:px-8 md:py-4 bg-transparent border border-white/[0.15] text-white font-medium rounded-full text-[13px] md:text-[14px] transition-all duration-500 group-hover/card:bg-white group-hover/card:text-black group-hover/card:border-white shadow-[0_0_30px_rgba(255,255,255,0)] group-hover/card:shadow-[0_0_30px_rgba(255,255,255,0.3)]">
-                    Explore Platform <ArrowUpRight size={18} />
-                  </div>
-                </div>
+          <div className="flex flex-col justify-between gap-6 md:gap-8 lg:flex-row lg:items-end">
+            <div className="max-w-xl">
+              {project.description && (
+                <p className={`text-[15px] font-light leading-[1.6] md:text-[18px] ${BODY}`}>
+                  {project.description}
+                </p>
               )}
             </div>
-          </div>
 
-          <div className="w-full relative px-3 md:px-14 pb-3 md:pb-6 overflow-hidden flex items-end justify-center min-h-[160px] md:min-h-[500px]">
-            <div className="relative w-full translate-y-3">
-              <img
-                src={project.src}
-                alt={project.title}
-                className="w-full h-auto object-contain transition-transform duration-[1500ms] group-hover/card:scale-[1.02] opacity-90 group-hover/card:opacity-100 rounded-[20px] shadow-[0_0_60px_rgba(255,255,255,0.08)]"
-              />
-            </div>
+            {isLink && (
+              <div className="shrink-0">
+                <div className="inline-flex items-center justify-center gap-2.5 rounded-full border border-[#0E1A33]/15 bg-white/70 px-7 py-3.5 text-[13px] font-medium text-[#0E1A33] transition-all duration-500 group-hover:border-[#1E293B] group-hover:bg-[#1E293B] group-hover:text-white md:px-8 md:py-4 md:text-[14px]">
+                  Explore Platform <ArrowUpRight size={18} />
+                </div>
+              </div>
+            )}
           </div>
-
         </div>
-      </Wrapper>
+
+        <div className="relative flex min-h-[160px] w-full items-end justify-center overflow-hidden px-3 pb-3 md:min-h-[500px] md:px-14 md:pb-6">
+          <div className="relative w-full translate-y-3">
+            <img
+              src={project.src}
+              alt={project.title}
+              className="h-auto w-full rounded-[20px] object-contain shadow-[0_24px_60px_-28px_rgba(15,23,42,0.35)] transition-transform duration-[1500ms] group-hover:scale-[1.02]"
+            />
+          </div>
+        </div>
+      </GlassCard>
     </motion.div>
   )
 }
@@ -363,8 +247,7 @@ const ProjectCard = ({ project, index }) => {
   const isImageOnly = project.category === "Graphic Design"
 
   const isLink = !!project.href
-  const Wrapper = isLink ? Link : 'div'
-  const wrapperProps = isLink ? { href: project.href } : {}
+  const linkProps = isLink ? { as: Link, href: project.href } : {}
 
   return (
     <motion.div
@@ -374,71 +257,67 @@ const ProjectCard = ({ project, index }) => {
       viewport={{ once: true, margin: "-10%" }}
       transition={{ duration: 0.7, delay: index * 0.08 }}
       onMouseMove={handleMouseMove}
-      className={`group relative w-full ${isLink ? 'cursor-auto md:cursor-none' : 'cursor-default'}`}
+      className={`relative h-full w-full ${isLink ? 'cursor-auto md:cursor-none' : 'cursor-default'}`}
     >
-      <Wrapper {...wrapperProps} className="block relative z-10 w-full h-full p-2 rounded-[32px] bg-[#0c0c0e] border border-white/10 transition-all duration-500 hover:border-white/[0.2] hover:shadow-[0_0_40px_rgba(255,255,255,0.06)] group/card">
+      <GlassCard {...linkProps} interactive={isLink} className="h-full" innerClassName={`flex flex-col p-2 ${isImageOnly ? '' : 'min-h-[300px]'}`}>
 
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.08)_0%,transparent_60%)] opacity-0 group-hover/card:opacity-100 transition-opacity duration-700 pointer-events-none rounded-[32px]" />
+        {/* shrink-0: as a flex item the frame was being squeezed below its
+            aspect ratio, leaving the image a strip with empty card under it. */}
+        <div className={`relative w-full overflow-hidden ${isImageOnly ? 'flex flex-1 flex-col rounded-[20px]' : 'aspect-[4/3] shrink-0 rounded-[20px] bg-[#ECEFF4] md:aspect-[3/2]'}`}>
 
-        <div className={`relative w-full h-full rounded-[24px] overflow-hidden bg-black border border-white/[0.05] p-2 flex flex-col z-10 ${isImageOnly ? '' : 'min-h-[300px]'}`}>
-
-          <div className={`relative overflow-hidden w-full ${isImageOnly ? 'rounded-[20px] bg-transparent flex-1 flex flex-col' : 'aspect-[4/3] md:aspect-[3/2] rounded-[20px] bg-[#050505]'}`}>
-
-            {isImageOnly ? (
+          {isImageOnly ? (
+            <img
+              src={project.src}
+              alt={project.title}
+              className="h-full w-full flex-1 rounded-[20px] object-cover transition-all duration-1000 group-hover:scale-[1.02]"
+            />
+          ) : (
+            <motion.div
+              style={{ y: yParallax }}
+              className="absolute inset-0 -top-[10%] h-[120%] w-full"
+            >
               <img
                 src={project.src}
                 alt={project.title}
-                className="w-full h-full flex-1 object-cover transition-all duration-1000 scale-100 group-hover/card:scale-[1.02] opacity-90 group-hover/card:opacity-100 rounded-[20px]"
+                className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110"
               />
-            ) : (
-              <motion.div
-                style={{ y: yParallax }}
-                className="absolute inset-0 h-[120%] w-full -top-[10%]"
-              >
-                <motion.img
-                  src={project.src}
-                  alt={project.title}
-                  className="w-full h-full object-cover transition-all duration-1000 scale-100 group-hover/card:scale-110 opacity-70 group-hover/card:opacity-100 filter group-hover/card:brightness-110"
-                />
-              </motion.div>
-            )}
+            </motion.div>
+          )}
 
-            {/* Magnetic cursor — only for linked cards */}
-            {isLink && (
-              <motion.div
-                style={{ left: mouseX, top: mouseY }}
-                className="hidden md:flex absolute w-[100px] h-[100px] bg-white rounded-full items-center justify-center pointer-events-none opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 -translate-x-1/2 -translate-y-1/2 mix-blend-difference z-20 shadow-[0_0_30px_rgba(255,255,255,0.5)]"
-              >
-                <ArrowUpRight className="text-black w-8 h-8" />
-              </motion.div>
-            )}
-
-          </div>
-
-          {/* Text below — only for non-image-only cards */}
-          {!isImageOnly && (
-            <div className="px-4 py-6 bg-transparent h-full flex flex-col justify-end">
-              <div className="flex items-start justify-between gap-4 mb-2">
-                <h3 className={`text-[24px] md:text-[28px] text-white leading-[1.2] drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] ${serif.className}`}>
-                  {project.title}
-                </h3>
-                {isLink && (
-                  <div className="w-10 h-10 rounded-full bg-white/[0.05] border border-white/[0.1] items-center justify-center flex flex-shrink-0 group-hover/card:bg-white group-hover/card:text-black transition-all duration-300">
-                    <ArrowUpRight size={20} className="text-white group-hover/card:text-black transition-colors duration-300" />
-                  </div>
-                )}
-              </div>
-
-              {project.description && (
-                <p className="text-[14px] md:text-[15px] text-white/50 font-light leading-[1.6] mb-3 max-w-[85%] group-hover/card:text-white/70 transition-colors duration-500">
-                  {project.description}
-                </p>
-              )}
-            </div>
+          {/* Magnetic cursor — only for linked cards */}
+          {isLink && (
+            <motion.div
+              style={{ left: mouseX, top: mouseY }}
+              className="pointer-events-none absolute z-20 hidden h-[100px] w-[100px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#1E293B]/90 opacity-0 shadow-[0_12px_30px_-10px_rgba(15,23,42,0.5)] backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100 md:flex"
+            >
+              <ArrowUpRight className="h-8 w-8 text-white" />
+            </motion.div>
           )}
 
         </div>
-      </Wrapper>
+
+        {/* Text below — only for non-image-only cards */}
+        {!isImageOnly && (
+          <div className="flex h-full flex-col justify-end px-4 py-6">
+            <div className="mb-2 flex items-start justify-between gap-4">
+              <h3 className={`font-[family-name:var(--font-instrument-serif)] text-[24px] leading-[1.2] md:text-[28px] ${INK}`}>
+                {project.title}
+              </h3>
+              {isLink && (
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-[#0E1A33]/10 bg-white/70 text-[#0E1A33] transition-all duration-300 group-hover:border-[#1E293B] group-hover:bg-[#1E293B] group-hover:text-white">
+                  <ArrowUpRight size={20} />
+                </div>
+              )}
+            </div>
+
+            {project.description && (
+              <p className={`mb-3 max-w-[85%] text-[14px] font-light leading-[1.6] md:text-[15px] ${BODY}`}>
+                {project.description}
+              </p>
+            )}
+          </div>
+        )}
+      </GlassCard>
     </motion.div>
   )
 }

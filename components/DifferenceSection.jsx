@@ -87,9 +87,9 @@ export default function DifferenceSection() {
             >
                 {/* Section Header - Centered & Compact */}
                 <motion.div variants={itemVariants} className="text-center mb-8 md:mb-12">
-                    <span className="text-[10px] font-mono tracking-[0.4em] text-neutral-500 uppercase block mb-4">
-                        The Standard
-                    </span>
+
+                        
+
                     <h2 className={`text-4xl md:text-6xl text-white tracking-wide leading-[1.1] ${seasonFont.className}`}>
                         The OneZeroLabs{' '}
                         <span className="italic text-neutral-500">Difference.</span>

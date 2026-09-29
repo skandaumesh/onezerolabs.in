@@ -1,19 +1,10 @@
 'use client'
 
 import { notFound } from 'next/navigation'
-import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { Instrument_Serif } from 'next/font/google'
 import { solutionsData } from '@/data/solutionsData'
 import ServiceCta from '@/components/ServiceCta'
-
-const seasonFont = Instrument_Serif({
-  subsets: ['latin'],
-  weight: '400',
-  style: ['normal', 'italic'],
-  display: 'swap',
-  adjustFontFallback: false,
-})
+import { Band, BODY, EYEBROW, GlassCard, HEADING, INK, MUTED, SkyHero } from '@/components/ui/light-kit'
 
 export default function SolutionPage({ params }) {
   const data = solutionsData[params.slug];
@@ -23,86 +14,45 @@ export default function SolutionPage({ params }) {
   }
 
   return (
-    <main className="min-h-screen bg-black text-white selection:bg-white/20 selection:text-white">
-      {/* Hero Section */}
-      <section className="relative w-full pb-12">
-        <div className="w-full relative">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.0 }}
-            className="relative w-full h-[60vh] md:h-[75vh] min-h-[400px] overflow-hidden flex flex-col items-center justify-center text-center px-6 pt-24"
-          >
-            {/* Background Image */}
-            <div 
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-              style={{ backgroundImage: `url(${data.image})` }}
-            />
-            
-            {/* Dark Overlays for readability */}
-            <div className="absolute inset-0 bg-black/30" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/40" />
-
-            {/* Content */}
-            <div className="relative z-10 max-w-4xl flex flex-col items-center">
-              <motion.span 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-[10px] md:text-[11px] tracking-[0.4em] font-mono text-white/80 uppercase block mb-6 md:mb-8 font-semibold"
-              >
-                SOLUTIONS
-              </motion.span>
-              
-              <motion.h1 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className={`text-5xl md:text-6xl lg:text-[6rem] text-white font-normal mb-4 leading-none ${seasonFont.className}`}
-              >
-                {data.title}
-              </motion.h1>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+    <main className="min-h-screen bg-ozl-base text-ozl-ink">
+      <SkyHero eyebrow="Solutions" title={data.title} />
 
       {/* Intro Section */}
-      <section className="relative w-full py-16 md:py-24 px-6 md:px-12 lg:px-24">
-        <div className="max-w-[1000px] mx-auto w-full">
-          <motion.div 
+      <Band className="px-6 py-14 md:px-12 md:py-20 lg:px-24">
+        <div className="mx-auto w-full max-w-[1000px]">
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6 }}
-            className="flex flex-col gap-10 md:gap-12"
+            className="flex flex-col gap-8 md:gap-10"
           >
-            <h2 className={`text-4xl md:text-5xl lg:text-6xl text-white leading-[1.15] ${seasonFont.className}`}>
+            <h2 className={`${HEADING} text-4xl md:text-5xl lg:text-6xl`}>
               {data.hero.headline}
             </h2>
-            
-            <div className="pl-6 md:pl-10 border-l border-white/20 flex flex-col gap-6">
-              <p className="text-xl md:text-2xl text-neutral-300 font-light leading-relaxed font-[family-name:var(--font-satoshi)]">
+
+            <div className="flex flex-col gap-6 border-l border-[#0E1A33]/10 pl-6 md:pl-10">
+              <p className={`text-xl font-light leading-relaxed md:text-2xl ${INK}`}>
                 {data.hero.subheadline}
               </p>
             </div>
           </motion.div>
         </div>
-      </section>
+      </Band>
 
-      {/* Common Challenges */}
-      <section className="relative w-full py-20 px-6 md:px-12 lg:px-24 bg-[#050505]">
-        <div className="max-w-6xl mx-auto w-full">
-          <div className="mb-16">
-            <span className="text-[11px] md:text-xs font-mono font-bold text-red-500/80 tracking-[0.2em] uppercase block mb-4">
-              THE FRICTION
-            </span>
-            <h2 className={`text-4xl md:text-5xl text-white mb-6 ${seasonFont.className}`}>
+      {/* One grey band from the challenges down through what we build, the
+          way the homepage runs its card sections together. */}
+      <Band tone="grey" fadeTop fadeBottom className="px-6 pb-16 pt-16 md:px-12 md:pb-24 md:pt-24 lg:px-24">
+        {/* Common Challenges */}
+        <div className="mx-auto w-full max-w-6xl">
+          <div className="mb-10 md:mb-12">
+            <span className={`${EYEBROW} mb-4`}>The friction</span>
+            <h2 className={`${HEADING} text-4xl md:text-5xl`}>
               Common Challenges
             </h2>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {data.commonChallenges.map((challenge, idx) => (
               <motion.div
                 key={idx}
@@ -110,34 +60,32 @@ export default function SolutionPage({ params }) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="p-6 md:p-8 rounded-2xl border border-white/5 bg-[#0a0a0a] flex items-start gap-4"
+                className="h-full"
               >
-                <div className="w-1.5 h-1.5 rounded-full bg-red-500/50 mt-2.5 flex-shrink-0" />
-                <p className="text-lg text-neutral-300 leading-relaxed font-[family-name:var(--font-satoshi)]">
-                  {challenge}
-                </p>
+                <GlassCard className="h-full" innerClassName="flex items-start gap-4 p-6 md:p-7">
+                  <span aria-hidden className="mt-2.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#0E1A33]/30" />
+                  <p className={`text-lg leading-relaxed ${BODY}`}>
+                    {challenge}
+                  </p>
+                </GlassCard>
               </motion.div>
             ))}
           </div>
         </div>
-      </section>
 
-      {/* How We Help */}
-      <section className="relative w-full py-24 md:py-32 px-6 md:px-12 lg:px-24">
-        <div className="max-w-6xl mx-auto w-full">
-          <div className="mb-16">
-            <span className="text-[11px] md:text-xs font-mono font-bold text-neutral-500 tracking-[0.2em] uppercase block mb-4">
-              OUR EXPERTISE
-            </span>
-            <h2 className={`text-4xl md:text-5xl text-white mb-6 ${seasonFont.className}`}>
+        {/* How We Help */}
+        <div className="mx-auto mt-20 w-full max-w-6xl md:mt-28">
+          <div className="mb-10 md:mb-12">
+            <span className={`${EYEBROW} mb-4`}>Our expertise</span>
+            <h2 className={`${HEADING} text-4xl md:text-5xl`}>
               How We Help
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+          <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-2 md:gap-6">
             {data.howWeHelp.map((service, index) => {
               const isLastOdd = index === data.howWeHelp.length - 1 && data.howWeHelp.length % 2 !== 0;
-              
+
               return (
               <motion.div
                 key={service.title}
@@ -145,43 +93,37 @@ export default function SolutionPage({ params }) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
-                className={`group relative p-8 md:p-10 rounded-[2.5rem] border border-white/5 bg-[#151515] hover:bg-[#1c1c1c] transition-all duration-500 overflow-hidden ${
-                  isLastOdd ? "md:col-span-2 md:w-[calc(50%-12px)] md:justify-self-center" : "w-full"
-                }`}
+                className={isLastOdd ? "md:col-span-2 md:w-[calc(50%-12px)] md:justify-self-center" : "w-full"}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-                
-                <div className="relative z-10 flex flex-col h-full">
-                  <span className="text-[10px] md:text-[11px] font-mono font-bold text-neutral-500 tracking-[0.2em] uppercase mb-4">
+                <GlassCard interactive className="h-full" innerClassName="flex flex-col p-7 md:p-9">
+                  <span className={`${EYEBROW} mb-4`}>
                     {String(index + 1).padStart(2, '0')}
                   </span>
-                  <h3 className={`text-3xl md:text-4xl text-white mb-4 leading-none ${seasonFont.className}`}>
+                  <h3 className={`mb-4 font-[family-name:var(--font-instrument-serif)] text-3xl leading-none tracking-wide md:text-4xl ${INK}`}>
                     {service.title}
                   </h3>
-                  <p className="text-lg text-neutral-400 font-light leading-relaxed mt-auto font-[family-name:var(--font-satoshi)]">
+                  <p className={`mt-auto text-lg font-light leading-relaxed ${BODY}`}>
                     {service.description}
                   </p>
-                </div>
+                </GlassCard>
               </motion.div>
               )
             })}
           </div>
         </div>
-      </section>
 
-      {/* What We Build (Checkmarks) */}
-      <section className="relative w-full py-24 px-6 md:px-12 lg:px-24 bg-[#050505]">
-        <div className="max-w-5xl mx-auto w-full">
-          <div className="text-center mb-16">
-            <h2 className={`text-4xl md:text-5xl text-white mb-6 ${seasonFont.className}`}>
+        {/* What We Build (Checkmarks) */}
+        <div className="mx-auto mt-20 w-full max-w-5xl md:mt-28">
+          <div className="mb-10 text-center md:mb-12">
+            <h2 className={`${HEADING} mb-5 text-4xl md:text-5xl`}>
               What We Build
             </h2>
-            <p className="text-xl text-neutral-400 font-[family-name:var(--font-satoshi)] max-w-2xl mx-auto">
+            <p className={`mx-auto max-w-2xl text-xl ${BODY}`}>
               Tangible deliverables tailored precisely for {data.title.toLowerCase()}.
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+
+          <div className="grid grid-cols-1 gap-x-12 gap-y-3 md:grid-cols-2">
             {data.deliverables.map((item, idx) => (
               <motion.div
                 key={idx}
@@ -189,52 +131,49 @@ export default function SolutionPage({ params }) {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.4, delay: idx * 0.05 }}
-                className="flex items-center gap-4 p-4 rounded-xl hover:bg-white/[0.02] transition-colors"
+                className="flex items-center gap-4 rounded-xl p-4 transition-colors hover:bg-white/60"
               >
-                <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
-                  <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-white bg-white/70 shadow-[0_2px_6px_rgba(15,23,42,0.06)]">
+                  <svg className="h-4 w-4 text-[#0E1A33]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <span className="text-lg md:text-xl text-white font-[family-name:var(--font-satoshi)] font-medium">
+                <span className={`text-lg font-medium md:text-xl ${INK}`}>
                   {item}
                 </span>
               </motion.div>
             ))}
           </div>
         </div>
-      </section>
+      </Band>
 
       {/* Ideal Clients */}
-      <section className="relative w-full py-24 md:py-32 px-6 md:px-12 lg:px-24">
-        <div className="max-w-4xl mx-auto w-full text-center">
-          <span className="text-[11px] md:text-xs font-mono font-bold text-neutral-500 tracking-[0.2em] uppercase block mb-8">
-            WHO WE WORK WITH
-          </span>
+      <Band className="px-6 py-20 md:px-12 md:py-28 lg:px-24">
+        <div className="mx-auto w-full max-w-4xl text-center">
+          <span className={`${EYEBROW} mb-8`}>Who we work with</span>
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-4 md:gap-x-10 md:gap-y-6">
             {data.idealClients.map((client, idx) => (
               <motion.span
                 key={idx}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className={`text-2xl md:text-4xl text-neutral-300 hover:text-white transition-colors cursor-default ${seasonFont.className}`}
+                className={`cursor-default font-[family-name:var(--font-instrument-serif)] text-2xl transition-colors hover:text-[#0E1A33] md:text-4xl ${BODY}`}
               >
                 {client}
                 {idx !== data.idealClients.length - 1 && (
-                  <span className="text-white/20 ml-6 md:ml-10 font-sans font-light">/</span>
+                  <span className={`ml-6 font-sans font-light md:ml-10 ${MUTED} opacity-50`}>/</span>
                 )}
               </motion.span>
             ))}
           </div>
         </div>
-      </section>
+      </Band>
 
-      {/* CTA Section */}
-      <div className="relative z-20 bg-black">
-        <ServiceCta title={data.ctaText} />
-      </div>
+      {/* CTA Section. This passed `title`, which ServiceCta doesn't take, so
+          the button rendered with no label. */}
+      <ServiceCta text={data.ctaText} />
     </main>
   );
 }

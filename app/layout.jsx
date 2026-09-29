@@ -1,12 +1,21 @@
 import { GeistSans } from 'geist/font/sans';
-import { Instrument_Serif } from 'next/font/google';
+import { EB_Garamond, Instrument_Serif, Plus_Jakarta_Sans } from 'next/font/google';
 import '../styles/globals.css'
 import Navbar from '../components/Navbar'
 import SmoothScroll from '../components/SmoothScroll'
 import Footer from '../components/Footer'
 import Script from 'next/script'
-import { Suspense } from 'react'
+import JsonLd from '../components/JsonLd'
+import { DEFAULT_DESCRIPTION, OG_IMAGE, ORG_ID, SITE_NAME, SITE_URL, WEBSITE_ID } from '../lib/seo'
 import { Analytics } from '@vercel/analytics/react'
+
+const ebGaramond = EB_Garamond({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
+  display: 'swap',
+  variable: '--font-eb-garamond',
+});
 
 const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
@@ -17,41 +26,61 @@ const instrumentSerif = Instrument_Serif({
   variable: '--font-instrument-serif',
 });
 
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+  variable: '--font-plus-jakarta',
+});
+
 export const metadata = {
-  metadataBase: new URL('https://www.onezerolabs.in'),
+  metadataBase: new URL(SITE_URL),
 
-  title: 'OneZeroLabs | Business Infrastructure Studio — Bengaluru',
-
-  description:
-    'OneZeroLabs is a business infrastructure studio from Bengaluru — building brand systems, web platforms, AI integrations, and operational infrastructure for founders, SMEs, and institutions.',
-
-  keywords: [
-    'business infrastructure studio',
-    'software studio Bengaluru',
-    'web development India',
-    'institutional software',
-    'Next.js development',
-    'AI automation India',
-    'branding agency Bengaluru',
-    'custom SaaS',
-    'educational ERP',
-    'full-stack development India',
-    'OneZeroLabs',
-  ],
-
-  applicationName: 'OneZeroLabs',
-  authors: [{ name: 'OneZeroLabs', url: 'https://www.onezerolabs.in' }],
-  generator: 'Next.js',
-  referrer: 'origin-when-cross-origin',
-  creator: 'OneZeroLabs',
-  publisher: 'OneZeroLabs',
-
-  alternates: {
-    canonical: 'https://www.onezerolabs.in',
+  // Pages set their own short title; the template adds the brand. The home
+  // page uses the default.
+  title: {
+    default: 'OneZeroLabs | Website, Software & Branding Studio in Bengaluru',
+    template: '%s | OneZeroLabs',
   },
 
+  description: DEFAULT_DESCRIPTION,
+
+  keywords: [
+    'OneZeroLabs',
+    'website development company Bengaluru',
+    'web design Bengaluru',
+    'custom software development Bengaluru',
+    'software company Bengaluru',
+    'college management software',
+    'attendance management system for colleges',
+    'SAAME',
+    'branding agency Bengaluru',
+    'social media management Bengaluru',
+    'website maintenance India',
+    'AI automation for business',
+  ],
+
+  applicationName: SITE_NAME,
+  authors: [{ name: SITE_NAME, url: SITE_URL }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  referrer: 'origin-when-cross-origin',
+
+  /* No canonical here. A canonical in the root layout is inherited by every
+     page that doesn't set its own -- it used to point /about, /services,
+     /portfolio, /contact and more at the home page, telling Google they were
+     duplicates of it. Each page now sets its own (lib/seo.js pageMetadata). */
+
+  // The 96px PNG is listed as an icon in its own right, not only as the old
+  // "shortcut" link: Google picks the favicon it shows in search results from
+  // these, and prefers one that is 48px or larger. Every favicon size is a
+  // white disc with the logo inside it, which also survives the round crop
+  // search results apply.
   icons: {
-    icon: '/favicon.ico',
+    icon: [
+      { url: '/favicon.ico', sizes: '48x48' },
+      { url: '/favicon-96x96.png', type: 'image/png', sizes: '96x96' },
+    ],
     shortcut: '/favicon-96x96.png',
     apple: '/apple-touch-icon.png',
   },
@@ -59,30 +88,20 @@ export const metadata = {
   manifest: '/site.webmanifest',
 
   openGraph: {
-    title: 'OneZeroLabs | Business Infrastructure Studio',
-    description:
-      'Brand, technology, marketing, and operations — built as one integrated system. OneZeroLabs is the growth partner for founders and institutions who are done managing fragmented vendors.',
-    url: 'https://www.onezerolabs.in',
-    siteName: 'OneZeroLabs',
-    images: [
-      {
-        url: '/og-image.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'OneZeroLabs | Business Infrastructure Studio',
-      },
-    ],
+    title: 'OneZeroLabs | Website, Software & Branding Studio in Bengaluru',
+    description: DEFAULT_DESCRIPTION,
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    images: [OG_IMAGE],
     locale: 'en_IN',
     type: 'website',
   },
 
   twitter: {
     card: 'summary_large_image',
-    title: 'OneZeroLabs | Business Infrastructure Studio — Bengaluru',
-    description:
-      'Brand, technology, marketing, and operations — built as one integrated system.',
-    creator: '@OneZeroLabs',
-    images: ['/og-image.jpg'],
+    title: 'OneZeroLabs | Website, Software & Branding Studio in Bengaluru',
+    description: DEFAULT_DESCRIPTION,
+    images: [OG_IMAGE.url],
   },
 
   robots: {
@@ -98,191 +117,108 @@ export const metadata = {
   },
 
   category: 'technology',
-  classification: 'Software Development',
 
   verification: {
-    google: 'KpgQoDDeGFSzTxXSZD4tVk6uSsjDyNojaIg_c_c9zqE', 
+    google: 'KpgQoDDeGFSzTxXSZD4tVk6uSsjDyNojaIg_c_c9zqE',
   },
 }
 
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#000000',
+  // The browser bar on phones; black was left over from the dark theme.
+  themeColor: '#FFFFFF',
+}
+
+/* Who OneZeroLabs is, for search engines: one graph with the business and
+   the website, sharing the @ids every other page's structured data points
+   back to. Only facts the site states elsewhere; the postcode and founding
+   year are left out until the site agrees on them. */
+const siteSchema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': ['Organization', 'ProfessionalService'],
+      '@id': ORG_ID,
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${SITE_URL}/web-app-manifest-512x512.png`,
+        width: 512,
+        height: 512,
+      },
+      image: `${SITE_URL}${OG_IMAGE.url}`,
+      description: DEFAULT_DESCRIPTION,
+      slogan: 'Designing the Future of Digital Infrastructure',
+      email: 'hello@onezerolabs.in',
+      telephone: '+91-7483729869',
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Bengaluru',
+        addressRegion: 'Karnataka',
+        addressCountry: 'IN',
+      },
+      areaServed: { '@type': 'Country', name: 'India' },
+      contactPoint: {
+        '@type': 'ContactPoint',
+        telephone: '+91-7483729869',
+        email: 'hello@onezerolabs.in',
+        contactType: 'sales',
+        areaServed: 'IN',
+        availableLanguage: ['English', 'Kannada', 'Hindi'],
+      },
+      founder: [
+        { '@type': 'Person', name: 'Skanda Umesh', jobTitle: 'Founder', sameAs: ['https://github.com/skandaumesh'] },
+        { '@type': 'Person', name: 'Praveen Kumar', jobTitle: 'Co-Founder' },
+      ],
+      knowsAbout: [
+        'Website design and development',
+        'Custom software development',
+        'College and school management software',
+        'Attendance management systems',
+        'AI automation',
+        'Brand identity design',
+        'Social media management',
+        'Website maintenance and support',
+      ],
+      hasOfferCatalog: {
+        '@type': 'OfferCatalog',
+        name: 'OneZeroLabs services',
+        itemListElement: [
+          ['Software & AI', 'Portals, dashboards and automation that replace manual work.', '/services/ai-automation'],
+          ['Websites', 'Fast websites and web apps you own outright.', '/services/digital-infrastructure'],
+          ['Brand & Social Media', 'Brand identity and social content, designed once and run every month.', '/services/brand-growth'],
+        ].map(([name, description, path]) => ({
+          '@type': 'Offer',
+          itemOffered: { '@type': 'Service', name, description, url: `${SITE_URL}${path}`, provider: { '@id': ORG_ID } },
+        })),
+      },
+      owns: { '@type': 'SoftwareApplication', name: 'SAAME', url: `${SITE_URL}/products/saame` },
+      sameAs: ['https://www.linkedin.com/company/onezerolabs'],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': WEBSITE_ID,
+      name: SITE_NAME,
+      url: SITE_URL,
+      inLanguage: 'en-IN',
+      publisher: { '@id': ORG_ID },
+    },
+  ],
 }
 
 export default function RootLayout({ children }) {
-  /* ===============================
-     WEBSITE SCHEMA (For Sitelinks)
-     =============================== */
-  const websiteSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: 'OneZeroLabs',
-    url: 'https://onezerolabs.in',
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: 'https://onezerolabs.in/search?q={search_term_string}',
-      'query-input': 'required name=search_term_string'
-    }
-  }
-
-  /* ===============================
-     ORGANIZATION SCHEMA
-     =============================== */
-  const organizationSchema = {
-    '@context': 'https://schema.org',
-    '@type': ['Organization', 'LocalBusiness'],
-    '@id': 'https://www.onezerolabs.in/#organization',
-    name: 'OneZeroLabs',
-    url: 'https://www.onezerolabs.in',
-    email: 'hello@onezerolabs.in',
-    logo: {
-      '@type': 'ImageObject',
-      url: 'https://www.onezerolabs.in/web-app-manifest-512x512.png',
-      width: 512,
-      height: 512
-    },
-    description:
-      'Business infrastructure studio from Bengaluru building brand systems, web platforms, AI integrations, and operational infrastructure for founders, SMEs, and institutions.',
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: 'Bengaluru',
-      addressRegion: 'Karnataka',
-      postalCode: '560064',
-      addressCountry: 'IN'
-    },
-    contactPoint: {
-      '@type': 'ContactPoint',
-      telephone: '+91-7483729869',
-      contactType: 'Business Enquiries',
-      email: 'hello@onezerolabs.in',
-      availableLanguage: ['English', 'Kannada', 'Hindi']
-    },
-    foundingDate: '2023',
-    sameAs: [
-      'https://www.linkedin.com/company/onezerolabs',
-      'https://github.com/skandaumesh'
-    ]
-  }
-
-  /* ===============================
-     SERVICE SCHEMA
-     =============================== */
-  const serviceSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'Service',
-    name: 'Institutional Software & Digital Infrastructure Development',
-    provider: {
-      '@id': 'https://onezerolabs.in/#organization'
-    },
-    areaServed: {
-      '@type': 'Country',
-      name: 'India'
-    },
-    hasOfferCatalog: {
-      '@type': 'OfferCatalog',
-      name: 'Educational Software Services',
-      itemListElement: [
-        {
-          '@type': 'Offer',
-          itemOffered: {
-            '@type': 'Service',
-            name: 'AI-Powered Attendance Management Systems'
-          }
-        },
-        {
-          '@type': 'Offer',
-          itemOffered: {
-            '@type': 'Service',
-            name: 'Student Information Systems (SIS)'
-          }
-        },
-        {
-          '@type': 'Offer',
-          itemOffered: {
-            '@type': 'Service',
-            name: 'Custom Academic ERP Development'
-          }
-        }
-      ]
-    },
-    description:
-      'Designing and deploying enterprise-grade digital systems for educational institutions, focused on scalability, security, and institutional efficiency.'
-  }
-
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en-IN" suppressHydrationWarning>
       <head>
-        {/* Structured Data */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@graph": [
-                {
-                  "@type": "ItemList",
-                  "itemListElement": [
-                    {
-                      "@type": "SiteNavigationElement",
-                      "position": 1,
-                      "name": "Services",
-                      "description": "Explore our digital infrastructure, AI automation, operations, analytics, and brand services.",
-                      "url": "https://www.onezerolabs.in/services"
-                    },
-                    {
-                      "@type": "SiteNavigationElement",
-                      "position": 2,
-                      "name": "Solutions",
-                      "description": "Tailored solutions for educational institutions, startups, SMEs, healthcare, and consultants.",
-                      "url": "https://www.onezerolabs.in/solutions"
-                    },
-                    {
-                      "@type": "SiteNavigationElement",
-                      "position": 3,
-                      "name": "SAAME",
-                      "description": "Our flagship institutional platform — attendance, academics, and AI, live on the Google Play Store.",
-                      "url": "https://www.onezerolabs.in/products/saame"
-                    },
-                    {
-                      "@type": "SiteNavigationElement",
-                      "position": 4,
-                      "name": "About",
-                      "description": "Learn about OneZeroLabs and our mission to build high-performance digital infrastructure.",
-                      "url": "https://www.onezerolabs.in/about"
-                    },
-                    {
-                      "@type": "SiteNavigationElement",
-                      "position": 5,
-                      "name": "Contact",
-                      "description": "Get in touch with OneZeroLabs for business enquiries and software solutions.",
-                      "url": "https://www.onezerolabs.in/contact"
-                    }
-                  ]
-                }
-              ]
-            })
-          }}
-        />
+        <JsonLd data={siteSchema} />
       </head>
-      <body className={`antialiased bg-black text-white ${GeistSans.className} ${instrumentSerif.variable}`}>
+      <body className={`antialiased bg-ozl-base text-ozl-ink ${GeistSans.className} ${ebGaramond.variable} ${instrumentSerif.variable} ${plusJakartaSans.variable}`}>
         <SmoothScroll>
           <Navbar />
-          <div className="relative z-10 w-full bg-black shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-            <main id="main-content" className="bg-black">{children}</main>
+          <div className="relative z-10 w-full bg-ozl-base">
+            <main id="main-content" className="bg-ozl-base">{children}</main>
           </div>
           <Footer />
         </SmoothScroll>

@@ -128,7 +128,7 @@ export const servicesData = {
     ctaText: "See Your Business Clearly →"
   },
   "brand-growth": {
-    title: "Brand & Growth",
+    title: "Brand & Social Media",
     image: "/se2.jpg",
     hero: {
       headline: "Build a Brand That Creates Momentum",

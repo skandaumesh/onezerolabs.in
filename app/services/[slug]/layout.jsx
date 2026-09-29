@@ -1,6 +1,6 @@
+import JsonLd from '@/components/JsonLd'
 import { servicesData } from '@/data/servicesData'
-
-const baseUrl = 'https://www.onezerolabs.in'
+import { breadcrumbs, ORG_ID, pageMetadata, SITE_URL } from '@/lib/seo'
 
 export function generateStaticParams() {
   return Object.keys(servicesData).map((slug) => ({ slug }))
@@ -8,62 +8,43 @@ export function generateStaticParams() {
 
 export function generateMetadata({ params }) {
   const data = servicesData[params.slug]
-  if (!data) return { title: 'Service Not Found | OneZeroLabs' }
+  if (!data) return { title: 'Service not found', robots: { index: false } }
 
-  const title = `${data.title} | OneZeroLabs`
-  const description = data.overview || data.hero?.subheadline || ''
-  const url = `${baseUrl}/services/${params.slug}`
-  const image = data.image || '/og-image.jpg'
-
-  return {
-    title,
-    description,
-    alternates: { canonical: url },
-    openGraph: {
-      title,
-      description,
-      url,
-      siteName: 'OneZeroLabs',
-      type: 'website',
-      images: [{ url: image, width: 1200, height: 630, alt: data.title }],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: [image],
-    },
-  }
+  return pageMetadata({
+    title: `${data.title} Services in Bengaluru`,
+    description: data.overview || data.hero?.subheadline || '',
+    path: `/services/${params.slug}`,
+  })
 }
 
 export default function ServiceSlugLayout({ children, params }) {
   const data = servicesData[params.slug]
-  const schema = data && {
-    '@context': 'https://schema.org',
-    '@type': 'Service',
-    name: data.title,
-    description: data.overview || data.hero?.subheadline || '',
-    provider: { '@id': `${baseUrl}/#organization` },
-    areaServed: { '@type': 'Country', name: 'India' },
-    url: `${baseUrl}/services/${params.slug}`,
-    hasOfferCatalog: data.servicesList && {
-      '@type': 'OfferCatalog',
+  const url = `${SITE_URL}/services/${params.slug}`
+  const schema = data && [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Service',
       name: data.title,
-      itemListElement: data.servicesList.map((s) => ({
-        '@type': 'Offer',
-        itemOffered: { '@type': 'Service', name: s.title, description: s.description },
-      })),
+      serviceType: data.title,
+      description: data.overview || data.hero?.subheadline || '',
+      url,
+      provider: { '@id': ORG_ID },
+      areaServed: { '@type': 'Country', name: 'India' },
+      hasOfferCatalog: data.servicesList && {
+        '@type': 'OfferCatalog',
+        name: data.title,
+        itemListElement: data.servicesList.map((s) => ({
+          '@type': 'Offer',
+          itemOffered: { '@type': 'Service', name: s.title, description: s.description },
+        })),
+      },
     },
-  }
+    breadcrumbs(['Services', '/services'], [data.title, `/services/${params.slug}`]),
+  ]
 
   return (
     <>
-      {schema && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-        />
-      )}
+      <JsonLd data={schema} />
       {children}
     </>
   )

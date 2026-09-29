@@ -6,14 +6,14 @@ const projects = [
   {
     client: "SAAME",
     tag: "EDUCATION · INSTITUTIONAL SOFTWARE",
-    description: "17-module production platform — parent Android app on Google Play, teaching portal PWA, and admin dashboard with AI-powered NLP chatbot.",
+    description: "17-module production platform: parent Android app on Google Play, teaching portal PWA, and admin dashboard with AI-powered NLP chatbot.",
     stack: "Node.js · MongoDB · Firebase · Capacitor · Tailwind",
     outcome: "43,000+ lines · 17 modules · ₹1.5L commercial sale"
   },
   {
     client: "Elevare Connect",
     tag: "EVENTS · WEB DEVELOPMENT",
-    description: "Full Next.js rebuild with Razorpay integration, GSC SEO setup, and schema optimisation — replacing a broken WordPress predecessor.",
+    description: "Full Next.js rebuild with Razorpay integration, GSC SEO setup, and schema optimisation, replacing a broken WordPress predecessor.",
     stack: "Next.js · Razorpay · Vercel · Tailwind · GSC",
     outcome: "Live at elevareconnect.in · Sub-2s load"
   },
@@ -27,7 +27,7 @@ const projects = [
   {
     client: "Vetaas Foundation",
     tag: "NON-PROFIT · WEB & DESIGN",
-    description: "React component library for an SEL nonprofit — About page, hero section, and full brand-aligned UI system in production-ready JSX.",
+    description: "React component library for an SEL nonprofit: About page, hero section, and full brand-aligned UI system in production-ready JSX.",
     stack: "React · JSX · Tailwind",
     outcome: "Full component library delivered"
   }

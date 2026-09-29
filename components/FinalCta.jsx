@@ -22,7 +22,7 @@ export default function FinalCta() {
         </h2>
         
         <p className="text-white/60 text-lg md:text-xl font-normal leading-relaxed mb-12 max-w-2xl">
-          Our studio is ready. Brand, technology, operations, marketing — tell us what you're building and we'll architect the system around it.
+          Our studio is ready. Brand, technology, operations, marketing. Tell us what you're building and we'll architect the system around it.
         </p>
         
         <div className="flex flex-col items-center gap-6">

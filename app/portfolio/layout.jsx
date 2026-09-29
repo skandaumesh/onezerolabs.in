@@ -1,8 +1,13 @@
-export const metadata = {
-  title: 'Our Portfolio | Selected Projects & Industrial Platforms',
-  description: 'Explore OneZeroLabs’ portfolio of high-performance digital products, institutional software, and scalable web applications.',
-}
+import { pageMetadata } from '@/lib/seo'
 
+export const metadata = pageMetadata({
+  title: 'Portfolio: Websites & Software We Have Built',
+  description:
+    'Work by OneZeroLabs: SAAME for MLA Academy of Higher Learning, websites for Praasa Consultancy and Samruddhi Pathway, an AI chatbot and more.',
+  path: '/portfolio',
+})
+
+// Structured data for /portfolio is rendered by the page: see lib/schemas.js.
 export default function PortfolioLayout({ children }) {
-  return <>{children}</>
+  return children
 }

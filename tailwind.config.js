@@ -27,6 +27,19 @@ module.exports = {
         '3xl': '1920px',    // Useful for 1080p+ and 4k monitors
       },
       colors: {
+        // OneZeroLabs visual direction. One source of truth -- components
+        // reference these rather than hardcoding hex values.
+        ozl: {
+          base: '#FFFFFF',                        // page background
+          surface: '#FFFFFF',                     // raised panel
+          glass: 'rgba(255,255,255,0.65)',        // glass fill
+          glassBorder: 'rgba(15,23,42,0.08)',     // glass edge
+          ink: '#0B0D12',                         // primary text
+          muted: '#667085',                       // secondary text
+          violet: '#6C63FF',                      // primary ambient glow
+          sky: '#7DD3FC',                         // secondary ambient glow
+          cta: '#111827',                         // deep navy call to action
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -75,8 +88,18 @@ module.exports = {
       },
       fontFamily: {
         sans: ["Inter", "sans-serif"],
-        display: ["Poppins", "sans-serif"],
+        display: ["var(--font-eb-garamond)", "serif"],
+        serif: ["var(--font-eb-garamond)", "serif"],
+        garamond: ["var(--font-eb-garamond)", "serif"],
         syne: ["Syne", "sans-serif"], // Custom font for headers
+      },
+      transitionTimingFunction: {
+        // Reference easing: slow out, decisive in. Noticeably less "linear"
+        // than Tailwind's default ease-in-out on buttons.
+        ozl: 'cubic-bezier(.2, 0, 0, 1)',
+      },
+      transitionDuration: {
+        ozl: '350ms',
       },
       keyframes: {
         "accordion-down": {
@@ -95,12 +118,19 @@ module.exports = {
           "0%": { opacity: "0", transform: "translateY(40px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        // Track holds two identical copies of the logo list; shifting by half
+        // its width lands copy 2 exactly where copy 1 began -> seamless loop.
+        "marquee": {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 1s ease-out forwards",
         "fade-up": "fade-up 1s ease-out forwards",
+        "marquee": "marquee 140s linear infinite",
       },
     },
   },

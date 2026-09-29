@@ -2,63 +2,49 @@
 
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Instrument_Serif } from 'next/font/google'
-import { Search, PenTool, Hammer, LineChart } from 'lucide-react'
+import { Band, BODY, EYEBROW, GlassCard, HEADING, INK } from '@/components/ui/light-kit'
 
-const seasonFont = Instrument_Serif({
-  subsets: ['latin'],
-  weight: '400',
-  style: ['normal', 'italic'],
-  display: 'swap',
-  adjustFontFallback: false,
-})
-
+// A numbered label on each step rather than an icon in a circle, as with the
+// homepage's How We Work steps.
 const steps = [
   {
     title: "Discover",
     description: "We analyze your business, identify bottlenecks, and uncover growth opportunities.",
-    icon: Search
   },
   {
     title: "Design",
     description: "We create systems, processes, and solutions tailored to your goals.",
-    icon: PenTool
   },
   {
     title: "Build",
     description: "Our team develops and implements the required infrastructure.",
-    icon: Hammer
   },
   {
     title: "Optimize",
     description: "We continuously improve performance through analytics and iteration.",
-    icon: LineChart
   }
 ]
 
 export default function ServiceApproach() {
   return (
-    <section className="relative w-full py-24 md:py-32 bg-black text-white px-6 md:px-12 lg:px-24">
-      {/* Background glow */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-white/[0.02] to-black pointer-events-none" />
-      
-      <div className="max-w-[1200px] mx-auto w-full relative z-10 flex flex-col items-center">
-        <motion.div 
+    // Continues the grey band of the section above it (the service's Core
+    // Services cards), so it fades out at the foot but not in at the top.
+    <Band tone="grey" fadeBottom className="px-6 pb-20 pt-6 md:px-12 md:pb-28 md:pt-8 lg:px-24">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1200px] flex-col items-center">
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="text-center mb-16 md:mb-24"
+          className="mb-12 text-center md:mb-16"
         >
-          <span className="text-[10px] md:text-xs tracking-[0.3em] font-mono text-neutral-500 uppercase block mb-4">
-            HOW WE WORK
-          </span>
-          <h2 className={`text-4xl md:text-5xl lg:text-6xl text-white font-normal tracking-wide ${seasonFont.className}`}>
-            The OneZeroLabs <span className="text-neutral-500">Approach.</span>
+          <span className={`${EYEBROW} mb-4`}>How we work</span>
+          <h2 className={`${HEADING} text-4xl md:text-5xl lg:text-6xl`}>
+            The OneZeroLabs <span className="italic">Approach.</span>
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+        <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-2 md:gap-6 lg:grid-cols-4">
           {steps.map((step, index) => (
             <motion.div
               key={step.title}
@@ -66,28 +52,23 @@ export default function ServiceApproach() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
-              className="relative p-8 rounded-[2rem] border border-white/5 bg-[#151515] hover:bg-[#1c1c1c] transition-colors duration-500 group"
+              className="h-full"
             >
-              {/* Top border highlight */}
-              <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              
-              <div className="flex flex-col h-full relative z-10">
-                <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center bg-white/5 text-neutral-400 mb-6 group-hover:text-white group-hover:border-white/30 transition-all duration-500 group-hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]">
-                  <step.icon size={20} strokeWidth={1.5} />
-                </div>
-                
-                <h3 className={`text-2xl text-white mb-3 ${seasonFont.className}`}>
-                  {index + 1}. {step.title}
+              <GlassCard interactive className="h-full" innerClassName="flex flex-col p-6 sm:p-7">
+                <span className={`${EYEBROW} mb-5`}>
+                  Step {String(index + 1).padStart(2, '0')}
+                </span>
+                <h3 className={`mb-3 font-[family-name:var(--font-instrument-serif)] text-2xl tracking-wide ${INK}`}>
+                  {step.title}
                 </h3>
-                
-                <p className="text-neutral-400 text-[15px] leading-relaxed group-hover:text-neutral-300 transition-colors duration-500" style={{ fontFamily: "'Satoshi', 'Matter', sans-serif" }}>
+                <p className={`text-[15px] font-light leading-relaxed ${BODY}`}>
                   {step.description}
                 </p>
-              </div>
+              </GlassCard>
             </motion.div>
           ))}
         </div>
       </div>
-    </section>
+    </Band>
   )
 }

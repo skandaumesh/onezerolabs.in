@@ -7,7 +7,7 @@ const team = [
     initials: "SU",
     name: "Skanda Umesh",
     role: "Founder & Lead Engineer",
-    bio: "Founder and lead engineer at OneZeroLabs. Architect of SAAME — a commercially sold, 43,000-line institutional platform built from scratch. Full-stack engineer specialising in Node.js, MongoDB, React, and AI integration. MCA candidate at Jain University.",
+    bio: "Founder and lead engineer at OneZeroLabs. Architect of SAAME, a commercially sold, 43,000-line institutional platform built from scratch. Full-stack engineer specialising in Node.js, MongoDB, React, and AI integration. MCA candidate at Jain University.",
     links: [
       { label: "LinkedIn", href: "https://linkedin.com/in/skanda-umesh-88b16432b" },
       { label: "GitHub", href: "https://github.com/skandaumesh" }

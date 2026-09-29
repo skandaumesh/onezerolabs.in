@@ -146,7 +146,7 @@ export default function VisionSection() {
               <strong className="text-white">OneZeroLabs</strong> is more than a development agency; we are a digital foundry. We operate at the intersection of rigorous engineering and fluid creativity.
             </p>
             <p>
-              Our mission is to strip away the noise of the modern web and rebuild it with absolute precision. We don't just write code—we forge digital infrastructure designed to dominate markets and endure trends.
+              Our mission is to strip away the noise of the modern web and rebuild it with absolute precision. We don't just write code. We forge digital infrastructure designed to dominate markets and endure trends.
             </p>
           </motion.div>
 

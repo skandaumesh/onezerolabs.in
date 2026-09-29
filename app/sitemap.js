@@ -3,7 +3,7 @@ import { servicesData } from '@/data/servicesData'
 import { productsData } from '@/data/productsData'
 import { solutionsData } from '@/data/solutionsData'
 
-const baseUrl = 'https://www.onezerolabs.in'
+import { SITE_URL as baseUrl } from '@/lib/seo'
 
 export default function sitemap() {
   const now = new Date()
@@ -16,6 +16,7 @@ export default function sitemap() {
     { url: `${baseUrl}/about`, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${baseUrl}/contact`, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${baseUrl}/portfolio/LMS`, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/privacy-policy`, changeFrequency: 'yearly', priority: 0.3 },
   ]
 
   const servicePages = Object.keys(servicesData).map((slug) => ({
