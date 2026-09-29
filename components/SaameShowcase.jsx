@@ -253,11 +253,12 @@ export default function SaameShowcase() {
   const shown = useInView(frameRef, { once: true, amount: 0.3 })
 
   // Fit the fixed-width stage to the room available: `width` is the layout
-  // width it uses, `scale` shrinks it, and `lost` is the height that shrinking
-  // frees up, handed back to the layout.
+  // width it uses, `scale` shrinks it, and `height` is what it measures once
+  // shrunk -- the box around it is set to that, so it takes only the room the
+  // stage visibly fills.
   const stageBoxRef = useRef(null)
   const stageRef = useRef(null)
-  const [stageFit, setStageFit] = useState({ width: STAGE_WIDTH, scale: 1, lost: 0 })
+  const [stageFit, setStageFit] = useState({ width: STAGE_WIDTH, scale: 1, height: null })
 
   // The frame shows the sky plus CROP_FRACTION of the dashboard window.
   // Measured, not fixed: phones run a 14px root size (globals.css), so
@@ -288,11 +289,11 @@ export default function SaameShowcase() {
       const scale = Math.min(1, room / width)
       // offsetHeight is the untransformed height, so this stays correct
       // however many times it runs.
-      const lost = stage.offsetHeight * (1 - scale)
+      const height = scale < 1 ? stage.offsetHeight * scale : null
       setStageFit((prev) =>
-        prev.width === width && prev.scale === scale && Math.abs(prev.lost - lost) < 0.5
+        prev.width === width && prev.scale === scale && Math.abs((prev.height ?? 0) - (height ?? 0)) < 0.5
           ? prev
-          : { width, scale, lost }
+          : { width, scale, height }
       )
     }
 
@@ -373,7 +374,16 @@ export default function SaameShowcase() {
             The scale is a fixed transform, set once per resize, which Chrome
             rasters at the final size. It is never animated -- see the note on
             the entrance below. */}
-        <div ref={stageBoxRef} className="relative mx-auto w-full max-w-[1240px]">
+        {/* The box's height is set to the stage's shrunk height. This used to
+            be a negative margin on the stage, which collapsed through to this
+            box instead -- the box stayed the stage's full unscaled height, an
+            invisible layer over the buttons below it, and on phones "Talk to
+            us" couldn't be tapped. */}
+        <div
+          ref={stageBoxRef}
+          className="relative mx-auto w-full max-w-[1240px]"
+          style={stageFit.height ? { height: stageFit.height } : undefined}
+        >
         <div
           ref={stageRef}
           // Opt out of the phone tap-target rule in globals.css (44px minimum
@@ -383,9 +393,6 @@ export default function SaameShowcase() {
           style={{
             width: stageFit.width,
             transform: `scale(${stageFit.scale})`,
-            // A transform doesn't change layout size, so pull the space below
-            // up by the height the scale took away.
-            marginBottom: -stageFit.lost,
           }}
         >
         {/* Fade and rise only. This used to tilt in (rotateX) and grow from

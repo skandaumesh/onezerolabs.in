@@ -6,10 +6,12 @@ import CtaSection from '@/components/CtaSection'
 import { Band, BODY, GlassCard, HEADING, INK } from '@/components/ui/light-kit'
 import { CLIENT_NAMES, listNames } from '@/lib/seo'
 
+// `position` is where each photo is anchored when the 4:5 card crops it.
 const founders = [
-  { name: 'Skanda Umesh', role: 'Founder', img: '/founder.jpg' },
-  { name: 'Praveen Kumar', role: 'Co-Founder', img: '/cofounder.jpg' },
-  { name: 'Tanisha Karve', role: 'Operations & Strategy', img: '/lead.jpg' },
+  { name: 'Skanda Umesh', role: 'Founder', img: '/founders/skanda.jpeg', position: '50% 25%' },
+  { name: 'Praveen Kumar', role: 'Co-Founder', img: '/cofounder.jpg', position: '50% 50%' },
+  // A 900px copy of public/founders/tanisha.jpeg (3024px, 1.4MB).
+  { name: 'Tanisha Karve', role: 'Operations & Strategy', img: '/founders/tanisha-web.jpg', position: '50% 30%' },
 ]
 
 const H2 = `${HEADING} mb-7 text-4xl sm:text-5xl lg:text-[56px]`
@@ -181,14 +183,19 @@ export default function AboutPage() {
                   <div className="relative mb-5 aspect-[4/5] w-full overflow-hidden rounded-[20px] bg-[#ECEFF4]">
                     <Image
                       src={f.img}
-                      alt={f.name}
+                      alt={`${f.name}, ${f.role} at OneZeroLabs`}
                       fill
+                      sizes="(min-width: 1024px) 340px, (min-width: 640px) 45vw, 340px"
                       className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                      style={{ objectPosition: f.position }}
                     />
                   </div>
-                  <p className={`px-4 pb-4 text-center font-[family-name:var(--font-instrument-serif)] text-2xl tracking-wide ${INK}`}>
-                    {f.name}
-                  </p>
+                  <div className="px-4 pb-4 text-center">
+                    <p className={`font-[family-name:var(--font-instrument-serif)] text-2xl tracking-wide ${INK}`}>
+                      {f.name}
+                    </p>
+                    <p className="mt-0.5 text-[13px] text-[#6E809F]">{f.role}</p>
+                  </div>
                 </GlassCard>
               </motion.div>
             ))}

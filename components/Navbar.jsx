@@ -222,17 +222,9 @@ export default function Navbar() {
               : 'bg-ozl-base/70 md:bg-transparent backdrop-blur-md md:backdrop-blur-none border border-white/40 md:border-transparent shadow-sm md:shadow-none'
           }`}
         >
-          {/* Left: Logo */}
-          <Link href="/" className="flex items-center gap-2 sm:gap-3 relative z-10 shrink-0">
-            <div className="relative w-8 h-8 sm:w-12 sm:h-12 md:w-14 md:h-14">
-              <Image
-                src="/logo-print.png"
-                alt="OneZeroLabs"
-                fill
-                className="object-contain"
-                priority
-              />
-            </div>
+          {/* Left: the name alone, no mark. The fixed height keeps the bar
+              the size it was with the logo image in it. */}
+          <Link href="/" className="flex h-8 items-center relative z-10 shrink-0 sm:h-12 md:h-14">
             <span className={`text-ozl-ink text-base sm:text-xl md:text-2xl font-bold tracking-tight ${syne.className}`}>
               OneZeroLabs
             </span>

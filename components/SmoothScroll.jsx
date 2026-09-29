@@ -28,11 +28,14 @@ export default function SmoothScroll({ children }) {
         })
       }
 
-      const onScroll = () => {
-        window.dispatchEvent(new Event('scroll'))
-      }
-      
-      lenisRef.current.on('scroll', onScroll)
+      // Lenis moves the real window scroll, so the browser already fires
+      // native scroll events. Re-dispatching one here on every Lenis frame
+      // (as this used to) made every scroll listener -- framer's useScroll
+      // included -- run twice a frame.
+      //
+      // Exposed for code that wants to scroll with the same easing, e.g. the
+      // How We Work step buttons.
+      window.lenis = lenisRef.current
 
       function raf(time) {
         lenisRef.current?.raf(time)
@@ -51,6 +54,7 @@ export default function SmoothScroll({ children }) {
         lenisRef.current.destroy()
         lenisRef.current = null
       }
+      if (window.lenis) delete window.lenis
       if (rafHandleRef.current) {
         cancelAnimationFrame(rafHandleRef.current)
         rafHandleRef.current = null

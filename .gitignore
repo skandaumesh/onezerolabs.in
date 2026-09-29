@@ -13,3 +13,6 @@ generated/
 # Real client and employee documents (fees, salary, IDs). This repository is
 # public, so these stay local. The placeholder example is fine to publish.
 examples/*.mjs
+
+# Full-size original; the site uses the 900px copy, founders/tanisha-web.jpg.
+public/founders/tanisha.jpeg

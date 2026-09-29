@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion"
+import { motion, useScroll, useMotionValueEvent, useTransform, AnimatePresence } from "framer-motion"
 
 const steps = [
   {
@@ -84,7 +84,7 @@ const IsometricStack = ({ activeIndex }) => {
         }}
       />
 
-      <div className="pointer-events-none absolute h-64 w-64 animate-pulse rounded-full bg-blue-500/14 blur-[70px]" />
+      <div className="pointer-events-none absolute h-64 w-64 rounded-full bg-blue-500/14 blur-[70px]" />
       <div className="pointer-events-none absolute h-44 w-44 rounded-full bg-cyan-400/10 blur-[50px]" />
 
       {/* Scale lives on a plain wrapper, NOT on the animated element. Framer
@@ -149,49 +149,98 @@ const IsometricStack = ({ activeIndex }) => {
   )
 }
 
-/* Content pane */
-const ContentPane = ({ step }) => {
+/* One segment per step, filling continuously with the scroll so the section
+   reads as moving with you rather than jumping between states. Each segment
+   is also a way to jump to its step. */
+const StepProgress = ({ progress, activeIndex, onSelect }) => (
+  <div className="mb-5 flex gap-1.5 md:mb-6">
+    {steps.map((step, i) => (
+      <StepSegment
+        key={step.id}
+        step={step}
+        index={i}
+        progress={progress}
+        active={i === activeIndex}
+        onSelect={onSelect}
+      />
+    ))}
+  </div>
+)
+
+const StepSegment = ({ step, index, progress, active, onSelect }) => {
+  const fill = useTransform(progress, [index / steps.length, (index + 1) / steps.length], [0, 1])
   return (
-    <div className="relative flex h-full min-h-[300px] w-full flex-col justify-center px-5 py-6 pb-8 md:min-h-0 md:p-8 lg:p-10">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={step.id}
-          initial={{ opacity: 0, filter: "blur(10px)", y: 20 }}
-          animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
-          exit={{ opacity: 0, filter: "blur(10px)", y: -20 }}
-          transition={{ duration: 0.4, ease: "easeInOut" }}
-          className="flex flex-col"
-        >
-          <span className="mb-4 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#6E809F] md:text-[11px]">
-            {step.id} · {step.label}
-          </span>
+    <button
+      type="button"
+      onClick={() => onSelect(index)}
+      aria-label={`Step ${index + 1}: ${step.label.toLowerCase()}`}
+      aria-current={active ? "step" : undefined}
+      // min-h-0 / min-w-0 opt out of the 44px phone tap-target rule in
+      // globals.css, which would turn each segment into a tall box; the
+      // button is still 24px tall around the 3px bar.
+      className="group relative flex h-6 min-h-0 min-w-0 flex-1 cursor-pointer items-center"
+    >
+      <span className="relative block h-[3px] w-full overflow-hidden rounded-full bg-[#0E1A33]/10 transition-colors group-hover:bg-[#0E1A33]/20">
+        <motion.span className="absolute inset-0 origin-left rounded-full bg-[#1E293B]" style={{ scaleX: fill }} />
+      </span>
+    </button>
+  )
+}
 
-          <h3 className="mb-5 text-3xl leading-tight tracking-wide text-[#0E1A33] font-[family-name:var(--font-instrument-serif)] sm:text-4xl md:text-[44px]">
-            {step.title}
-          </h3>
+/* Content pane. Every step is laid out in the same grid cell and only the
+   active one is visible, so switching is a crossfade: nothing mounts or
+   unmounts mid-scroll, and the pane keeps the height of the longest step --
+   before, the height changed with each step and on phones the stack above it
+   jumped every time. Opacity and a short rise only; the blur filter this used
+   was costly to animate and lagged behind a fast scroll. */
+const ContentPane = ({ activeIndex, progress, onSelect }) => {
+  return (
+    <div className="relative flex h-full w-full flex-col justify-center px-5 py-6 pb-8 md:p-8 lg:p-10">
+      <StepProgress progress={progress} activeIndex={activeIndex} onSelect={onSelect} />
+      <div className="grid">
+        {steps.map((step, i) => {
+          const on = i === activeIndex
+          return (
+            <motion.div
+              key={step.id}
+              aria-hidden={!on}
+              initial={false}
+              animate={{ opacity: on ? 1 : 0, y: on ? 0 : i < activeIndex ? -14 : 14 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+              className={`flex flex-col [grid-area:1/1] ${on ? "" : "pointer-events-none"}`}
+            >
+              <span className="mb-4 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#6E809F] md:text-[11px]">
+                {step.id} · {step.label}
+              </span>
 
-          <p className="mb-6 max-w-md text-[14px] font-light leading-relaxed text-[#33415C] sm:text-[15px] md:text-[16px]">
-            {step.description}
-          </p>
+              <h3 className="mb-5 text-3xl leading-tight tracking-wide text-[#0E1A33] font-[family-name:var(--font-instrument-serif)] sm:text-4xl md:text-[44px]">
+                {step.title}
+              </h3>
 
-          {/* Plain markers rather than the icon discs that used to be here --
-              twelve check icons per section was more furniture than the list
-              needed. */}
-          <ul className="space-y-2.5">
-            {step.features.map((feature) => (
-              <li key={feature} className="flex items-start gap-3">
-                <span
-                  aria-hidden
-                  className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-[#2563EB]/60"
-                />
-                <span className="text-[13px] font-medium leading-snug text-[#33415C] sm:text-sm">
-                  {feature}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </motion.div>
-      </AnimatePresence>
+              <p className="mb-6 max-w-md text-[14px] font-light leading-relaxed text-[#33415C] sm:text-[15px] md:text-[16px]">
+                {step.description}
+              </p>
+
+              {/* Plain markers rather than the icon discs that used to be here --
+                  twelve check icons per section was more furniture than the list
+                  needed. */}
+              <ul className="space-y-2.5">
+                {step.features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-3">
+                    <span
+                      aria-hidden
+                      className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-[#2563EB]/60"
+                    />
+                    <span className="text-[13px] font-medium leading-snug text-[#33415C] sm:text-sm">
+                      {feature}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -206,15 +255,27 @@ export default function HowWeWork() {
   })
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    setActiveTab(Math.min(Math.floor(latest * steps.length), steps.length - 1))
+    const next = Math.min(Math.max(Math.floor(latest * steps.length), 0), steps.length - 1)
+    setActiveTab((prev) => (prev === next ? prev : next))
   })
 
-  const currentStep = steps[activeTab]
+  // Scroll to the middle of a step's stretch of the section. Through Lenis
+  // when it is running (components/SmoothScroll.jsx), so the jump uses the
+  // same easing as wheel scrolling instead of fighting it.
+  const goToStep = (index) => {
+    const el = containerRef.current
+    if (!el) return
+    const top = el.getBoundingClientRect().top + window.scrollY
+    const range = el.offsetHeight - window.innerHeight
+    const target = top + (range * (index + 0.5)) / steps.length
+    if (window.lenis) window.lenis.scrollTo(target, { duration: 1.1 })
+    else window.scrollTo({ top: target, behavior: "smooth" })
+  }
 
   return (
     <section
       ref={containerRef}
-      className="relative min-h-[300vh] w-full"
+      className="relative min-h-[340vh] w-full"
       style={{
         // Part of one continuous grey band: service cards above, testimonials
         // below. The fade back to white happens at the foot of testimonials.
@@ -250,11 +311,13 @@ export default function HowWeWork() {
             // the stack's unscaled layout box (192px, drawn at 0.55) props
             // that up well past what is visible.
             className="relative mx-auto w-full max-w-[1000px] rounded-[32px] p-1.5 sm:rounded-[3rem] sm:p-2 max-md:flex max-md:min-h-0 max-md:flex-1 max-md:flex-col"
+            // No backdrop-filter: this card is pinned while the section scrolls
+            // behind it, so a blur has to be recomputed every frame -- the
+            // main cost of scrolling here on phones -- and over the flat grey
+            // band it made no visible difference.
             style={{
               background: "rgba(255,255,255,0.28)",
               border: "1px solid rgba(255,255,255,0.65)",
-              backdropFilter: "blur(18px) saturate(140%)",
-              WebkitBackdropFilter: "blur(18px) saturate(140%)",
               boxShadow: ["0 12px 28px -14px rgba(51,65,85,0.18)", "inset 0 1px 0 rgba(255,255,255,0.9)"].join(", "),
             }}
           >
@@ -277,7 +340,7 @@ export default function HowWeWork() {
 
               {/* Right: Content */}
               <div className="relative z-10 w-full md:w-[58%]">
-                <ContentPane step={currentStep} />
+                <ContentPane activeIndex={activeTab} progress={scrollYProgress} onSelect={goToStep} />
               </div>
             </div>
           </div>
