@@ -175,7 +175,6 @@ const siteSchema = {
       },
       founder: [
         { '@type': 'Person', name: 'Skanda Umesh', jobTitle: 'Founder', sameAs: ['https://github.com/skandaumesh'] },
-        { '@type': 'Person', name: 'Praveen Kumar', jobTitle: 'Co-Founder' },
       ],
       knowsAbout: [
         'Website design and development',
