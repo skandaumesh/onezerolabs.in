@@ -142,16 +142,6 @@ export const RENDERERS = {
   insights: StudentInsights,
 }
 
-/* Only facts that can be checked against the product repository. Student and
-   parent counts are deliberately absent: the real ones belong to the client,
-   and inventing them is what went wrong here before. */
-export const FACTS = [
-  { value: "3 apps", label: "Teacher, office and student" },
-  { value: "5 programmes", label: "BCA, BCom, BBA, MCA, MBA" },
-  { value: "Android + PWA", label: "Installable, and works offline" },
-  { value: "NAAC & NBA", label: "Compliance tracked per programme" },
-]
-
 export const findScreen = (appId, screenId) => {
   const app = APPS.find((a) => a.id === appId)
   return app && app.screens.find((s) => s.id === screenId)

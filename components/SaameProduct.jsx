@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 
 import { PhoneFrame, BrowserFrame } from "./saame-ui/Frames"
-import { APPS, RENDERERS, FACTS, MODULES } from "./saame-ui/apps"
+import { APPS, RENDERERS, MODULES } from "./saame-ui/apps"
 
 /**
  * /products/saame: the whole product, since the homepage now shows one screen
@@ -309,7 +309,7 @@ export default function SaameProduct() {
         </div>
       </Section>
 
-      {/* Facts and close */}
+      {/* Close */}
       <motion.section
         initial="hidden"
         whileInView="visible"
@@ -317,18 +317,7 @@ export default function SaameProduct() {
         variants={fade}
         className="relative z-10 mx-auto mt-24 w-full max-w-6xl px-4 md:mt-32 md:px-8"
       >
-        <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4">
-          {FACTS.map((f) => (
-            <div key={f.value} className="border-l border-ozl-glassBorder pl-4">
-              <p className="text-[19px] font-semibold tracking-tight text-ozl-ink md:text-[22px]">
-                {f.value}
-              </p>
-              <p className="mt-1.5 text-[12px] leading-relaxed text-ozl-muted">{f.label}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-12 flex flex-col items-start gap-5 border-t border-ozl-glassBorder pt-8 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col items-start gap-5 border-t border-ozl-glassBorder pt-8 sm:flex-row sm:items-center sm:justify-between">
           <p className="max-w-md text-[15px] leading-relaxed text-ozl-ink/70">
             If your institution still runs on registers and spreadsheets, this is what the
             alternative looks like.
