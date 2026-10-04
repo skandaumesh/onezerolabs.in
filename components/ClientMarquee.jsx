@@ -19,7 +19,12 @@ function LogoRow({ ariaHidden = false }) {
           key={logo.src}
           whileHover={{ scale: 1.1, y: -2 }}
           transition={{ type: "spring", stiffness: 400, damping: 20 }}
-          className="flex w-[110px] sm:w-[150px] md:w-[200px] shrink-0 items-center justify-center cursor-pointer"
+          // Equal padding either side of each logo, not a fixed-width slot. A
+          // fixed slot spaced logos by their centres, so wide wordmarks
+          // (Elevare, Élan Vital) nearly filled theirs and ended up almost
+          // touching on phones while the round badges floated apart. Padding
+          // gives the same gap between every pair, whatever the logo's width.
+          className="flex shrink-0 items-center justify-center cursor-pointer px-6 sm:px-8 md:px-12"
         >
           <img
             src={logo.src}
