@@ -39,8 +39,10 @@ const testimonials = [
     logo: { src: "/clients/svg/vetaas.svg", w: 808, h: 860 },
     quote:
       "ONEZEROLABS brings a refreshing blend of technical expertise and problem-solving mindset. Their team is proactive, responsive, and genuinely invested in building solutions that work in real environments. Their ability to translate complex requirements into intuitive, scalable systems is truly commendable. It's exciting to see young innovators building technology with such clarity, purpose, and a deep understanding of what institutions actually need.",
-    author: "Vetaas Education Foundation",
-    role: "Education partner",
+    author: "Kirti Krishna Ratnoo",
+    role: "Founder, Vetaas Education Foundation",
+    image: "/kirti.webp",
+    imagePosition: "50% 30%",
   },
 ]
 
