@@ -6,7 +6,7 @@ import Image from "next/image"
 
 /* What clients say, between Why Us and the FAQ.
 
-   Compact glass cards, three across on desktop: the client at the top, the
+   Compact glass cards, two across on desktop: the client at the top, the
    quote (first five lines, "Read more" for the rest), the person at the foot.
    Quotes are the clients' own words, kept verbatim. */
 
@@ -42,6 +42,17 @@ const testimonials = [
     author: "Kirti Krishna Ratnoo",
     role: "Founder, Vetaas Education Foundation",
     image: "/kirti.webp",
+    imagePosition: "50% 30%",
+  },
+  {
+    company: "VAAYU Chest & Sleep Specialists",
+    sector: "Healthcare · Bengaluru",
+    logo: { src: "/clients/svg/vaayu.svg", w: 1125, h: 1105 },
+    quote:
+      "OneZero labs is run by 2 very young and enthusiastic people. Skanda and Tanisha. We've worked with them for a few of our projects related to website design, app building, payment solutions and social media management and data analytics and we are nothing but praise. Skanda's proactive approach and out of the box solutions to make life easier in the long term are much appreciated and we keep coming back for any of our tech needs.",
+    author: "Dr. Sameer Bansal",
+    role: "Senior Consultant & Clinical Head, VAAYU Chest & Sleep Specialists",
+    image: "/sameer.webp",
     imagePosition: "50% 30%",
   },
 ]
@@ -169,7 +180,7 @@ export default function Testimonials() {
           </motion.div>
 
           <div
-            className="mx-auto grid max-w-xl grid-cols-1 items-start gap-4 lg:max-w-none lg:grid-cols-3 lg:gap-5"
+            className="mx-auto grid max-w-xl grid-cols-1 items-start gap-4 lg:max-w-none lg:grid-cols-2 lg:gap-5"
           >
             {testimonials.map((t, i) => (
               <motion.div
