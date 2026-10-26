@@ -1,13 +1,15 @@
 "use client"
 
-import { MotionConfig, motion } from "framer-motion"
-import { useState } from "react"
+import { MotionConfig, motion, useReducedMotion } from "framer-motion"
+import { useEffect, useRef, useState } from "react"
+import { Pause, Play } from "lucide-react"
 import Image from "next/image"
 
 /* What clients say, between Why Us and the FAQ.
 
-   Compact glass cards, two across on desktop: the client at the top, the
-   quote (first five lines, "Read more" for the rest), the person at the foot.
+   One row of glass cards drifting left in an endless loop: the client at the
+   top, the full quote, the person at the foot. The row stops under the mouse,
+   follows a finger on touch screens, and has a pause button for keyboards.
    Quotes are the clients' own words, kept verbatim. */
 
 const testimonials = [
@@ -19,8 +21,7 @@ const testimonials = [
       "Collaborating with One Zero Labs to build the Praasa Consultancy website was a phenomenal experience. They translated our mission into a professional, user-friendly platform where researchers can easily access our services. Skanda's technical expertise and attention to detail ensured every feature works flawlessly. The communication was prompt and transparent throughout. I highly recommend them to anyone looking for a talented team that brings a vision to life.",
     author: "Dr. Sandesh Bhat",
     role: "Founder, Praasa Consultancy",
-    image: "/praasa.jpeg",
-    imagePosition: "50% 20%",
+    image: "/testimonials/praasa.webp",
   },
   {
     company: "MLA Academy of Higher Learning",
@@ -30,8 +31,7 @@ const testimonials = [
       "The AI-Powered Academic Management Platform developed by OneZeroLabs has brought a remarkable improvement in the way attendance is managed within the department and the institution. The system is simple, efficient, and well-designed to meet the practical needs of faculty members. It has helped reduce manual effort, improved accuracy in attendance tracking, and made the overall process much more organized and reliable.",
     author: "Ms. Kamala S",
     role: "HOD & Assistant Professor, Dept. of Computer Applications",
-    image: "/kamala.png",
-    imagePosition: "45% 30%",
+    image: "/testimonials/kamala.webp",
   },
   {
     company: "Vetaas Education Foundation",
@@ -41,8 +41,7 @@ const testimonials = [
       "ONEZEROLABS brings a refreshing blend of technical expertise and problem-solving mindset. Their team is proactive, responsive, and genuinely invested in building solutions that work in real environments. Their ability to translate complex requirements into intuitive, scalable systems is truly commendable. It's exciting to see young innovators building technology with such clarity, purpose, and a deep understanding of what institutions actually need.",
     author: "Kirti Krishna Ratnoo",
     role: "Founder, Vetaas Education Foundation",
-    image: "/kirti.webp",
-    imagePosition: "50% 30%",
+    image: "/testimonials/kirti.webp",
   },
   {
     company: "VAAYU Chest & Sleep Specialists",
@@ -52,27 +51,28 @@ const testimonials = [
       "OneZero labs is run by 2 very young and enthusiastic people. Skanda and Tanisha. We've worked with them for a few of our projects related to website design, app building, payment solutions and social media management and data analytics and we are nothing but praise. Skanda's proactive approach and out of the box solutions to make life easier in the long term are much appreciated and we keep coming back for any of our tech needs.",
     author: "Dr. Sameer Bansal",
     role: "Senior Consultant & Clinical Head, VAAYU Chest & Sleep Specialists",
-    image: "/sameer.webp",
-    imagePosition: "50% 30%",
+    image: "/testimonials/sameer.webp",
   },
 ]
 
 const EASE = [0.22, 1, 0.36, 1]
 
-const cardIn = {
-  hidden: { opacity: 0, y: 32, filter: "blur(8px)" },
-  visible: (i) => ({
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.75, ease: EASE, delay: i * 0.1 },
-  }),
-}
+// Sets of cards in the track. The loop slides by one set, so the sets after
+// the first have to cover the widest screen: two more is ~3,300px.
+const COPIES = 3
 
-function TestimonialCard({ t, expanded, onToggle }) {
+// Drift in px per second. Slower on phones, where one card fills the screen
+// and has to stay on it long enough to be read.
+const SPEED = 30
+const SPEED_PHONE = 22
+
+// How long the row waits after a finger lets go before drifting again.
+const TOUCH_HOLD_MS = 2500
+
+function TestimonialCard({ t }) {
   return (
-    // The lift goes through framer: the wrapper animates this card's entrance,
-    // so a hover translate class here would be overwritten.
+    // The lift goes through framer: a hover translate class would be
+    // overwritten by framer's own transform on this element.
     <motion.figure
       whileHover={{ y: -4, transition: { duration: 0.35, ease: EASE } }}
       className="group h-full rounded-[28px] border border-white/65 bg-white/[0.28] p-1.5 shadow-[0_10px_24px_-14px_rgba(51,65,85,0.18),inset_0_1px_0_rgba(255,255,255,0.9)] transition-[box-shadow,border-color] duration-500 ease-ozl hover:border-white hover:shadow-[0_20px_38px_-18px_rgba(51,65,85,0.26),inset_0_1px_0_rgba(255,255,255,1)]"
@@ -87,13 +87,13 @@ function TestimonialCard({ t, expanded, onToggle }) {
         <div className="relative flex h-full flex-col">
           {/* Client */}
           <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white bg-white shadow-[0_6px_16px_-10px_rgba(15,23,42,0.3)]">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-white bg-white shadow-[0_6px_16px_-10px_rgba(15,23,42,0.3)]">
               <img
                 src={t.logo.src}
                 alt={`${t.company} logo`}
                 width={t.logo.w}
                 height={t.logo.h}
-                className="h-7 w-auto"
+                className="h-8 w-auto"
                 draggable={false}
               />
             </span>
@@ -105,38 +105,26 @@ function TestimonialCard({ t, expanded, onToggle }) {
             </span>
           </div>
 
-          {/* Quote: five lines, then "Read more" */}
-          <blockquote
-            className={`mt-4 text-[14.5px] leading-[1.65] text-[#33415C] ${expanded ? "" : "line-clamp-5"}`}
-          >
+          <blockquote className="mb-5 mt-4 text-[14.5px] leading-[1.65] text-[#33415C]">
             &ldquo;{t.quote}&rdquo;
           </blockquote>
-          <button
-            type="button"
-            onClick={onToggle}
-            aria-expanded={expanded}
-            className="mb-5 mt-1.5 w-fit cursor-pointer text-[13px] font-medium text-[#42557A] transition-colors hover:text-ozl-violet"
-          >
-            {expanded ? "Show less" : "Read more"}
-          </button>
 
-          {/* Person */}
-          <figcaption className="mt-auto flex items-center gap-2.5 border-t border-[#0E1A33]/[0.07] pt-4">
-            {t.image && (
-              <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full border-2 border-white shadow-[0_4px_12px_-6px_rgba(15,23,42,0.4)]">
-                <Image
-                  src={t.image}
-                  alt={t.author}
-                  fill
-                  sizes="36px"
-                  className="object-cover"
-                  style={{ objectPosition: t.imagePosition }}
-                />
-              </span>
-            )}
+          {/* Person. Tall enough for a two-line role, so the divider sits at
+              the same height on every card in the row. */}
+          <figcaption className="mt-auto flex min-h-[71px] items-center gap-3 border-t border-[#0E1A33]/[0.07] pt-4">
+            <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full border-2 border-white shadow-[0_4px_12px_-6px_rgba(15,23,42,0.4)]">
+              <Image
+                src={t.image}
+                alt={t.author}
+                fill
+                sizes="44px"
+                className="object-cover"
+                draggable={false}
+              />
+            </span>
             <span className="min-w-0">
               <span className="block text-[13.5px] font-medium text-[#0E1A33]">{t.author}</span>
-              <span className="block truncate text-[12px] text-[#6E809F]">{t.role}</span>
+              <span className="block text-[12px] leading-snug text-[#6E809F]">{t.role}</span>
             </span>
           </figcaption>
         </div>
@@ -146,11 +134,109 @@ function TestimonialCard({ t, expanded, onToggle }) {
 }
 
 export default function Testimonials() {
-  // One quote open at a time. Cards aren't stretched to the row's height --
-  // collapsed they are already equal (same structure, quotes clamped to five
-  // lines) -- so an opened card grows on its own without leaving gaps in the
-  // others.
-  const [expanded, setExpanded] = useState(null)
+  const reduceMotion = useReducedMotion()
+  const viewportRef = useRef(null)
+  const trackRef = useRef(null)
+  const [paused, setPaused] = useState(false)
+  const pausedRef = useRef(paused)
+  pausedRef.current = paused
+
+  // The drift runs from requestAnimationFrame rather than a CSS keyframe so
+  // the row can follow a finger and so each frame lands on a whole device
+  // pixel: a row parked between pixels (wherever hover happens to stop it)
+  // renders its text and photos soft.
+  useEffect(() => {
+    if (reduceMotion) return
+    const viewport = viewportRef.current
+    const track = trackRef.current
+
+    let offset = 0 // how far the row has drifted into the first set, px
+    let period = 0 // width of one set, trailing margin included
+    let last = 0
+    let raf = 0
+    let hovered = false
+    let drag = null // a finger on the row: { id, x, from }
+    let holdUntil = 0
+
+    const paint = () => {
+      if (!period) return
+      offset = ((offset % period) + period) % period
+      const dpr = window.devicePixelRatio || 1
+      track.style.transform = `translate3d(${-Math.round(offset * dpr) / dpr}px, 0, 0)`
+    }
+
+    const tick = (now) => {
+      raf = requestAnimationFrame(tick)
+      // Capped so the first frame after a stall doesn't jump the row.
+      const dt = last ? Math.min(now - last, 50) / 1000 : 0
+      last = now
+      if (pausedRef.current || hovered || drag || now < holdUntil) return
+      offset += (window.innerWidth < 640 ? SPEED_PHONE : SPEED) * dt
+      paint()
+    }
+    const start = () => {
+      if (raf) return
+      last = 0
+      raf = requestAnimationFrame(tick)
+    }
+    const stop = () => {
+      cancelAnimationFrame(raf)
+      raf = 0
+    }
+
+    const resize = new ResizeObserver(() => {
+      period = track.offsetWidth / COPIES
+      paint()
+    })
+    resize.observe(track)
+    // Only drift while the row is on screen.
+    const onScreen = new IntersectionObserver(([entry]) =>
+      entry.isIntersecting ? start() : stop()
+    )
+    onScreen.observe(viewport)
+
+    const onEnter = (e) => {
+      if (e.pointerType === "mouse") hovered = true
+    }
+    const onLeave = (e) => {
+      if (e.pointerType === "mouse") hovered = false
+    }
+    // Touch drags the row, so a quote that drifted off can be pulled back.
+    // touch-pan-y on the viewport leaves vertical swipes to the page.
+    const onDown = (e) => {
+      if (e.pointerType === "mouse") return
+      drag = { id: e.pointerId, x: e.clientX, from: offset }
+    }
+    const onMove = (e) => {
+      if (drag?.id !== e.pointerId) return
+      offset = drag.from - (e.clientX - drag.x)
+      paint()
+    }
+    const onUp = (e) => {
+      if (drag?.id !== e.pointerId) return
+      drag = null
+      holdUntil = performance.now() + TOUCH_HOLD_MS
+    }
+
+    viewport.addEventListener("pointerenter", onEnter)
+    viewport.addEventListener("pointerleave", onLeave)
+    viewport.addEventListener("pointerdown", onDown)
+    viewport.addEventListener("pointermove", onMove)
+    viewport.addEventListener("pointerup", onUp)
+    viewport.addEventListener("pointercancel", onUp)
+    return () => {
+      stop()
+      resize.disconnect()
+      onScreen.disconnect()
+      viewport.removeEventListener("pointerenter", onEnter)
+      viewport.removeEventListener("pointerleave", onLeave)
+      viewport.removeEventListener("pointerdown", onDown)
+      viewport.removeEventListener("pointermove", onMove)
+      viewport.removeEventListener("pointerup", onUp)
+      viewport.removeEventListener("pointercancel", onUp)
+      track.style.transform = ""
+    }
+  }, [reduceMotion])
 
   return (
     <section
@@ -162,44 +248,70 @@ export default function Testimonials() {
       }}
     >
       <MotionConfig reducedMotion="user">
-        <div className="mx-auto w-full max-w-[1150px] px-4 md:px-8">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="mb-8 text-center md:mb-12"
-          >
-            <span className="mb-3 block font-mono text-[10px] uppercase tracking-[0.4em] text-ozl-muted sm:mb-4">
-              Testimonials
-            </span>
-            <h2 className="ozl-heading-fade text-3xl leading-[1.1] tracking-wide font-[family-name:var(--font-instrument-serif)] md:text-5xl lg:text-6xl">
-              What our clients <span className="italic">say.</span>
-            </h2>
-          </motion.div>
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mx-auto mb-2 w-full max-w-[1150px] px-4 text-center md:mb-6 md:px-8"
+        >
+          <span className="mb-3 block font-mono text-[10px] uppercase tracking-[0.4em] text-ozl-muted sm:mb-4">
+            Testimonials
+          </span>
+          <h2 className="ozl-heading-fade text-3xl leading-[1.1] tracking-wide font-[family-name:var(--font-instrument-serif)] md:text-5xl lg:text-6xl">
+            What our clients <span className="italic">say.</span>
+          </h2>
+        </motion.div>
 
+        {/* The row fades in as a whole; per-card entrances would replay on
+            each copy as it drifts into view. */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.75, ease: EASE }}
+        >
+          {/* Vertical padding keeps the hover lift and shadows clear of the
+              clip; the mask fades cards in and out at the screen edges. */}
           <div
-            className="mx-auto grid max-w-xl grid-cols-1 items-start gap-4 lg:max-w-none lg:grid-cols-2 lg:gap-5"
+            ref={viewportRef}
+            className={`touch-pan-y px-4 py-6 [mask-image:linear-gradient(90deg,transparent,#000_7%,#000_93%,transparent)] md:px-8 ${
+              reduceMotion ? "overflow-x-auto" : "overflow-hidden"
+            }`}
           >
-            {testimonials.map((t, i) => (
-              <motion.div
-                key={t.company}
-                variants={cardIn}
-                custom={i}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.25 }}
-              >
-                <TestimonialCard
-                  t={t}
-                  expanded={expanded === i}
-                  onToggle={() => setExpanded(expanded === i ? null : i)}
-                />
-              </motion.div>
-            ))}
+            {/* Cards are spaced by a right margin, not a gap, so one set's
+                width (track / COPIES) includes the space after its last card
+                and the loop joins without a seam. Stretched to the tallest
+                card so every footer sits on the same line. */}
+            <div ref={trackRef} className="flex w-max items-stretch">
+              {Array.from({ length: reduceMotion ? 1 : COPIES }, (_, copy) =>
+                testimonials.map((t) => (
+                  <div
+                    key={`${copy}-${t.company}`}
+                    aria-hidden={copy > 0 || undefined}
+                    className="mr-4 w-[300px] shrink-0 sm:w-[360px] lg:mr-5 lg:w-[400px]"
+                  >
+                    <TestimonialCard t={t} />
+                  </div>
+                ))
+              )}
+            </div>
           </div>
-        </div>
+        </motion.div>
+
+        {!reduceMotion && (
+          <div className="mt-1 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setPaused(!paused)}
+              aria-label={paused ? "Play testimonials" : "Pause testimonials"}
+              className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/80 bg-white/50 text-[#42557A] shadow-[0_6px_16px_-10px_rgba(15,23,42,0.3)] transition-colors hover:text-ozl-violet"
+            >
+              {paused ? <Play size={14} strokeWidth={2.2} /> : <Pause size={14} strokeWidth={2.2} />}
+            </button>
+          </div>
+        )}
       </MotionConfig>
     </section>
   )
