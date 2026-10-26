@@ -74,44 +74,46 @@ function TestimonialCard({ t }) {
     // overwritten by framer's own transform on this element.
     <motion.figure
       whileHover={{ y: -4, transition: { duration: 0.35, ease: EASE } }}
-      className="group h-full rounded-[28px] border border-white/65 bg-white/[0.28] p-1.5 shadow-[0_10px_24px_-14px_rgba(51,65,85,0.18),inset_0_1px_0_rgba(255,255,255,0.9)] transition-[box-shadow,border-color] duration-500 ease-ozl hover:border-white hover:shadow-[0_20px_38px_-18px_rgba(51,65,85,0.26),inset_0_1px_0_rgba(255,255,255,1)]"
+      className="group h-full rounded-[24px] sm:rounded-[28px] border border-white/65 bg-white/[0.28] p-1.5 shadow-[0_10px_24px_-14px_rgba(51,65,85,0.18),inset_0_1px_0_rgba(255,255,255,0.9)] transition-[box-shadow,border-color] duration-500 ease-ozl hover:border-white hover:shadow-[0_20px_38px_-18px_rgba(51,65,85,0.26),inset_0_1px_0_rgba(255,255,255,1)]"
     >
-      <div className="relative flex h-full flex-col overflow-hidden rounded-[22px] border border-white/85 bg-[linear-gradient(145deg,rgba(255,255,255,0.6)_0%,rgba(255,255,255,0.32)_100%)] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,1)] sm:p-6">
+      <div className="relative flex h-full flex-col overflow-hidden rounded-[18px] sm:rounded-[22px] border border-white/85 bg-[linear-gradient(145deg,rgba(255,255,255,0.6)_0%,rgba(255,255,255,0.32)_100%)] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,1)] sm:p-6">
         {/* Light sweep on hover, as on the service and Why Us cards. */}
         <span
           aria-hidden
           className="pointer-events-none absolute inset-y-0 left-0 w-[45%] -translate-x-[160%] skew-x-[-18deg] bg-[linear-gradient(90deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.75)_50%,rgba(255,255,255,0)_100%)] group-hover:translate-x-[330%] group-hover:transition-transform group-hover:duration-1000 group-hover:ease-out motion-reduce:hidden"
         />
 
+        {/* Phones get a tighter card (smaller type, logo and photo) so a
+            full quote doesn't fill the screen; sm and up is the 460px square. */}
         <div className="relative flex h-full flex-col">
           {/* Client */}
-          <div className="flex items-center gap-3">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-white bg-white shadow-[0_6px_16px_-10px_rgba(15,23,42,0.3)]">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white bg-white shadow-[0_6px_16px_-10px_rgba(15,23,42,0.3)] sm:h-12 sm:w-12">
               <img
                 src={t.logo.src}
                 alt={`${t.company} logo`}
                 width={t.logo.w}
                 height={t.logo.h}
-                className="h-8 w-auto"
+                className="h-7 w-auto sm:h-8"
                 draggable={false}
               />
             </span>
             <span className="min-w-0">
-              <span className="block truncate text-[14.5px] font-semibold tracking-tight text-[#0E1A33]">
+              <span className="block truncate text-[13.5px] font-semibold tracking-tight text-[#0E1A33] sm:text-[14.5px]">
                 {t.company}
               </span>
-              <span className="block text-[12px] text-[#6E809F]">{t.sector}</span>
+              <span className="block text-[11.5px] text-[#6E809F] sm:text-[12px]">{t.sector}</span>
             </span>
           </div>
 
-          <blockquote className="mb-5 mt-4 text-[14.5px] leading-[1.65] text-[#33415C]">
+          <blockquote className="mb-4 mt-3 text-[13px] leading-[1.55] text-[#33415C] sm:mb-5 sm:mt-4 sm:text-[14.5px] sm:leading-[1.65]">
             &ldquo;{t.quote}&rdquo;
           </blockquote>
 
           {/* Person. Tall enough for a two-line role, so the divider sits at
               the same height on every card in the row. */}
-          <figcaption className="mt-auto flex min-h-[71px] items-center gap-3 border-t border-[#0E1A33]/[0.07] pt-4">
-            <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full border-2 border-white shadow-[0_4px_12px_-6px_rgba(15,23,42,0.4)]">
+          <figcaption className="mt-auto flex min-h-[64px] items-center gap-2.5 border-t border-[#0E1A33]/[0.07] pt-3 sm:min-h-[71px] sm:gap-3 sm:pt-4">
+            <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-white shadow-[0_4px_12px_-6px_rgba(15,23,42,0.4)] sm:h-11 sm:w-11">
               <Image
                 src={t.image}
                 alt={t.author}
@@ -122,8 +124,8 @@ function TestimonialCard({ t }) {
               />
             </span>
             <span className="min-w-0">
-              <span className="block text-[13.5px] font-medium text-[#0E1A33]">{t.author}</span>
-              <span className="block text-[12px] leading-snug text-[#6E809F]">{t.role}</span>
+              <span className="block text-[13px] font-medium text-[#0E1A33] sm:text-[13.5px]">{t.author}</span>
+              <span className="block text-[11.5px] leading-snug text-[#6E809F] sm:text-[12px]">{t.role}</span>
             </span>
           </figcaption>
         </div>
