@@ -1,16 +1,15 @@
 "use client"
 
 import { MotionConfig, motion, useReducedMotion } from "framer-motion"
-import { useEffect, useRef, useState } from "react"
-import { Pause, Play } from "lucide-react"
+import { useEffect, useRef } from "react"
 import Image from "next/image"
 
 /* What clients say, between Why Us and the FAQ.
 
-   One row of glass cards drifting left in an endless loop: the client at the
-   top, the full quote, the person at the foot. The row stops under the mouse,
-   follows a finger on touch screens, and has a pause button for keyboards.
-   Quotes are the clients' own words, kept verbatim. */
+   One row of square glass cards drifting left in an endless loop: the client
+   at the top, the full quote, the person at the foot. The row stops under the
+   mouse and follows a finger on touch screens. Quotes are the clients' own
+   words, kept verbatim. */
 
 const testimonials = [
   {
@@ -137,9 +136,6 @@ export default function Testimonials() {
   const reduceMotion = useReducedMotion()
   const viewportRef = useRef(null)
   const trackRef = useRef(null)
-  const [paused, setPaused] = useState(false)
-  const pausedRef = useRef(paused)
-  pausedRef.current = paused
 
   // The drift runs from requestAnimationFrame rather than a CSS keyframe so
   // the row can follow a finger and so each frame lands on a whole device
@@ -170,7 +166,7 @@ export default function Testimonials() {
       // Capped so the first frame after a stall doesn't jump the row.
       const dt = last ? Math.min(now - last, 50) / 1000 : 0
       last = now
-      if (pausedRef.current || hovered || drag || now < holdUntil) return
+      if (hovered || drag || now < holdUntil) return
       offset += (window.innerWidth < 640 ? SPEED_PHONE : SPEED) * dt
       paint()
     }
@@ -282,15 +278,17 @@ export default function Testimonials() {
           >
             {/* Cards are spaced by a right margin, not a gap, so one set's
                 width (track / COPIES) includes the space after its last card
-                and the loop joins without a seam. Stretched to the tallest
-                card so every footer sits on the same line. */}
+                and the loop joins without a seam. Square from sm up, at a
+                width where the longest quote still fits in full; phones are
+                too narrow for that, so there cards take the quote's height.
+                Stretched to the tallest card so every footer lines up. */}
             <div ref={trackRef} className="flex w-max items-stretch">
               {Array.from({ length: reduceMotion ? 1 : COPIES }, (_, copy) =>
                 testimonials.map((t) => (
                   <div
                     key={`${copy}-${t.company}`}
                     aria-hidden={copy > 0 || undefined}
-                    className="mr-4 w-[300px] shrink-0 sm:w-[360px] lg:mr-5 lg:w-[400px]"
+                    className="mr-4 w-[300px] shrink-0 sm:aspect-square sm:w-[460px] lg:mr-5"
                   >
                     <TestimonialCard t={t} />
                   </div>
@@ -299,19 +297,6 @@ export default function Testimonials() {
             </div>
           </div>
         </motion.div>
-
-        {!reduceMotion && (
-          <div className="mt-1 flex justify-center">
-            <button
-              type="button"
-              onClick={() => setPaused(!paused)}
-              aria-label={paused ? "Play testimonials" : "Pause testimonials"}
-              className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/80 bg-white/50 text-[#42557A] shadow-[0_6px_16px_-10px_rgba(15,23,42,0.3)] transition-colors hover:text-ozl-violet"
-            >
-              {paused ? <Play size={14} strokeWidth={2.2} /> : <Pause size={14} strokeWidth={2.2} />}
-            </button>
-          </div>
-        )}
       </MotionConfig>
     </section>
   )
