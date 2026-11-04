@@ -16,6 +16,12 @@ npm run dev                     # http://localhost:3100
 
 Run `user:add` once for each founder. Running it again for an existing email resets that password.
 
+In PowerShell, npm drops the `--`, so the name and email never reach the script. Run it directly instead:
+
+```powershell
+node --env-file=.env.local scripts/add-user.mjs --name Skanda --email you@example.com
+```
+
 With `DATABASE_URL` set, as `neon init` does, the app uses that Postgres database. With no `DATABASE_URL`, data is stored in `os/.data/` on this computer only. In that case back the folder up, and stop the dev server before running `user:add`, because the local database allows one process at a time.
 
 ## Deploy it so both founders share it
