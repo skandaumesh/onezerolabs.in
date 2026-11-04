@@ -1,0 +1,302 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Colours, as space-separated RGB so Tailwind can add opacity. The script in
+   app/layout.jsx sets data-theme before the first paint. Red, orange and green
+   are Apple's darker text variants in light mode and brighter ones in dark, so
+   small text stays readable on their pale or deep backgrounds. */
+:root {
+  color-scheme: light;
+  --ink: 29 29 31;
+  --ink2: 66 66 69;
+  --muted: 103 103 108;
+  --canvas: 245 245 247;
+  --surface: 255 255 255;
+  --raised: 255 255 255;
+  --field: 245 245 247;
+  --fill: 232 232 237;
+  --fill-hover: 222 222 227;
+  --thumb: 255 255 255;
+  --pill: 237 237 241;
+  --sidebar: 237 237 240;
+  --accent: 0 102 204;
+  --accent-fill: 0 113 227;
+  --accent-press: 0 98 196;
+  --late: 215 0 21;
+  --late-soft: 255 239 239;
+  --soon: 178 80 0;
+  --soon-soft: 255 244 229;
+  --good: 31 122 54;
+  --good-soft: 233 247 236;
+  --line: rgba(60, 60, 67, 0.14);
+  --tint-press: rgba(60, 60, 67, 0.08);
+  --tint-hover: rgba(60, 60, 67, 0.04);
+  --tick-line: rgba(60, 60, 67, 0.32);
+  --glass: rgba(250, 250, 252, 0.72);
+  --glass-solid: #fafafc;
+  --paper: 255 255 255;
+  --folder-back: 52 142 232;
+  --folder-front: 112 182 246;
+  --alert: rgba(245, 245, 247, 0.84);
+  --alert-solid: #f5f5f7;
+  --tab-selected: rgba(0, 0, 0, 0.06);
+  --bar: #0066cc;
+
+  /* A critically damped spring (damping 1.0, response 0.35) as an easing curve.
+     CSS transitions start from the current value, so a press or tick that is
+     reversed mid-way turns around instead of jumping. */
+  --spring: linear(0, 0.102, 0.293, 0.48, 0.634, 0.75, 0.833, 0.89, 0.929, 0.954, 0.971, 0.981, 0.988, 0.993, 0.995, 1);
+  --spring-time: 450ms;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --ink: 245 245 247;
+  --ink2: 209 209 214;
+  --muted: 152 152 159;
+  --canvas: 0 0 0;
+  --surface: 28 28 30;
+  --raised: 44 44 46;
+  --field: 44 44 46;
+  --fill: 44 44 46;
+  --fill-hover: 58 58 60;
+  --thumb: 72 72 74;
+  --pill: 66 66 69;
+  --sidebar: 22 22 24;
+  --accent: 64 156 255;
+  --accent-fill: 0 113 227;
+  --accent-press: 0 98 196;
+  --late: 255 105 97;
+  --late-soft: 59 26 26;
+  --soon: 255 179 64;
+  --soon-soft: 58 42 18;
+  --good: 48 209 88;
+  --good-soft: 18 48 28;
+  --line: rgba(84, 84, 88, 0.65);
+  --tint-press: rgba(235, 235, 245, 0.1);
+  --tint-hover: rgba(235, 235, 245, 0.05);
+  --tick-line: rgba(235, 235, 245, 0.38);
+  --glass: rgba(30, 30, 32, 0.72);
+  --glass-solid: #1e1e20;
+  --paper: 255 255 255;
+  --folder-back: 34 112 196;
+  --folder-front: 78 152 226;
+  --alert: rgba(44, 44, 46, 0.84);
+  --alert-solid: #2c2c2e;
+  --tab-selected: rgba(255, 255, 255, 0.1);
+  --bar: #3a90f0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  scrollbar-gutter: stable;
+}
+
+body {
+  background: rgb(var(--canvas));
+  color: rgb(var(--ink2));
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Removes the browser's wait for a possible double-tap. */
+a,
+button,
+select,
+label,
+input {
+  touch-action: manipulation;
+}
+
+/* The logo file is black artwork, which would vanish on a dark background. */
+[data-theme='dark'] .logo-mark {
+  filter: invert(1);
+}
+
+@layer components {
+  /* Reacts the moment a finger lands, not when it lifts. */
+  .press {
+    transition: transform var(--spring-time) var(--spring), background-color 150ms ease-out, opacity 150ms ease-out;
+  }
+  .press:active {
+    transform: scale(0.97);
+    transition: transform 100ms ease-out, background-color 100ms ease-out, opacity 100ms ease-out;
+  }
+
+  /* A whole row is the target: it highlights in place rather than shrinking. */
+  .row-press {
+    transition: background-color 200ms ease-out;
+  }
+  .row-press:active {
+    background-color: var(--tint-press);
+    transition: background-color 50ms linear;
+  }
+  @media (hover: hover) {
+    .row-press:hover {
+      background-color: var(--tint-hover);
+    }
+  }
+
+  /* Grouped list rows: the separator starts at the text, as on iOS. */
+  .rows > li {
+    position: relative;
+  }
+  .rows > li + li::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: var(--rows-inset, 1rem);
+    height: 1px;
+    background: var(--line);
+  }
+  .rows-task {
+    --rows-inset: 3.25rem;
+  }
+
+  /* Native selects keep the phone's own picker; only the arrow is ours. */
+  .select-arrow {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 2.25rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%238E8E93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3 4.5 3 3 3-3'/%3E%3C/svg%3E");
+    background-position: right 0.85rem center;
+    background-repeat: no-repeat;
+  }
+
+  /* Floating chrome that content scrolls under. */
+  .glass {
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-top: 1px solid var(--line);
+  }
+
+  .alert-glass {
+    background: var(--alert);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    backdrop-filter: blur(30px) saturate(180%);
+  }
+
+  /* The floating tab bar sits above the page, so it gets a full edge, a soft
+     shadow, and light catching the top. */
+  .dock {
+    border: 1px solid var(--line);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  }
+
+  .tick {
+    display: flex;
+    height: 1.375rem;
+    width: 1.375rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    border: 1.5px solid var(--tick-line);
+    color: transparent;
+    transition: background-color var(--spring-time) var(--spring), border-color var(--spring-time) var(--spring);
+  }
+  .tick > svg {
+    transform: scale(0.4);
+    opacity: 0;
+    transition: transform var(--spring-time) var(--spring), opacity 120ms ease-out;
+  }
+  .tick[data-done='true'] {
+    background: rgb(var(--accent-fill));
+    border-color: rgb(var(--accent-fill));
+    color: #fff;
+  }
+  .tick[data-done='true'] > svg {
+    transform: scale(1);
+    opacity: 1;
+  }
+  .tick[data-square='true'] {
+    height: 1.125rem;
+    width: 1.125rem;
+    border-radius: 0.3125rem;
+  }
+
+  .bar {
+    transition: transform var(--spring-time) var(--spring);
+  }
+}
+
+/* A new page or its loading placeholder appears by cross-fade. The delay on the
+   placeholder stops it flashing when a page loads quickly. */
+.page-in > * {
+  animation: page-in 160ms ease-out both;
+}
+.skeleton {
+  animation: page-in 200ms ease-out 120ms both;
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* A soft ring so it is obvious the mic is on. It says the app is listening, which is
+   a privacy matter, so it stays visible, just still, with Reduce Motion on. */
+.mic-listening {
+  box-shadow: 0 0 0 0 rgb(var(--late) / 0.45);
+  animation: mic-ring 1400ms ease-out infinite;
+}
+@keyframes mic-ring {
+  to {
+    box-shadow: 0 0 0 18px rgb(var(--late) / 0);
+  }
+}
+
+/* Gentler, not absent: presses dim instead of moving. */
+@media (prefers-reduced-motion: reduce) {
+  .mic-listening {
+    animation: none;
+    box-shadow: 0 0 0 6px rgb(var(--late) / 0.3);
+  }
+  .press:active {
+    transform: none;
+    opacity: 0.7;
+  }
+  .bar,
+  .tick > svg {
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    background: var(--glass-solid);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .alert-glass {
+    background: var(--alert-solid);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .glass {
+    background: rgb(var(--surface));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-top-color: rgb(var(--ink));
+  }
+  .alert-glass {
+    background: rgb(var(--surface));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    outline: 1px solid rgb(var(--ink));
+    outline-offset: -1px;
+  }
+  .card-surface {
+    outline: 1px solid rgb(var(--ink));
+    outline-offset: -1px;
+  }
+  .tick {
+    border-color: rgb(var(--ink));
+  }
+}
