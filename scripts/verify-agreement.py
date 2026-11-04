@@ -96,7 +96,10 @@ def check(path):
             notes.append(f"p{n}: sparse ({len(text)} chars) - check for an avoidable gap")
 
     # 7. signature block integrity
-    sig_pages = [i + 1 for i, p in enumerate(doc) if all(m in p.get_text() for m in SIG_MARKERS)]
+    # Only the markers the document actually uses: a block without a seal line
+    # (signatureSeal: false) has no "Company Seal:" to find.
+    present = [m for m in SIG_MARKERS if any(m in p.get_text() for p in doc)]
+    sig_pages = [i + 1 for i, p in enumerate(doc) if present and all(m in p.get_text() for m in present)]
     any_sig = [i + 1 for i, p in enumerate(doc) if any(m in p.get_text() for m in SIG_MARKERS)]
     if not any_sig:
         # Not every document is signable -- a proposal has no signature block by
