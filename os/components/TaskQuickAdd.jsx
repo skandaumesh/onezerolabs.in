@@ -31,7 +31,7 @@ export function TaskQuickAdd({ users, projectId, projects, defaultAssignee }) {
           name="assignee_id"
           blank="Unassigned"
           defaultValue={defaultAssignee ?? ''}
-          options={users.map((u) => ({ value: u.id, label: u.name }))}
+          options={[...users.map((u) => ({ value: u.id, label: u.name })), { value: 'both', label: 'Both' }]}
         />
       </Field>
       <Field label="Priority">

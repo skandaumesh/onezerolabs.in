@@ -38,7 +38,7 @@ function Preview({ said, users, meId }) {
     <div aria-label="Understood as" className="flex flex-wrap items-center gap-1.5">
       <span className="min-w-0 break-words text-sub font-semibold text-ink">{task.title}</span>
       {when && <Badge tone="soon">{when}</Badge>}
-      {task.assigneeId !== meId && task.assigneeName && <Badge>For {task.assigneeName}</Badge>}
+      {task.forBoth ? <Badge>For both</Badge> : task.assigneeId !== meId && task.assigneeName && <Badge>For {task.assigneeName}</Badge>}
       {task.priority === 'critical' && <Badge tone="late">Critical</Badge>}
       {task.priority === 'high' && <Badge tone="soon">High</Badge>}
       {task.priority === 'low' && <Badge>Low</Badge>}

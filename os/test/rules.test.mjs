@@ -131,4 +131,13 @@ describe('database rules', () => {
       /recurring_tasks_need_due_date/
     )
   })
+
+  test('a task for both cannot also name one person', async () => {
+    const [{ id }] = (await db.query(`INSERT INTO users (name, email, password_hash) VALUES ('X', 'x@both.test', 'a:b') RETURNING id`)).rows
+    await assert.rejects(
+      db.query(`INSERT INTO tasks (title, assignee_id, for_both) VALUES ('Review', $1, true)`, [id]),
+      /both_means_no_one_person/
+    )
+    await db.query(`INSERT INTO tasks (title, for_both) VALUES ('Review', true)`)
+  })
 })

@@ -48,7 +48,7 @@ Covers sessions, passwords, IST date handling, the database rules, and how spoke
 The mic button on every screen opens a sheet that starts listening. Say the task in one sentence, such as "I have meeting today at 7", and it is saved as Meeting, today, 7:00 pm. Undo is shown straight away in case it misheard. Typing the same sentence does the same thing.
 
 - **Understanding:** `lib/parse-task.mjs` reads the sentence with plain rules, so it costs nothing and needs no API key. It runs in the browser for the live preview and on the server when saving.
-- **What it picks up:** the task name, date, time, priority ("urgent"), repeats ("every Monday") and who it is for ("tell Tanisha to...").
+- **What it picks up:** the task name, date, time, priority ("urgent"), repeats ("every Monday") and who it is for ("tell Tanisha to...", or both of you with "we have...", "for both of us" or both names).
 - **A bare hour:** with no am or pm, 8 to 11 is morning and 12 to 7 is afternoon or evening. For something today, a time already gone flips to the other half of the day.
 - **Hearing:** the browser's speech recognition does this. It needs a secure page (HTTPS or `localhost`), so voice is unavailable on a plain `http://` Wi-Fi address and the sheet offers typing instead. In Chrome the audio goes to Google to be transcribed, so client names said aloud go there too.
 

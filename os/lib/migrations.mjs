@@ -302,4 +302,13 @@ export const migrations = [
       );
     `,
   },
+  {
+    version: 6,
+    sql: `
+      -- A task for both founders. It shows in each one's own list, and it can't
+      -- also name one person.
+      ALTER TABLE tasks ADD COLUMN for_both boolean NOT NULL DEFAULT false;
+      ALTER TABLE tasks ADD CONSTRAINT both_means_no_one_person CHECK (NOT for_both OR assignee_id IS NULL);
+    `,
+  },
 ]

@@ -132,6 +132,36 @@ describe('who and how urgent', () => {
     assert.equal(read('tell Tanisha to post the reel').assigneeName, 'Tanisha Rao')
   })
 
+  test('"we", "both of us" or both names make it a task for both', () => {
+    for (const said of [
+      'we have a meeting today at 7',
+      'We need to call Globex tomorrow',
+      "ok we've got the review on Friday",
+      'meeting for both of us at 5',
+      'assign to both the proposal review',
+      'Skanda and Tanisha have a call at 4',
+      'Tanisha and I meet Acme tomorrow',
+      'review the invoice with me and Tanisha',
+    ]) {
+      const task = parse(said)
+      assert.equal(task.forBoth, true, said)
+      assert.equal(task.assigneeId, null, said)
+      assert.equal(task.assigneeName, 'Both', said)
+    }
+    assert.equal(parse('we have a meeting today at 7').title, 'Meeting')
+    assert.equal(parse('meeting for both of us at 5').title, 'Meeting')
+    assert.equal(parse('Skanda and Tanisha have a call at 4').title, 'Call')
+  })
+
+  test('naming one person beats "we", and plain sentences stay yours', () => {
+    assert.equal(parse('we should tell Tanisha to post the reel').assigneeId, 'her')
+    assert.equal(parse('we should tell Tanisha to post the reel').forBoth, false)
+    for (const said of ['meeting with Tanisha today at 7', 'weekly report on Wednesday', 'website fixes tomorrow', 'I have meeting today at 7']) {
+      assert.equal(parse(said).forBoth, false, said)
+    }
+    assert.equal(parse('meeting with Tanisha today at 7').assigneeId, 'me')
+  })
+
   test('the name does not stay in the title when it only says who', () => {
     assert.equal(parse('tell Tanisha to post the reel tomorrow').title, 'Post the reel')
     assert.equal(parse('Tanisha has a meeting today at 7').title, 'Meeting')

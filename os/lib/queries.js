@@ -9,8 +9,8 @@ export const listUsers = () => sql('SELECT id, name FROM users ORDER BY name')
 
 const TASK_SELECT = `
   SELECT t.id, t.title, t.notes, t.priority, t.due_date, to_char(t.due_time, 'HH24:MI') AS due_time, t.done_at, t.approval, t.recurrence,
-         t.project_id, t.blocked_by, t.assignee_id,
-         u.name AS assignee_name,
+         t.project_id, t.blocked_by, t.assignee_id, t.for_both,
+         CASE WHEN t.for_both THEN 'Both' ELSE u.name END AS assignee_name,
          p.name AS project_name,
          c.id AS company_id, c.name AS company_name,
          b.title AS blocker_title,
@@ -28,11 +28,11 @@ const TASK_ORDER = `
            array_position(ARRAY['critical', 'high', 'medium', 'low'], t.priority),
            t.created_at`
 
-/** Open tasks, optionally for one person. Grouping by date happens on the page. */
+/** Open tasks, optionally one person's, which includes those for both. Grouping by date happens on the page. */
 export const listOpenTasks = (assigneeId = null) =>
   sql(
     `${TASK_SELECT}
-     WHERE t.done_at IS NULL AND ($1::uuid IS NULL OR t.assignee_id = $1::uuid)
+     WHERE t.done_at IS NULL AND ($1::uuid IS NULL OR t.assignee_id = $1::uuid OR t.for_both)
      ${TASK_ORDER}`,
     [assigneeId]
   )
@@ -40,7 +40,7 @@ export const listOpenTasks = (assigneeId = null) =>
 export const listDoneTasks = (assigneeId = null) =>
   sql(
     `${TASK_SELECT}
-     WHERE t.done_at IS NOT NULL AND ($1::uuid IS NULL OR t.assignee_id = $1::uuid)
+     WHERE t.done_at IS NOT NULL AND ($1::uuid IS NULL OR t.assignee_id = $1::uuid OR t.for_both)
      ORDER BY t.done_at DESC LIMIT 100`,
     [assigneeId]
   )
@@ -202,18 +202,19 @@ export const getOverview = async (userId, today) => {
          (SELECT count(*)::int FROM companies WHERE stage <> 'lost' AND next_follow_up <= $1) AS follow_ups_due`,
       [today, horizon]
     ),
-    // Overdue and due today, the signed-in founder's own first.
+    // Overdue and due today, the signed-in founder's own first, counting those for both.
     sql(
       `${TASK_SELECT}
        WHERE t.done_at IS NULL AND t.due_date <= $1
-       ORDER BY t.assignee_id IS NOT DISTINCT FROM $2::uuid DESC, t.due_date, t.due_time NULLS LAST,
+       ORDER BY (t.for_both OR t.assignee_id IS NOT DISTINCT FROM $2::uuid) DESC, t.due_date, t.due_time NULLS LAST,
                 array_position(ARRAY['critical', 'high', 'medium', 'low'], t.priority)`,
       [today, userId]
     ),
     // After today, because today's tasks are already in the list above.
     sql(
       `SELECT * FROM (
-         SELECT 'task' AS type, t.id, t.title, t.due_date, to_char(t.due_time, 'HH24:MI') AS due_time, c.name AS company_name, u.name AS person
+         SELECT 'task' AS type, t.id, t.title, t.due_date, to_char(t.due_time, 'HH24:MI') AS due_time, c.name AS company_name,
+                CASE WHEN t.for_both THEN 'Both' ELSE u.name END AS person
          FROM tasks t
          LEFT JOIN projects p ON p.id = t.project_id
          LEFT JOIN companies c ON c.id = p.company_id

@@ -143,8 +143,8 @@ export default async function TaskPage({ params }) {
                 <Select
                   name="assignee_id"
                   blank="Unassigned"
-                  defaultValue={task.assignee_id ?? ''}
-                  options={users.map((u) => ({ value: u.id, label: u.name }))}
+                  defaultValue={task.for_both ? 'both' : (task.assignee_id ?? '')}
+                  options={[...users.map((u) => ({ value: u.id, label: u.name })), { value: 'both', label: 'Both' }]}
                 />
               </Field>
               <Field label="Priority">

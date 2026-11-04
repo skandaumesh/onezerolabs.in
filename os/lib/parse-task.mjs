@@ -85,7 +85,8 @@ const cleanTitle = (raw) => {
 }
 
 /**
- * @returns {{ title, dueDate, dueTime, priority, assigneeId, assigneeName, recurrence }}
+ * @returns {{ title, dueDate, dueTime, priority, assigneeId, assigneeName, forBoth, recurrence }}
+ * When `forBoth` is true the task is for both founders and `assigneeId` is null.
  * `title` is null when nothing was left that says what the task is.
  */
 export const parseTask = (input, { today, minutesNow = 0, users = [], meId = null }) => {
@@ -106,6 +107,11 @@ export const parseTask = (input, { today, minutesNow = 0, users = [], meId = nul
     .replace(/\b(\d{1,2})\s+(\d{2})\s*(am|pm)\b/gi, '$1:$2 $3')
 
   // Who it is for. Only clear phrasing counts, so "meeting with Tanisha" stays yours.
+  // "We have...", "for both of us" or both names make it a task for both founders.
+  let forBoth = Boolean(
+    /^\s*(?:(?:ok(?:ay)?|so|hey|um|uh),?\s+)*(?:we\b|we've\b|let's\b|lets\b|us\s+both\b)/i.test(text) ||
+      take(/\b(?:assign(?:ed)?(?:\s+(?:it|this))?\s+to\s+both(?:\s+of\s+us)?|for\s+(?:both(?:\s+of\s+us)?|us\s+both|the\s+two\s+of\s+us)|both\s+of\s+us)\b/i)
+  )
   let assigneeId = meId
   // People say first names, whatever the account is called. Full names come first so
   // "Tanisha Rao" is taken whole, not just its first word.
@@ -123,10 +129,17 @@ export const parseTask = (input, { today, minutesNow = 0, users = [], meId = nul
     const asked = take(new RegExp(`\\b(?:tell|ask|remind)\\s+(${names})\\s+to\\b`, 'i'))
     const assigned = asked || take(new RegExp(`\\b(?:assign(?:ed)?(?:\\s+(?:it|this))?\\s+to|for)\\s+(${names})\\b`, 'i'))
     const subject = assigned || take(new RegExp(`\\b(${names})\\s+(?:has to|needs to|need to|should|must|will|has|have to)\\b`, 'i'))
-    if (subject) assigneeId = byName(subject[1])
+    if (subject) {
+      // Naming one person is clearer than "we", so it wins.
+      assigneeId = byName(subject[1])
+      forBoth = false
+    } else if (take(new RegExp(`\\b(?:${names}|me)\\s+(?:and|&)\\s+(?:${names}|me|i)\\b(?:\\s+(?:have|has|need to|must|should|will))?`, 'i'))) {
+      forBoth = true
+    }
   }
   take(/\b(?:assign(?:ed)?(?:\s+(?:it|this))?\s+to|for)\s+me\b/i)
-  const assigneeName = users.find((u) => u.id === assigneeId)?.name ?? null
+  if (forBoth) assigneeId = null
+  const assigneeName = forBoth ? 'Both' : (users.find((u) => u.id === assigneeId)?.name ?? null)
 
   let priority = 'medium'
   if (take(/\b(?:very\s+)?(?:urgent(?:ly)?|critical|asap|as soon as possible)\b/i)) priority = 'critical'
@@ -239,7 +252,7 @@ export const parseTask = (input, { today, minutesNow = 0, users = [], meId = nul
   }
   if (recurrence !== 'none' && !dueDate) dueDate = today
 
-  return { title: cleanTitle(text), dueDate, dueTime, priority, assigneeId, assigneeName, recurrence }
+  return { title: cleanTitle(text), dueDate, dueTime, priority, assigneeId, assigneeName, forBoth, recurrence }
 }
 
 /** "Today, 7:00 pm", "Tomorrow", "12 Nov". Null when there is no date. */

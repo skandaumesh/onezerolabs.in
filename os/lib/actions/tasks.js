@@ -11,6 +11,10 @@ import { parseTask, whenText } from '@/lib/parse-task.mjs'
 
 const RECUR_NEEDS_DATE = 'A repeating task needs a due date to count from.'
 const TIME_NEEDS_DATE = 'Choose a date to go with that time.'
+
+/** "both", one founder, or nobody, from the Assign to choice. */
+const assignment = (form) =>
+  text(form, 'assignee_id') === 'both' ? { assigneeId: null, forBoth: true } : { assigneeId: uuid(form, 'assignee_id'), forBoth: false }
 const INTERVAL = { weekly: '1 week', monthly: '1 month', yearly: '1 year' }
 
 export async function createTask(_prev, form) {
@@ -22,14 +26,16 @@ export async function createTask(_prev, form) {
   if (!title) return { error: 'Enter what needs doing.' }
   if (recurrence !== 'none' && !dueDate) return { error: RECUR_NEEDS_DATE }
   if (dueTime && !dueDate) return { error: TIME_NEEDS_DATE }
+  const { assigneeId, forBoth } = assignment(form)
 
   await sql(
-    `INSERT INTO tasks (project_id, title, assignee_id, created_by, priority, due_date, due_time, recurrence)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+    `INSERT INTO tasks (project_id, title, assignee_id, for_both, created_by, priority, due_date, due_time, recurrence)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
     [
       uuid(form, 'project_id'),
       title,
-      uuid(form, 'assignee_id'),
+      assigneeId,
+      forBoth,
       user.id,
       oneOf(form, 'priority', PRIORITIES, 'medium'),
       dueDate,
@@ -53,16 +59,16 @@ export async function quickAddTask(_prev, form) {
   if (!task.title) return { error: `I heard “${said}” but not what the task is. Try saying it again.` }
 
   const [row] = await sql(
-    `INSERT INTO tasks (title, assignee_id, created_by, priority, due_date, due_time, recurrence)
-     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-    [task.title, task.assigneeId, user.id, task.priority, task.dueDate, task.dueTime, task.recurrence]
+    `INSERT INTO tasks (title, assignee_id, for_both, created_by, priority, due_date, due_time, recurrence)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+    [task.title, task.assigneeId, task.forBoth, user.id, task.priority, task.dueDate, task.dueTime, task.recurrence]
   )
   revalidatePath('/', 'layout')
   return {
     ok: true,
     id: row.id,
     summary: [task.title, whenText(task.dueDate, task.dueTime, today)].filter(Boolean).join(' · '),
-    assigneeName: task.assigneeId === user.id ? null : task.assigneeName,
+    assigneeName: task.forBoth ? 'both' : task.assigneeId === user.id ? null : task.assigneeName,
   }
 }
 
@@ -99,6 +105,7 @@ export async function updateTask(_prev, form) {
   if (!title) return { error: 'Enter what needs doing.' }
   if (recurrence !== 'none' && !dueDate) return { error: RECUR_NEEDS_DATE }
   if (dueTime && !dueDate) return { error: TIME_NEEDS_DATE }
+  const { assigneeId, forBoth } = assignment(form)
   if (blockedBy && (await wouldCycle(id, blockedBy))) {
     return { error: 'Those two tasks would end up waiting on each other.' }
   }
@@ -106,19 +113,20 @@ export async function updateTask(_prev, form) {
   await sql(
     `UPDATE tasks
      SET title = $2, notes = $3, assignee_id = $4, priority = $5, due_date = $6,
-         approval = $7, recurrence = $8, blocked_by = $9, due_time = $10
+         approval = $7, recurrence = $8, blocked_by = $9, due_time = $10, for_both = $11
      WHERE id = $1`,
     [
       id,
       title,
       text(form, 'notes'),
-      uuid(form, 'assignee_id'),
+      assigneeId,
       oneOf(form, 'priority', PRIORITIES, 'medium'),
       dueDate,
       oneOf(form, 'approval', APPROVALS, 'not_required'),
       recurrence,
       blockedBy,
       dueTime,
+      forBoth,
     ]
   )
   revalidatePath('/', 'layout')
@@ -149,8 +157,8 @@ export async function toggleTask(_prev, form) {
       await t.query(`UPDATE tasks SET done_at = now(), recurrence = 'none' WHERE id = $1`, [id])
       if (task.recurrence !== 'none') {
         await t.query(
-          `INSERT INTO tasks (project_id, title, notes, assignee_id, created_by, priority, due_date, approval, recurrence, due_time)
-           VALUES ($1, $2, $3, $4, $5, $6, ($7::date + $8::interval)::date, $9, $10, $11)`,
+          `INSERT INTO tasks (project_id, title, notes, assignee_id, created_by, priority, due_date, approval, recurrence, due_time, for_both)
+           VALUES ($1, $2, $3, $4, $5, $6, ($7::date + $8::interval)::date, $9, $10, $11, $12)`,
           [
             task.project_id,
             task.title,
@@ -163,6 +171,7 @@ export async function toggleTask(_prev, form) {
             task.approval === 'not_required' ? 'not_required' : 'awaiting',
             task.recurrence,
             task.due_time,
+            task.for_both,
           ]
         )
       }
