@@ -1,0 +1,10 @@
+# The local database holds real client data. This repository is public.
+.data/
+
+# The parent .gitignore ignores .env*. This one holds no secrets and is needed.
+!.env.example
+.neon
+node_modules/
+
+# Vercel's link to the hosted project, made by the CLI on this computer.
+.vercel
