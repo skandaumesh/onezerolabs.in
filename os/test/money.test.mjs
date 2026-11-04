@@ -7,7 +7,7 @@ import { formatINR, parseAmount, receivedStatus, summariseIncome } from '../lib/
 describe('money', () => {
   test('amounts use Indian grouping, with paise only when there are some', () => {
     assert.equal(formatINR(125000), '₹1,25,000')
-    assert.equal(formatINR(11500), '₹11,500')
+    assert.equal(formatINR(12500), '₹12,500')
     assert.equal(formatINR(1500.5), '₹1,500.50')
   })
 
@@ -25,12 +25,12 @@ describe('money', () => {
 
   test('totals keep value and money received apart', () => {
     const totals = summariseIncome([
-      { company_id: 'a', kind: 'project', amount: 150000, received: null },
-      { company_id: 'b', kind: 'project', amount: 25000, received: 25000 },
-      { company_id: 'b', kind: 'monthly', amount: 2000, received: null },
-      { company_id: 'c', kind: 'other', amount: 3000, received: null },
+      { company_id: 'a', kind: 'project', amount: 120000, received: null },
+      { company_id: 'b', kind: 'project', amount: 40000, received: 40000 },
+      { company_id: 'b', kind: 'monthly', amount: 5000, received: null },
+      { company_id: 'c', kind: 'other', amount: 7000, received: null },
     ])
-    assert.deepEqual(totals, { projectValue: 175000, monthly: 2000, other: 3000, received: 25000, unrecorded: 2, clients: 3 })
+    assert.deepEqual(totals, { projectValue: 160000, monthly: 5000, other: 7000, received: 40000, unrecorded: 2, clients: 3 })
   })
 
   test('a job nobody has recorded is not treated as unpaid', () => {

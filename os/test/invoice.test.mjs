@@ -51,9 +51,9 @@ describe('invoice numbers', () => {
 
 describe('amount in words', () => {
   for (const [amount, words] of [
-    [235000, 'Rupees Two Lakh Thirty Five Thousand Only'],
-    [11500, 'Rupees Eleven Thousand Five Hundred Only'],
-    [150000, 'Rupees One Lakh Fifty Thousand Only'],
+    [325000, 'Rupees Three Lakh Twenty Five Thousand Only'],
+    [12500, 'Rupees Twelve Thousand Five Hundred Only'],
+    [175000, 'Rupees One Lakh Seventy Five Thousand Only'],
     [1500.5, 'Rupees One Thousand Five Hundred and Fifty Paise Only'],
     [10000000, 'Rupees One Crore Only'],
     [12345678, 'Rupees One Crore Twenty Three Lakh Forty Five Thousand Six Hundred Seventy Eight Only'],

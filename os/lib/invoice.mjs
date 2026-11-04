@@ -60,7 +60,7 @@ const belowThousand = (n) => {
   return parts.join(' ')
 }
 
-/** 235000.5 -> 'Rupees Two Lakh Thirty Five Thousand and Fifty Paise Only', in Indian units. */
+/** 325000.5 -> 'Rupees Three Lakh Twenty Five Thousand and Fifty Paise Only', in Indian units. */
 export const amountInWords = (amount) => {
   let rupees = Math.floor(amount + 1e-9)
   const paise = Math.round((amount - rupees) * 100)
