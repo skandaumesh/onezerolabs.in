@@ -132,6 +132,28 @@ describe('database rules', () => {
     )
   })
 
+  test('money out of the company bank needs both partners', async () => {
+    await assert.rejects(
+      db.query(`INSERT INTO bank_entries (direction, amount, entry_date, description) VALUES ('out', 500, '2026-11-10', 'Domain')`),
+      /spending_needs_both/
+    )
+    await db.query(`INSERT INTO bank_entries (direction, amount, entry_date, description, agreed_by_both) VALUES ('out', 500, '2026-11-10', 'Domain', true)`)
+    await db.query(`INSERT INTO bank_entries (direction, amount, entry_date, description) VALUES ('in', 5000, '2026-11-01', 'Opening balance')`)
+  })
+
+  test('an earning’s share can’t exceed it, or be paid in before it arrived', async () => {
+    const [{ id }] = (await db.query(`INSERT INTO users (name, email, password_hash) VALUES ('E', 'e@bank.test', 'a:b') RETURNING id`)).rows
+    await assert.rejects(
+      db.query(`INSERT INTO earnings (user_id, amount, share, received_on) VALUES ($1, 100, 200, '2026-11-10')`, [id]),
+      /earnings_check|share/
+    )
+    await assert.rejects(
+      db.query(`INSERT INTO earnings (user_id, amount, share, received_on, paid_on) VALUES ($1, 100, 25, '2026-11-10', '2026-11-01')`, [id]),
+      /paid_after_received/
+    )
+    await db.query(`INSERT INTO earnings (user_id, amount, share, received_on, paid_on) VALUES ($1, 100, 25, '2026-11-10', '2026-11-10')`, [id])
+  })
+
   test('a task for both cannot also name one person', async () => {
     const [{ id }] = (await db.query(`INSERT INTO users (name, email, password_hash) VALUES ('X', 'x@both.test', 'a:b') RETURNING id`)).rows
     await assert.rejects(

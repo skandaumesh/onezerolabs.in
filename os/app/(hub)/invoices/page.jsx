@@ -46,6 +46,7 @@ export default async function InvoicesPage() {
           items={[
             { value: 'revenue', label: 'Revenue', href: '/revenue' },
             { value: 'invoices', label: 'Invoices', href: '/invoices' },
+            { value: 'bank', label: 'Bank', href: '/bank' },
           ]}
         />
         <Link href="/invoices/settings" className={BUTTON_TEXT}>

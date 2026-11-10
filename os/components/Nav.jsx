@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CircleUser, Files, FolderKanban, IndianRupee, LayoutDashboard, ListChecks, ReceiptText, Users } from 'lucide-react'
+import { CircleUser, Files, FolderKanban, IndianRupee, Landmark, LayoutDashboard, ListChecks, ReceiptText, Users } from 'lucide-react'
 import { motion, MotionConfig } from 'motion/react'
 import { Avatar } from '@/components/ui'
 
@@ -17,6 +17,7 @@ const ITEMS = [
 // In the desktop sidebar. Phones keep to five tabs, so there they open from Overview.
 const REVENUE = { href: '/revenue', label: 'Revenue', icon: IndianRupee }
 const INVOICES = { href: '/invoices', label: 'Invoices', icon: ReceiptText }
+const BANK = { href: '/bank', label: 'Bank', icon: Landmark }
 const DOCUMENTS = { href: '/documents', label: 'Documents', icon: Files }
 
 // Its own tab on phones. On desktop it sits at the foot of the sidebar, as the signed-in person.
@@ -57,7 +58,7 @@ export function SidebarNav({ userName }) {
   return (
     <MotionConfig reducedMotion="user">
       <nav aria-label="Main" className="flex min-h-0 flex-1 flex-col gap-0.5 px-3 pb-3">
-        {[...ITEMS, REVENUE, INVOICES, DOCUMENTS].map(({ href, label, icon: Icon }) => {
+        {[...ITEMS, REVENUE, INVOICES, BANK, DOCUMENTS].map(({ href, label, icon: Icon }) => {
           const active = isActive(href)
           return (
             <Link
@@ -95,7 +96,7 @@ export function SidebarNav({ userName }) {
 /** The phone's tab bar: a floating glass bar with the page scrolling under it. */
 export function TabBar() {
   // Revenue and Invoices open from Overview on phones, so that tab stays lit on them.
-  const { isActive, onNavigate } = useActiveItem({ '/': [REVENUE.href, INVOICES.href, DOCUMENTS.href] })
+  const { isActive, onNavigate } = useActiveItem({ '/': [REVENUE.href, INVOICES.href, BANK.href, DOCUMENTS.href] })
   return (
     <MotionConfig reducedMotion="user">
       <nav

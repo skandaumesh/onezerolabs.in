@@ -63,6 +63,15 @@ Agreements, quotations and other files, in folders that nest like the Files app.
 - **Other files:** images show on their page. Everything else downloads, so nothing uploaded can run inside the app. `/documents/file/[id]/raw` checks the session itself.
 - **Safety:** a folder can only be deleted once it is empty, and uploading the same file twice into a folder is ignored. Every upload, rename, move and delete is in the file's history.
 
+## Bank
+
+The company fund from the partners agreement: each partner pays 25% of what they earn from OneZeroLabs work into the company bank within 7 days, and every payment out needs both partners to agree. This page is the shared record the agreement asks for.
+
+- **Add earning:** who earned it, how much (GST left out), when, and for which client. The 25% is worked out as it is typed and kept with the earning, so a later change of rate never rewrites the past.
+- **Paid in:** on by default, so the share joins the balance straight away. Turned off, the share waits under "To pay into the bank" with its due date, turns red once late, and has a Paid button.
+- **Money in and out:** anything else, such as the opening balance or spending. Money out needs the "both of us agreed" switch, and the database refuses spending without it.
+- **Balance:** shares paid in, plus money in, minus money out. It is a record kept by hand, so check it against the bank statement now and then, and use Money in or Money out to correct any difference.
+
 ## Design rules
 
 The interface follows Apple's interaction rules on both phone and desktop. New screens should keep to them:
@@ -90,6 +99,6 @@ The interface follows Apple's interaction rules on both phone and desktop. New s
 
 ## Roadmap
 
-Everything lives in this one app. Built so far: overview, CRM and lead pipeline, projects, tasks with times, voice task capture, documents in folders, profile, light and dark modes, revenue, invoices with PDF, and a change log for money records.
+Everything lives in this one app. Built so far: overview, CRM and lead pipeline, projects, tasks with times, voice task capture, documents in folders, bank and the 25% fund, profile, light and dark modes, revenue, invoices with PDF, and a change log for money records.
 
 Next, in priority order: founder command centre and daily check-in, goals and OKRs, business development and cold-call tracking, permissions and audit logs across the app, SOP library, team workspace, Google Calendar and reminders. After those: quotations, client support, product lab, client portal, asset registry, business intelligence, AI assistant, search and quick actions, knowledge centre.

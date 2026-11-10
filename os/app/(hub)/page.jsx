@@ -8,7 +8,8 @@ import { dueLabel, formatDay, hourIST, todayIST } from '@/lib/dates.mjs'
 import { formatINR, summariseIncome } from '@/lib/money.mjs'
 import { withBalance } from '@/lib/invoice.mjs'
 import { formatBytes } from '@/lib/documents.mjs'
-import { getDocumentStats, getOverview, getSettings, listIncome, listInvoices } from '@/lib/queries'
+import { summariseBank } from '@/lib/bank.mjs'
+import { getDocumentStats, getOverview, getSettings, listBankEntries, listEarnings, listIncome, listInvoices, listUsers } from '@/lib/queries'
 
 export const metadata = { title: 'Overview' }
 
@@ -59,13 +60,17 @@ function DateRow({ href, title, detail, due }) {
 export default async function OverviewPage() {
   const user = await requireUser()
   const today = todayIST()
-  const [o, income, invoiceRows, settings, files] = await Promise.all([
+  const [o, income, invoiceRows, settings, files, earnings, bankEntries, users] = await Promise.all([
     getOverview(user.id, today),
     listIncome(),
     listInvoices(),
     getSettings(),
     getDocumentStats(),
+    listEarnings(),
+    listBankEntries(),
+    listUsers(),
   ])
+  const bank = summariseBank({ earnings, entries: bankEntries, users, today })
   const totals = summariseIncome(income)
   const invoices = invoiceRows.map((inv) => withBalance(inv, settings))
   const toCollect = invoices.filter((i) => i.status === 'issued').reduce((sum, i) => sum + i.balance, 0)
@@ -81,7 +86,7 @@ export default async function OverviewPage() {
         <Stat label="Follow-ups due" value={o.follow_ups_due} href="#follow-ups" alert />
       </div>
 
-      <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-3">
+      <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <MoneyLink
           href="/revenue"
           title="Revenue"
@@ -96,13 +101,20 @@ export default async function OverviewPage() {
           title="Invoices"
           detail={invoices.length ? `${formatINR(toCollect)} to collect` : 'No invoices yet'}
         />
-        <div className="col-span-2 md:col-span-1">
-          <MoneyLink
-            href="/documents"
-            title="Documents"
-            detail={files.files ? `${files.files === 1 ? '1 file' : `${files.files} files`} · ${formatBytes(files.bytes)}` : 'Agreements and quotations'}
-          />
-        </div>
+        <MoneyLink
+          href="/bank"
+          title="Bank"
+          detail={
+            earnings.length || bankEntries.length
+              ? `${formatINR(bank.balance)} in the bank${bank.toPay > 0 ? ` · ${formatINR(bank.toPay)} to pay in` : ''}`
+              : 'The company fund'
+          }
+        />
+        <MoneyLink
+          href="/documents"
+          title="Documents"
+          detail={files.files ? `${files.files === 1 ? '1 file' : `${files.files} files`} · ${formatBytes(files.bytes)}` : 'Agreements and quotations'}
+        />
       </div>
 
       <div className="grid items-start gap-4 lg:grid-cols-2">

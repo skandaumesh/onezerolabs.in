@@ -323,3 +323,26 @@ export const listFolderOptions = () =>
      )
      SELECT id, path FROM tree ORDER BY sort COLLATE "C"`
   )
+
+// --- bank --------------------------------------------------------------------
+
+export const listEarnings = () =>
+  sql(
+    `SELECT e.id, e.user_id, u.name AS user_name, e.amount::float8 AS amount, e.rate::float8 AS rate,
+            e.share::float8 AS share, e.received_on, e.paid_on, e.note,
+            e.company_id, c.name AS company_name, a.name AS added_by, e.created_at
+     FROM earnings e
+     JOIN users u ON u.id = e.user_id
+     LEFT JOIN companies c ON c.id = e.company_id
+     LEFT JOIN users a ON a.id = e.created_by
+     ORDER BY e.received_on DESC, e.created_at DESC`
+  )
+
+export const listBankEntries = () =>
+  sql(
+    `SELECT b.id, b.direction, b.amount::float8 AS amount, b.entry_date, b.description, b.category,
+            b.agreed_by_both, u.name AS added_by, b.created_at
+     FROM bank_entries b
+     LEFT JOIN users u ON u.id = b.created_by
+     ORDER BY b.entry_date DESC, b.created_at DESC`
+  )

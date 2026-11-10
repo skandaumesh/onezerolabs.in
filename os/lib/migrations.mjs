@@ -311,4 +311,44 @@ export const migrations = [
       ALTER TABLE tasks ADD CONSTRAINT both_means_no_one_person CHECK (NOT for_both OR assignee_id IS NULL);
     `,
   },
+  {
+    version: 7,
+    sql: `
+      -- What each partner earns from OneZeroLabs work, and the share of it paid into
+      -- the company bank account, as the partners agreement requires. The share is
+      -- worked out once, at the rate of the day, so a later change of rate never
+      -- rewrites the past.
+      CREATE TABLE earnings (
+        id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id     uuid NOT NULL REFERENCES users (id) ON DELETE RESTRICT,
+        amount      numeric(12, 2) NOT NULL CHECK (amount > 0),
+        rate        numeric(5, 2) NOT NULL DEFAULT 25 CHECK (rate > 0 AND rate <= 100),
+        share       numeric(12, 2) NOT NULL CHECK (share >= 0 AND share <= amount),
+        received_on date NOT NULL,
+        paid_on     date,
+        company_id  uuid REFERENCES companies (id) ON DELETE SET NULL,
+        note        text,
+        created_by  uuid REFERENCES users (id) ON DELETE SET NULL,
+        created_at  timestamptz NOT NULL DEFAULT now(),
+        CONSTRAINT paid_after_received CHECK (paid_on IS NULL OR paid_on >= received_on)
+      );
+      CREATE INDEX earnings_received_idx ON earnings (received_on);
+
+      -- Everything else that goes in or out of the company bank account. Money out
+      -- needs both partners' agreement, so it can't be saved without it.
+      CREATE TABLE bank_entries (
+        id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        direction      text NOT NULL CHECK (direction IN ('in', 'out')),
+        amount         numeric(12, 2) NOT NULL CHECK (amount > 0),
+        entry_date     date NOT NULL,
+        description    text NOT NULL CHECK (length(btrim(description)) > 0),
+        category       text,
+        agreed_by_both boolean NOT NULL DEFAULT false,
+        created_by     uuid REFERENCES users (id) ON DELETE SET NULL,
+        created_at     timestamptz NOT NULL DEFAULT now(),
+        CONSTRAINT spending_needs_both CHECK (direction = 'in' OR agreed_by_both)
+      );
+      CREATE INDEX bank_entries_date_idx ON bank_entries (entry_date);
+    `,
+  },
 ]

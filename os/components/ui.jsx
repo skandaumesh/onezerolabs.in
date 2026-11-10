@@ -169,3 +169,23 @@ export function Tabs({ label, items, active }) {
     </nav>
   )
 }
+
+/**
+ * An iPhone-style switch. The real checkbox stays in the form, and focusable, so
+ * keyboards and screen readers work; the track and knob only draw it.
+ */
+export function Switch({ name, label, hint, defaultChecked = false, required = false }) {
+  return (
+    <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl bg-field px-3.5 py-2.5">
+      <span className="min-w-0">
+        <span className="block text-body text-ink md:text-sub">{label}</span>
+        {hint && <span className="mt-0.5 block text-foot text-muted">{hint}</span>}
+      </span>
+      <input type="checkbox" name={name} defaultChecked={defaultChecked} required={required} className="peer sr-only" />
+      <span
+        aria-hidden="true"
+        className="relative h-[31px] w-[51px] shrink-0 rounded-full bg-fill transition-colors duration-200 after:absolute after:left-[2px] after:top-[2px] after:h-[27px] after:w-[27px] after:rounded-full after:bg-paper after:shadow-[0_2px_4px_rgba(0,0,0,0.2)] after:transition-transform after:duration-200 peer-checked:bg-good peer-checked:after:translate-x-5 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent"
+      />
+    </label>
+  )
+}

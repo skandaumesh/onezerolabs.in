@@ -90,6 +90,7 @@ export default async function RevenuePage() {
           items={[
             { value: 'revenue', label: 'Revenue', href: '/revenue' },
             { value: 'invoices', label: 'Invoices', href: '/invoices' },
+            { value: 'bank', label: 'Bank', href: '/bank' },
           ]}
         />
       </div>
