@@ -53,6 +53,7 @@ export const APPROVAL_LABEL = labels(APPROVALS)
 
 export const RECURRENCES = [
   { value: 'none', label: 'Does not repeat' },
+  { value: 'daily', label: 'Every day' },
   { value: 'weekly', label: 'Every week' },
   { value: 'monthly', label: 'Every month' },
   { value: 'yearly', label: 'Every year' },

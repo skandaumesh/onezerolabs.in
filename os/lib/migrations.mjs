@@ -351,4 +351,13 @@ export const migrations = [
       CREATE INDEX bank_entries_date_idx ON bank_entries (entry_date);
     `,
   },
+  {
+    version: 8,
+    sql: `
+      -- Tasks can repeat every day too.
+      ALTER TABLE tasks DROP CONSTRAINT IF EXISTS tasks_recurrence_check;
+      ALTER TABLE tasks ADD CONSTRAINT tasks_recurrence_check
+        CHECK (recurrence IN ('none', 'daily', 'weekly', 'monthly', 'yearly'));
+    `,
+  },
 ]

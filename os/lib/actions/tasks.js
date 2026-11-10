@@ -15,7 +15,7 @@ const TIME_NEEDS_DATE = 'Choose a date to go with that time.'
 /** "both", one founder, or nobody, from the Assign to choice. */
 const assignment = (form) =>
   text(form, 'assignee_id') === 'both' ? { assigneeId: null, forBoth: true } : { assigneeId: uuid(form, 'assignee_id'), forBoth: false }
-const INTERVAL = { weekly: '1 week', monthly: '1 month', yearly: '1 year' }
+const INTERVAL = { daily: '1 day', weekly: '1 week', monthly: '1 month', yearly: '1 year' }
 
 export async function createTask(_prev, form) {
   const user = await requireUser()
@@ -156,6 +156,9 @@ export async function toggleTask(_prev, form) {
     await tx(async (t) => {
       await t.query(`UPDATE tasks SET done_at = now(), recurrence = 'none' WHERE id = $1`, [id])
       if (task.recurrence !== 'none') {
+        // A daily task ticked off late comes back tomorrow, not on a day already gone.
+        const today = todayIST()
+        const from = task.recurrence === 'daily' && task.due_date < today ? today : task.due_date
         await t.query(
           `INSERT INTO tasks (project_id, title, notes, assignee_id, created_by, priority, due_date, approval, recurrence, due_time, for_both)
            VALUES ($1, $2, $3, $4, $5, $6, ($7::date + $8::interval)::date, $9, $10, $11, $12)`,
@@ -166,7 +169,7 @@ export async function toggleTask(_prev, form) {
             task.assignee_id,
             task.created_by,
             task.priority,
-            task.due_date,
+            from,
             INTERVAL[task.recurrence],
             task.approval === 'not_required' ? 'not_required' : 'awaiting',
             task.recurrence,

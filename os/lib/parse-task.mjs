@@ -146,20 +146,26 @@ export const parseTask = (input, { today, minutesNow = 0, users = [], meId = nul
   else if (take(/\b(?:very\s+important|high[- ]priority|important)\b/i)) priority = 'high'
   else if (take(/\blow[- ]priority\b/i)) priority = 'low'
 
-  // Repeats. Only "every ...": "monthly maintenance" is a name, not a schedule.
+  // Repeats. Only "every ...": "monthly maintenance" and "daily standup" are names,
+  // not schedules. "Every morning" is every day, in the morning.
   let recurrence = 'none'
   let dueDate = null
-  const everyDay = take(new RegExp(`\\bevery\\s+(${WEEKDAY})\\b`, 'i'))
-  if (everyDay) {
+  let dayPart = null
+  const everyPart = take(/\bevery\s+(morning|afternoon|evening|night)\b/i)
+  const everyDay = !everyPart && take(new RegExp(`\\bevery\\s+(${WEEKDAY})\\b`, 'i'))
+  if (everyPart) {
+    recurrence = 'daily'
+    dayPart = everyPart[1].toLowerCase()
+  } else if (everyDay) {
     recurrence = 'weekly'
     dueDate = nextWeekday(today, everyDay[1].toLowerCase())
-  } else if (take(/\bevery\s+week\b/i)) recurrence = 'weekly'
+  } else if (take(/\b(?:every\s*day|each\s+day)\b/i)) recurrence = 'daily'
+  else if (take(/\bevery\s+week\b/i)) recurrence = 'weekly'
   else if (take(/\bevery\s+month\b/i)) recurrence = 'monthly'
   else if (take(/\bevery\s+year\b/i)) recurrence = 'yearly'
 
   // "tomorrow morning" says when, but "morning standup" is only a name. So a part of
   // the day counts only straight after a day, or after words like "in the" or "this".
-  let dayPart = null
   text = text.replace(new RegExp(`\\b(today|tomorrow|tmrw|tomorow|${WEEKDAY})\\s+(morning|afternoon|evening|night)\\b`, 'i'), (_, when, part) => {
     dayPart = part.toLowerCase()
     return when
@@ -239,7 +245,9 @@ export const parseTask = (input, { today, minutesNow = 0, users = [], meId = nul
 
   let dueTime = null
   if (hour !== null) {
-    const isToday = !dueDate || dueDate === today
+    // A one-off time already gone today flips to the other half of the day. A repeating
+    // one keeps its hour and starts tomorrow instead: "every day at 9" means 9 am.
+    const isToday = recurrence === 'none' && (!dueDate || dueDate === today)
     let resolved = resolveHour(hour, minute, meridiem, dayPart, isToday, minutesNow)
     // A time with no date means the next time it comes round.
     if (!dueDate) dueDate = resolved * 60 + minute > minutesNow ? today : addDays(today, 1)

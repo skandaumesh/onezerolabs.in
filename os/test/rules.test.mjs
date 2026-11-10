@@ -154,6 +154,11 @@ describe('database rules', () => {
     await db.query(`INSERT INTO earnings (user_id, amount, share, received_on, paid_on) VALUES ($1, 100, 25, '2026-11-10', '2026-11-10')`, [id])
   })
 
+  test('a task can repeat every day, but not on a made-up schedule', async () => {
+    await db.query(`INSERT INTO tasks (title, recurrence, due_date) VALUES ('Gym', 'daily', '2026-11-10')`)
+    await assert.rejects(db.query(`INSERT INTO tasks (title, recurrence, due_date) VALUES ('Gym', 'hourly', '2026-11-10')`), /tasks_recurrence_check/)
+  })
+
   test('a task for both cannot also name one person', async () => {
     const [{ id }] = (await db.query(`INSERT INTO users (name, email, password_hash) VALUES ('X', 'x@both.test', 'a:b') RETURNING id`)).rows
     await assert.rejects(

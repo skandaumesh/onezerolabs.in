@@ -192,6 +192,29 @@ describe('repeats', () => {
     assert.deepEqual([task.title, task.recurrence, task.dueDate, task.dueTime], ['Team review', 'weekly', '2026-11-09', '10:00'])
   })
 
+  test('every day, everyday, and every morning repeat daily', () => {
+    const at = (said) => {
+      const t = parse(said)
+      return [t.title, t.recurrence, t.dueDate, t.dueTime]
+    }
+    assert.deepEqual(at('gym every day at 7 pm'), ['Gym', 'daily', TODAY, '19:00'])
+    assert.deepEqual(at('gym everyday at 7 pm'), ['Gym', 'daily', TODAY, '19:00'])
+    assert.deepEqual(at('walk every evening at 6'), ['Walk', 'daily', TODAY, '18:00'])
+    assert.deepEqual(at('water the plants each day'), ['Water the plants', 'daily', TODAY, null])
+  })
+
+  test('a daily time already gone starts tomorrow, without flipping to the evening', () => {
+    // At 10 am, 9 am has gone: a one-off "at 9" means 9 pm, but "every day at 9" is 9 am from tomorrow.
+    assert.deepEqual([parse('standup every day at 9').dueDate, parse('standup every day at 9').dueTime], [TOMORROW, '09:00'])
+    assert.deepEqual([parse('check emails every morning at 9').dueDate, parse('check emails every morning at 9').dueTime], [TOMORROW, '09:00'])
+    assert.equal(parse('meeting today at 9').dueTime, '21:00')
+  })
+
+  test('daily in a name does not make it repeat', () => {
+    const task = parse('daily standup at 11')
+    assert.deepEqual([task.title, task.recurrence], ['Daily standup', 'none'])
+  })
+
   test('a word like monthly in a name does not make it repeat', () => {
     assert.equal(parse('monthly maintenance for Umbrella').recurrence, 'none')
   })
