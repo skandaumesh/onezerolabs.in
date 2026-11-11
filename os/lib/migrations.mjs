@@ -1,0 +1,498 @@
+/**
+ * Database schema, as ordered migrations. Each runs once. To change the schema,
+ * append a new entry; never edit one that has already run on a real database.
+ *
+ * Kept as JS strings rather than .sql files so they are always bundled with the
+ * server code, wherever it is deployed.
+ */
+
+export const migrations = [
+  {
+    version: 1,
+    sql: `
+      CREATE TABLE users (
+        id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        name          text NOT NULL,
+        email         text NOT NULL UNIQUE,
+        password_hash text NOT NULL,
+        created_at    timestamptz NOT NULL DEFAULT now()
+      );
+
+      CREATE TABLE login_attempts (
+        email        text NOT NULL,
+        attempted_at timestamptz NOT NULL DEFAULT now()
+      );
+      CREATE INDEX login_attempts_email_idx ON login_attempts (email, attempted_at);
+
+      -- A lead and a client are one record at different stages, so a client's
+      -- history starts from the first enquiry.
+      CREATE TABLE companies (
+        id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        name           text NOT NULL,
+        sector         text,
+        website        text,
+        address        text,
+        services       text,
+        stage          text NOT NULL DEFAULT 'new'
+                       CHECK (stage IN ('new', 'contacted', 'meeting', 'proposal', 'negotiation', 'won', 'lost')),
+        source         text,
+        lost_reason    text,
+        next_follow_up date,
+        owner_id       uuid REFERENCES users (id) ON DELETE SET NULL,
+        created_at     timestamptz NOT NULL DEFAULT now(),
+        updated_at     timestamptz NOT NULL DEFAULT now(),
+
+        -- The rule that stops leads being forgotten: anything still open must
+        -- have a next follow-up date. Enforced here so no code path can skip it.
+        CONSTRAINT open_leads_need_follow_up
+          CHECK (stage IN ('won', 'lost') OR next_follow_up IS NOT NULL)
+      );
+      CREATE INDEX companies_stage_idx ON companies (stage);
+      CREATE INDEX companies_follow_up_idx ON companies (next_follow_up);
+
+      CREATE TABLE contacts (
+        id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        company_id uuid NOT NULL REFERENCES companies (id) ON DELETE CASCADE,
+        name       text NOT NULL,
+        role       text,
+        email      text,
+        phone      text,
+        created_at timestamptz NOT NULL DEFAULT now()
+      );
+      CREATE INDEX contacts_company_idx ON contacts (company_id);
+
+      CREATE TABLE notes (
+        id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        company_id uuid NOT NULL REFERENCES companies (id) ON DELETE CASCADE,
+        author_id  uuid REFERENCES users (id) ON DELETE SET NULL,
+        kind       text NOT NULL DEFAULT 'conversation' CHECK (kind IN ('conversation', 'internal')),
+        body       text NOT NULL,
+        created_at timestamptz NOT NULL DEFAULT now()
+      );
+      CREATE INDEX notes_company_idx ON notes (company_id, created_at);
+
+      -- RESTRICT: a client with projects cannot be deleted by accident.
+      CREATE TABLE projects (
+        id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        company_id  uuid NOT NULL REFERENCES companies (id) ON DELETE RESTRICT,
+        name        text NOT NULL,
+        description text,
+        status      text NOT NULL DEFAULT 'planning'
+                    CHECK (status IN ('planning', 'in_progress', 'client_review', 'on_hold', 'done')),
+        owner_id    uuid REFERENCES users (id) ON DELETE SET NULL,
+        due_date    date,
+        created_at  timestamptz NOT NULL DEFAULT now(),
+        updated_at  timestamptz NOT NULL DEFAULT now()
+      );
+      CREATE INDEX projects_company_idx ON projects (company_id);
+
+      CREATE TABLE tasks (
+        id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        project_id  uuid REFERENCES projects (id) ON DELETE CASCADE,
+        title       text NOT NULL,
+        notes       text,
+        assignee_id uuid REFERENCES users (id) ON DELETE SET NULL,
+        created_by  uuid REFERENCES users (id) ON DELETE SET NULL,
+        priority    text NOT NULL DEFAULT 'medium' CHECK (priority IN ('critical', 'high', 'medium', 'low')),
+        due_date    date,
+        done_at     timestamptz,
+        approval    text NOT NULL DEFAULT 'not_required'
+                    CHECK (approval IN ('not_required', 'awaiting', 'approved', 'changes_requested')),
+        recurrence  text NOT NULL DEFAULT 'none' CHECK (recurrence IN ('none', 'weekly', 'monthly', 'yearly')),
+        blocked_by  uuid REFERENCES tasks (id) ON DELETE SET NULL,
+        created_at  timestamptz NOT NULL DEFAULT now(),
+
+        -- A repeat is counted from the due date, so it needs one.
+        CONSTRAINT recurring_tasks_need_due_date
+          CHECK (recurrence = 'none' OR due_date IS NOT NULL),
+        CONSTRAINT tasks_cannot_block_themselves
+          CHECK (blocked_by IS NULL OR blocked_by <> id)
+      );
+      CREATE INDEX tasks_project_idx ON tasks (project_id);
+      CREATE INDEX tasks_assignee_idx ON tasks (assignee_id);
+      CREATE INDEX tasks_due_idx ON tasks (due_date) WHERE done_at IS NULL;
+
+      CREATE TABLE subtasks (
+        id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        task_id    uuid NOT NULL REFERENCES tasks (id) ON DELETE CASCADE,
+        title      text NOT NULL,
+        done       boolean NOT NULL DEFAULT false,
+        created_at timestamptz NOT NULL DEFAULT now()
+      );
+      CREATE INDEX subtasks_task_idx ON subtasks (task_id);
+
+      CREATE TABLE task_comments (
+        id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        task_id    uuid NOT NULL REFERENCES tasks (id) ON DELETE CASCADE,
+        author_id  uuid REFERENCES users (id) ON DELETE SET NULL,
+        body       text NOT NULL,
+        created_at timestamptz NOT NULL DEFAULT now()
+      );
+      CREATE INDEX task_comments_task_idx ON task_comments (task_id, created_at);
+    `,
+  },
+  {
+    version: 2,
+    sql: `
+      -- What a client is worth on paper. RESTRICT: a client with income on record
+      -- cannot be deleted by accident.
+      CREATE TABLE income (
+        id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        company_id  uuid NOT NULL REFERENCES companies (id) ON DELETE RESTRICT,
+        kind        text NOT NULL CHECK (kind IN ('project', 'monthly', 'other')),
+        description text NOT NULL,
+        amount      numeric(12, 2) NOT NULL CHECK (amount > 0),
+        -- NULL means nobody has recorded what came in, not that nothing did. The
+        -- value of a job and the money received are different facts.
+        received    numeric(12, 2) CHECK (received IS NULL OR received >= 0),
+        created_at  timestamptz NOT NULL DEFAULT now(),
+        updated_at  timestamptz NOT NULL DEFAULT now(),
+
+        -- A monthly fee has no single total received; months get tracked separately.
+        CONSTRAINT monthly_income_has_no_total_received
+          CHECK (kind <> 'monthly' OR received IS NULL)
+      );
+      CREATE INDEX income_company_idx ON income (company_id);
+    `,
+  },
+  {
+    version: 3,
+    sql: `
+      -- Who changed what, when, and from what. Written in the same transaction as the
+      -- change itself, so a record cannot change without leaving a trace.
+      CREATE TABLE audit_log (
+        id        bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+        at        timestamptz NOT NULL DEFAULT now(),
+        user_id   uuid REFERENCES users (id) ON DELETE SET NULL,
+        user_name text,
+        action    text NOT NULL,
+        entity    text NOT NULL,
+        entity_id uuid,
+        summary   text,
+        before    jsonb,
+        after     jsonb
+      );
+      CREATE INDEX audit_entity_idx ON audit_log (entity, entity_id, at);
+
+      -- One row: the details printed on invoices. Bank details live only here,
+      -- never in the code, because the repository is public.
+      CREATE TABLE company_settings (
+        id             boolean PRIMARY KEY DEFAULT true CHECK (id),
+        legal_name     text NOT NULL DEFAULT 'OneZeroLabs',
+        address        text,
+        state          text,
+        email          text,
+        phone          text,
+        udyam          text,
+        gstin          text,
+        bank_name      text,
+        account_name   text,
+        account_number text,
+        ifsc           text,
+        upi_id         text,
+        invoice_prefix text NOT NULL DEFAULT 'OZL',
+        invoice_terms  text,
+        updated_at     timestamptz NOT NULL DEFAULT now()
+      );
+      INSERT INTO company_settings (address, state, email, phone, udyam, invoice_terms) VALUES (
+        'Bengaluru, Karnataka 560091, India',
+        'Karnataka',
+        'hello@onezerolabs.in',
+        '+91 74837 29869',
+        'UDYAM-KR-03-0615981',
+        'Payment is due by the date shown above.'
+      );
+
+      CREATE TABLE invoices (
+        id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        -- Given only when issued, so a deleted draft leaves no gap in the series.
+        number          text UNIQUE,
+        company_id      uuid NOT NULL REFERENCES companies (id) ON DELETE RESTRICT,
+        income_id       uuid REFERENCES income (id) ON DELETE SET NULL,
+        status          text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'issued', 'paid', 'cancelled')),
+        issue_date      date NOT NULL,
+        due_date        date,
+        bill_to_name    text NOT NULL,
+        bill_to_address text,
+        bill_to_state   text,
+        bill_to_gstin   text,
+        gst_rate        numeric(4, 2) NOT NULL DEFAULT 0 CHECK (gst_rate >= 0 AND gst_rate <= 50),
+        notes           text,
+        -- The seller's details as they stood when issued. Changing the settings
+        -- later must never rewrite an invoice already sent.
+        seller          jsonb,
+        created_by      uuid REFERENCES users (id) ON DELETE SET NULL,
+        created_at      timestamptz NOT NULL DEFAULT now(),
+        updated_at      timestamptz NOT NULL DEFAULT now(),
+
+        CONSTRAINT issued_invoices_have_numbers CHECK (status = 'draft' OR (number IS NOT NULL AND seller IS NOT NULL))
+      );
+      CREATE INDEX invoices_company_idx ON invoices (company_id);
+      CREATE INDEX invoices_status_idx ON invoices (status);
+
+      CREATE TABLE invoice_items (
+        id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        invoice_id  uuid NOT NULL REFERENCES invoices (id) ON DELETE CASCADE,
+        position    int NOT NULL,
+        description text NOT NULL,
+        quantity    numeric(10, 2) NOT NULL CHECK (quantity > 0),
+        rate        numeric(12, 2) NOT NULL CHECK (rate > 0)
+      );
+      CREATE INDEX invoice_items_invoice_idx ON invoice_items (invoice_id, position);
+
+      CREATE TABLE invoice_payments (
+        id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        invoice_id uuid NOT NULL REFERENCES invoices (id) ON DELETE RESTRICT,
+        amount     numeric(12, 2) NOT NULL CHECK (amount > 0),
+        paid_on    date NOT NULL,
+        method     text,
+        reference  text,
+        created_by uuid REFERENCES users (id) ON DELETE SET NULL,
+        created_at timestamptz NOT NULL DEFAULT now()
+      );
+      CREATE INDEX invoice_payments_invoice_idx ON invoice_payments (invoice_id, paid_on);
+    `,
+  },
+  {
+    version: 4,
+    sql: `
+      -- A time of day, for things like a meeting at 7. Kept apart from the date so
+      -- most tasks can simply have neither, or a date alone.
+      ALTER TABLE tasks ADD COLUMN due_time time;
+      ALTER TABLE tasks ADD CONSTRAINT a_time_needs_a_date CHECK (due_time IS NULL OR due_date IS NOT NULL);
+    `,
+  },
+  {
+    version: 5,
+    sql: `
+      -- Folders nest, as in the Files app. One with anything inside can't be
+      -- deleted, so nothing disappears by accident.
+      CREATE TABLE folders (
+        id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        parent_id  uuid REFERENCES folders (id) ON DELETE RESTRICT,
+        name       text NOT NULL CHECK (length(btrim(name)) BETWEEN 1 AND 80),
+        created_by uuid REFERENCES users (id) ON DELETE SET NULL,
+        created_at timestamptz NOT NULL DEFAULT now(),
+        CHECK (parent_id IS DISTINCT FROM id)
+      );
+      -- No two folders of the same name side by side. The top level has no parent,
+      -- so it stands in as an all-zero id.
+      CREATE UNIQUE INDEX folders_name_idx
+        ON folders (COALESCE(parent_id, '00000000-0000-0000-0000-000000000000'::uuid), lower(name));
+
+      CREATE TABLE documents (
+        id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        folder_id   uuid REFERENCES folders (id) ON DELETE RESTRICT,
+        company_id  uuid REFERENCES companies (id) ON DELETE SET NULL,
+        name        text NOT NULL CHECK (length(btrim(name)) BETWEEN 1 AND 200),
+        mime        text NOT NULL,
+        size        integer NOT NULL CHECK (size > 0),
+        sha256      text NOT NULL,
+        uploaded_by uuid REFERENCES users (id) ON DELETE SET NULL,
+        created_at  timestamptz NOT NULL DEFAULT now()
+      );
+      CREATE UNIQUE INDEX documents_name_idx
+        ON documents (COALESCE(folder_id, '00000000-0000-0000-0000-000000000000'::uuid), lower(name));
+      CREATE INDEX documents_company_idx ON documents (company_id) WHERE company_id IS NOT NULL;
+
+      -- The file itself, kept apart so listing a folder never reads the bytes.
+      CREATE TABLE document_files (
+        document_id uuid PRIMARY KEY REFERENCES documents (id) ON DELETE CASCADE,
+        data        bytea NOT NULL
+      );
+    `,
+  },
+  {
+    version: 6,
+    sql: `
+      -- A task for both founders. It shows in each one's own list, and it can't
+      -- also name one person.
+      ALTER TABLE tasks ADD COLUMN for_both boolean NOT NULL DEFAULT false;
+      ALTER TABLE tasks ADD CONSTRAINT both_means_no_one_person CHECK (NOT for_both OR assignee_id IS NULL);
+    `,
+  },
+  {
+    version: 7,
+    sql: `
+      -- What each partner earns from OneZeroLabs work, and the share of it paid into
+      -- the company bank account, as the partners agreement requires. The share is
+      -- worked out once, at the rate of the day, so a later change of rate never
+      -- rewrites the past.
+      CREATE TABLE earnings (
+        id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id     uuid NOT NULL REFERENCES users (id) ON DELETE RESTRICT,
+        amount      numeric(12, 2) NOT NULL CHECK (amount > 0),
+        rate        numeric(5, 2) NOT NULL DEFAULT 25 CHECK (rate > 0 AND rate <= 100),
+        share       numeric(12, 2) NOT NULL CHECK (share >= 0 AND share <= amount),
+        received_on date NOT NULL,
+        paid_on     date,
+        company_id  uuid REFERENCES companies (id) ON DELETE SET NULL,
+        note        text,
+        created_by  uuid REFERENCES users (id) ON DELETE SET NULL,
+        created_at  timestamptz NOT NULL DEFAULT now(),
+        CONSTRAINT paid_after_received CHECK (paid_on IS NULL OR paid_on >= received_on)
+      );
+      CREATE INDEX earnings_received_idx ON earnings (received_on);
+
+      -- Everything else that goes in or out of the company bank account. Money out
+      -- needs both partners' agreement, so it can't be saved without it.
+      CREATE TABLE bank_entries (
+        id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        direction      text NOT NULL CHECK (direction IN ('in', 'out')),
+        amount         numeric(12, 2) NOT NULL CHECK (amount > 0),
+        entry_date     date NOT NULL,
+        description    text NOT NULL CHECK (length(btrim(description)) > 0),
+        category       text,
+        agreed_by_both boolean NOT NULL DEFAULT false,
+        created_by     uuid REFERENCES users (id) ON DELETE SET NULL,
+        created_at     timestamptz NOT NULL DEFAULT now(),
+        CONSTRAINT spending_needs_both CHECK (direction = 'in' OR agreed_by_both)
+      );
+      CREATE INDEX bank_entries_date_idx ON bank_entries (entry_date);
+    `,
+  },
+  {
+    version: 8,
+    sql: `
+      -- Tasks can repeat every day too.
+      ALTER TABLE tasks DROP CONSTRAINT IF EXISTS tasks_recurrence_check;
+      ALTER TABLE tasks ADD CONSTRAINT tasks_recurrence_check
+        CHECK (recurrence IN ('none', 'daily', 'weekly', 'monthly', 'yearly'));
+    `,
+  },
+  {
+    version: 9,
+    sql: `
+      -- Goals for a day, a week, a month or a year. A goal belongs to the period
+      -- starting on starts_on; a repeating one also to every later period, until
+      -- it is stopped. Each period's progress is kept separately, so last week's
+      -- result stays as it was when this week starts afresh.
+      CREATE TABLE goals (
+        id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        title      text NOT NULL CHECK (length(btrim(title)) > 0),
+        period     text NOT NULL CHECK (period IN ('day', 'week', 'month', 'year')),
+        starts_on  date NOT NULL,
+        repeats    boolean NOT NULL DEFAULT false,
+        stopped_on date,
+        owner_id   uuid REFERENCES users (id) ON DELETE SET NULL,
+        for_both   boolean NOT NULL DEFAULT false,
+        target     numeric(12, 2) CHECK (target IS NULL OR target > 0),
+        unit       text,
+        created_by uuid REFERENCES users (id) ON DELETE SET NULL,
+        created_at timestamptz NOT NULL DEFAULT now(),
+        CONSTRAINT goal_both_means_no_one_person CHECK (NOT for_both OR owner_id IS NULL),
+        CONSTRAINT goal_stops_after_it_starts CHECK (stopped_on IS NULL OR stopped_on > starts_on)
+      );
+      CREATE INDEX goals_period_idx ON goals (period, starts_on);
+
+      CREATE TABLE goal_progress (
+        goal_id      uuid NOT NULL REFERENCES goals (id) ON DELETE CASCADE,
+        period_start date NOT NULL,
+        value        numeric(12, 2) NOT NULL DEFAULT 0 CHECK (value >= 0),
+        done         boolean NOT NULL DEFAULT false,
+        updated_by   uuid REFERENCES users (id) ON DELETE SET NULL,
+        updated_at   timestamptz NOT NULL DEFAULT now(),
+        PRIMARY KEY (goal_id, period_start)
+      );
+    `,
+  },
+  {
+    version: 10,
+    sql: `
+      -- Events the founders attend, with photos. Photos are resized on the phone
+      -- before upload, and kept twice: a full copy and a small one for lists.
+      CREATE TABLE events (
+        id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        title       text NOT NULL CHECK (length(btrim(title)) > 0),
+        happened_on date NOT NULL,
+        place       text,
+        description text,
+        created_by  uuid REFERENCES users (id) ON DELETE SET NULL,
+        created_at  timestamptz NOT NULL DEFAULT now()
+      );
+      CREATE INDEX events_day_idx ON events (happened_on DESC);
+
+      CREATE TABLE event_photos (
+        id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        event_id   uuid NOT NULL REFERENCES events (id) ON DELETE CASCADE,
+        data       bytea NOT NULL,
+        thumb      bytea NOT NULL,
+        width      integer NOT NULL CHECK (width > 0),
+        height     integer NOT NULL CHECK (height > 0),
+        bytes      integer NOT NULL CHECK (bytes > 0),
+        created_by uuid REFERENCES users (id) ON DELETE SET NULL,
+        created_at timestamptz NOT NULL DEFAULT now()
+      );
+      CREATE INDEX event_photos_event_idx ON event_photos (event_id, created_at);
+    `,
+  },
+  {
+    version: 11,
+    sql: `
+      -- What each founder should hear about: a task the other one gave them, or a
+      -- meeting set for both. Shown in the app and sent to their phones.
+      CREATE TABLE notifications (
+        id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id    uuid NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+        kind       text NOT NULL,
+        title      text NOT NULL,
+        body       text,
+        url        text,
+        actor_id   uuid REFERENCES users (id) ON DELETE SET NULL,
+        created_at timestamptz NOT NULL DEFAULT now(),
+        read_at    timestamptz
+      );
+      CREATE INDEX notifications_user_idx ON notifications (user_id, created_at DESC);
+
+      -- Phones with the Android app, by their push token. A token moves to
+      -- whoever signed in on that phone last.
+      CREATE TABLE devices (
+        id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id      uuid NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+        token        text NOT NULL UNIQUE,
+        platform     text NOT NULL DEFAULT 'android',
+        created_at   timestamptz NOT NULL DEFAULT now(),
+        last_seen_at timestamptz NOT NULL DEFAULT now()
+      );
+    `,
+  },
+  {
+    version: 12,
+    sql: `
+      -- A founder's profile photo: a small square JPEG, made on the phone. When
+      -- it changed is part of its address, so browsers fetch a new photo at once.
+      ALTER TABLE users ADD COLUMN avatar bytea;
+      ALTER TABLE users ADD COLUMN avatar_updated_at timestamptz;
+      ALTER TABLE users ADD CONSTRAINT avatar_has_a_date CHECK (avatar IS NULL OR avatar_updated_at IS NOT NULL);
+    `,
+  },
+  {
+    version: 13,
+    sql: `
+      -- Upcoming events have a start time, so the reminder the day before can
+      -- come at that time. Optional: without one it comes at 9 in the morning.
+      ALTER TABLE events ADD COLUMN start_time time;
+    `,
+  },
+  {
+    version: 14,
+    sql: `
+      -- A meeting task's Google Meet link. Only Meet links, so a task can never
+      -- send someone to another site.
+      ALTER TABLE tasks ADD COLUMN meet_link text;
+      ALTER TABLE tasks ADD CONSTRAINT meet_link_is_google_meet
+        CHECK (meet_link IS NULL OR meet_link LIKE 'https://meet.google.com/%');
+    `,
+  },
+  {
+    version: 15,
+    sql: `
+      -- Whose money went into or out of the company bank: one founder's, both
+      -- founders', or the company's own. Older entries were saved without it.
+      ALTER TABLE bank_entries ADD COLUMN owner_kind text CHECK (owner_kind IN ('person', 'both', 'company'));
+      ALTER TABLE bank_entries ADD COLUMN owner_id uuid REFERENCES users (id) ON DELETE RESTRICT;
+      ALTER TABLE bank_entries ADD CONSTRAINT a_person_is_named
+        CHECK ((owner_kind = 'person') = (owner_id IS NOT NULL));
+    `,
+  },
+]

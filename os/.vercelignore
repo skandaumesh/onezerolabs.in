@@ -1,0 +1,11 @@
+# Never upload these from this computer. .env.local holds the database password,
+# and .data/ is a local database that may hold real client data.
+.env*
+!.env.example
+.data
+.neon
+.next
+node_modules
+
+# The Android app is built on this computer, not on Vercel.
+android
