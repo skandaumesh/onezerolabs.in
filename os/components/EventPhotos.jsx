@@ -186,6 +186,12 @@ export function PostPhotos({ photos, title }) {
                 <ChevronLeft size={18} aria-hidden="true" />
               </button>
             )}
+            {/* Dots on the photo, white, as iPhone shows them. */}
+            <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-2.5 flex justify-center gap-1.5">
+              {photos.map((p, i) => (
+                <span key={p.id} className={`h-1.5 w-1.5 rounded-full shadow-[0_0_2px_rgba(0,0,0,0.5)] transition-colors ${i === index ? 'bg-white' : 'bg-white/45'}`} />
+              ))}
+            </div>
             {index < photos.length - 1 && (
               <button type="button" onClick={() => slide(1)} aria-label="Next photo" className="press absolute right-2 top-1/2 hidden h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-black shadow md:flex">
                 <ChevronRight size={18} aria-hidden="true" />
@@ -194,13 +200,6 @@ export function PostPhotos({ photos, title }) {
           </>
         )}
       </div>
-      {photos.length > 1 && (
-        <div aria-hidden="true" className="flex justify-center gap-1 pt-2.5">
-          {photos.map((p, i) => (
-            <span key={p.id} className={`h-1.5 w-1.5 rounded-full transition-colors ${i === index ? 'bg-accent' : 'bg-fill'}`} />
-          ))}
-        </div>
-      )}
       {open !== null && <Viewer photos={photos} index={open} onMove={move} onClose={close} />}
     </div>
   )

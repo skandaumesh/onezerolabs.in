@@ -92,3 +92,14 @@ export const summariseBank = ({ earnings, entries, users, today }) => {
 
   return { balance, toPay, monthIn, monthOut, byMonth, thisMonth: current }
 }
+
+/** The choices for whose money went in or out: each founder, both, or the company's own. */
+export const whoseOptions = (users) => [
+  ...users.map((u) => ({ value: u.id, label: `${u.name}’s money` })),
+  { value: 'both', label: 'Both of ours' },
+  { value: 'company', label: 'The company’s money' },
+]
+
+/** How an entry says whose money it was, or null for entries saved before this was asked. */
+export const whoseLabel = (entry) =>
+  entry.owner_kind === 'person' ? `${entry.owner_name}’s money` : entry.owner_kind === 'both' ? 'Both of ours' : entry.owner_kind === 'company' ? 'The company’s money' : null

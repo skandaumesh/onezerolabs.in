@@ -8,6 +8,7 @@ import { minutesIST, todayIST } from '@/lib/dates.mjs'
 import { sql, tx } from '@/lib/db.mjs'
 import { taskChanged, tasksMoved } from '@/lib/notify'
 import { day, oneOf, text, time, uuid } from '@/lib/forms'
+import { parseMeetLink } from '@/lib/meet.mjs'
 import { parseTask, whenText } from '@/lib/parse-task.mjs'
 
 const RECUR_NEEDS_DATE = 'A repeating task needs a due date to count from.'
@@ -18,7 +19,7 @@ const assignment = (form) =>
   text(form, 'assignee_id') === 'both' ? { assigneeId: null, forBoth: true } : { assigneeId: uuid(form, 'assignee_id'), forBoth: false }
 const INTERVAL = { daily: '1 day', weekly: '1 week', monthly: '1 month', yearly: '1 year' }
 // What a notice about a task needs to know.
-const NOTICE_FIELDS = `id, title, assignee_id, for_both, due_date, to_char(due_time, 'HH24:MI') AS due_time`
+const NOTICE_FIELDS = `id, title, assignee_id, for_both, due_date, to_char(due_time, 'HH24:MI') AS due_time, meet_link`
 
 export async function createTask(_prev, form) {
   const user = await requireUser()
@@ -29,11 +30,13 @@ export async function createTask(_prev, form) {
   if (!title) return { error: 'Enter what needs doing.' }
   if (recurrence !== 'none' && !dueDate) return { error: RECUR_NEEDS_DATE }
   if (dueTime && !dueDate) return { error: TIME_NEEDS_DATE }
+  const meet = parseMeetLink(text(form, 'meet_link'))
+  if (meet.error) return { error: meet.error }
   const { assigneeId, forBoth } = assignment(form)
 
   const [task] = await sql(
-    `INSERT INTO tasks (project_id, title, assignee_id, for_both, created_by, priority, due_date, due_time, recurrence)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING ${NOTICE_FIELDS}`,
+    `INSERT INTO tasks (project_id, title, assignee_id, for_both, created_by, priority, due_date, due_time, recurrence, meet_link)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING ${NOTICE_FIELDS}`,
     [
       uuid(form, 'project_id'),
       title,
@@ -44,6 +47,7 @@ export async function createTask(_prev, form) {
       dueDate,
       dueTime,
       recurrence,
+      meet.link,
     ]
   )
   await taskChanged(user, task)
@@ -115,6 +119,8 @@ export async function updateTask(_prev, form) {
   if (!title) return { error: 'Enter what needs doing.' }
   if (recurrence !== 'none' && !dueDate) return { error: RECUR_NEEDS_DATE }
   if (dueTime && !dueDate) return { error: TIME_NEEDS_DATE }
+  const meet = parseMeetLink(text(form, 'meet_link'))
+  if (meet.error) return { error: meet.error }
   const { assigneeId, forBoth } = assignment(form)
   if (blockedBy && (await wouldCycle(id, blockedBy))) {
     return { error: 'Those two tasks would end up waiting on each other.' }
@@ -125,7 +131,7 @@ export async function updateTask(_prev, form) {
   const [task] = await sql(
     `UPDATE tasks
      SET title = $2, notes = $3, assignee_id = $4, priority = $5, due_date = $6,
-         approval = $7, recurrence = $8, blocked_by = $9, due_time = $10, for_both = $11
+         approval = $7, recurrence = $8, blocked_by = $9, due_time = $10, for_both = $11, meet_link = $12
      WHERE id = $1 RETURNING ${NOTICE_FIELDS}`,
     [
       id,
@@ -139,6 +145,7 @@ export async function updateTask(_prev, form) {
       blockedBy,
       dueTime,
       forBoth,
+      meet.link,
     ]
   )
   if (task) await taskChanged(user, task, before)
@@ -173,8 +180,8 @@ export async function toggleTask(_prev, form) {
         const today = todayIST()
         const from = task.recurrence === 'daily' && task.due_date < today ? today : task.due_date
         await t.query(
-          `INSERT INTO tasks (project_id, title, notes, assignee_id, created_by, priority, due_date, approval, recurrence, due_time, for_both)
-           VALUES ($1, $2, $3, $4, $5, $6, ($7::date + $8::interval)::date, $9, $10, $11, $12)`,
+          `INSERT INTO tasks (project_id, title, notes, assignee_id, created_by, priority, due_date, approval, recurrence, due_time, for_both, meet_link)
+           VALUES ($1, $2, $3, $4, $5, $6, ($7::date + $8::interval)::date, $9, $10, $11, $12, $13)`,
           [
             task.project_id,
             task.title,
@@ -188,6 +195,7 @@ export async function toggleTask(_prev, form) {
             task.recurrence,
             task.due_time,
             task.for_both,
+            task.meet_link,
           ]
         )
       }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ActionForm, Submit } from '@/components/forms'
+import { ActionForm, ConfirmSubmit } from '@/components/forms'
 import { BUTTON_PRIMARY, Field, Input, Select, Switch } from '@/components/ui'
 import { addEarning } from '@/lib/actions/bank'
 import { keepOf, PAY_WITHIN_DAYS, SHARE_PERCENT, shareOf } from '@/lib/bank.mjs'
@@ -64,7 +64,22 @@ export function EarningForm({ users, meId, companies, today }) {
         />
       </div>
       <div className="col-span-2">
-        <Submit className={`${BUTTON_PRIMARY} w-full`}>Add earning</Submit>
+        <ConfirmSubmit
+          destructive={false}
+          confirm="Add"
+          title={(data) => {
+            const who = users.find((u) => u.id === data.get('user_id'))?.name ?? 'This'
+            return `Add ${who}’s ${formatINR(parseAmount(data.get('amount')) ?? 0)}?`
+          }}
+          message={(data) => {
+            const earned = parseAmount(data.get('amount')) ?? 0
+            const paid = data.get('paid') === 'on'
+            return `${SHARE_PERCENT}%, ${formatINR(shareOf(earned))}, goes to the company bank${paid ? ' now' : `, to be paid in within ${PAY_WITHIN_DAYS} days`}. ${formatINR(keepOf(earned))} is kept.`
+          }}
+          className={`${BUTTON_PRIMARY} w-full`}
+        >
+          Add earning
+        </ConfirmSubmit>
       </div>
     </ActionForm>
   )

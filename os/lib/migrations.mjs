@@ -474,4 +474,25 @@ export const migrations = [
       ALTER TABLE events ADD COLUMN start_time time;
     `,
   },
+  {
+    version: 14,
+    sql: `
+      -- A meeting task's Google Meet link. Only Meet links, so a task can never
+      -- send someone to another site.
+      ALTER TABLE tasks ADD COLUMN meet_link text;
+      ALTER TABLE tasks ADD CONSTRAINT meet_link_is_google_meet
+        CHECK (meet_link IS NULL OR meet_link LIKE 'https://meet.google.com/%');
+    `,
+  },
+  {
+    version: 15,
+    sql: `
+      -- Whose money went into or out of the company bank: one founder's, both
+      -- founders', or the company's own. Older entries were saved without it.
+      ALTER TABLE bank_entries ADD COLUMN owner_kind text CHECK (owner_kind IN ('person', 'both', 'company'));
+      ALTER TABLE bank_entries ADD COLUMN owner_id uuid REFERENCES users (id) ON DELETE RESTRICT;
+      ALTER TABLE bank_entries ADD CONSTRAINT a_person_is_named
+        CHECK ((owner_kind = 'person') = (owner_id IS NOT NULL));
+    `,
+  },
 ]

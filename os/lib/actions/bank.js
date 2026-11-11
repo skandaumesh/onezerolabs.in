@@ -46,6 +46,29 @@ export async function addEarning(_prev, form) {
   return { ok: true }
 }
 
+/** Undoes "Paid": the share comes off the balance and waits to be paid in again. */
+export async function markShareNotPaid(_prev, form) {
+  const user = await requireUser()
+  const id = uuid(form, 'id')
+  const result = await tx(async (t) => {
+    const [before] = await t.query(`SELECT ${EARNING_ROW} FROM earnings WHERE id = $1 FOR UPDATE`, [id])
+    if (!before) return { error: 'This earning no longer exists.' }
+    if (!before.paid_on) return { ok: true }
+    const [after] = await t.query(`UPDATE earnings SET paid_on = NULL WHERE id = $1 RETURNING ${EARNING_ROW}`, [id])
+    await logChange(t, user, {
+      action: 'update',
+      entity: 'earning',
+      entityId: id,
+      summary: `Marked ${formatINR(before.share)} as not paid in`,
+      before,
+      after,
+    })
+    return { ok: true }
+  })
+  revalidatePath('/', 'layout')
+  return result
+}
+
 /** The share has gone into the company bank account today. */
 export async function markSharePaid(_prev, form) {
   const user = await requireUser()
@@ -105,19 +128,24 @@ export async function addBankEntry(_prev, form) {
     return { error: 'The partners agreement needs both of you to agree to every payment from the company bank.' }
   }
   const category = direction === 'out' ? oneOf(form, 'category', SPEND_CATEGORIES, 'other') : null
+  const whose = text(form, 'whose')
+  const owner = whose === 'both' || whose === 'company' ? { kind: whose, id: null } : null
+  const [person] = !owner && whose ? await sql('SELECT id, name FROM users WHERE id = $1', [uuid(form, 'whose')]) : []
+  const ownerKind = owner?.kind ?? (person ? 'person' : null)
+  if (!ownerKind) return { error: 'Choose whose money it is.' }
 
   await tx(async (t) => {
     const [row] = await t.query(
-      `INSERT INTO bank_entries (direction, amount, entry_date, description, category, agreed_by_both, created_by)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
-       RETURNING id, direction, amount::float8 AS amount, entry_date, description, category, agreed_by_both`,
-      [direction, amount, entryDate, description, category, direction === 'out' && agreed, user.id]
+      `INSERT INTO bank_entries (direction, amount, entry_date, description, category, agreed_by_both, created_by, owner_kind, owner_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       RETURNING id, direction, amount::float8 AS amount, entry_date, description, category, agreed_by_both, owner_kind, owner_id`,
+      [direction, amount, entryDate, description, category, direction === 'out' && agreed, user.id, ownerKind, person?.id ?? null]
     )
     await logChange(t, user, {
       action: 'create',
       entity: 'bank',
       entityId: row.id,
-      summary: `${direction === 'out' ? 'Spent' : 'Added'} ${formatINR(amount)}: ${description}`,
+      summary: `${direction === 'out' ? 'Spent' : 'Added'} ${formatINR(amount)} (${person ? `${person.name}’s money` : ownerKind === 'both' ? 'both founders’ money' : 'the company’s money'}): ${description}`,
       after: row,
     })
   })

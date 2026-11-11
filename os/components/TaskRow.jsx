@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Hourglass, ListTree, Repeat } from 'lucide-react'
 import { CheckButton } from '@/components/forms'
+import { JoinMeet } from '@/components/MeetField'
 import { Badge } from '@/components/ui'
 import { toggleTask } from '@/lib/actions/tasks'
 import { APPROVAL_LABEL, PRIORITY_LABEL, RECURRENCE_LABEL } from '@/lib/constants.mjs'
@@ -47,6 +48,7 @@ export function TaskRow({ task, today, showProject = true }) {
             <Badge tone={PRIORITY_TONE[task.priority]}>{PRIORITY_LABEL[task.priority]}</Badge>
           )}
           {!done && due && <Badge tone={due.tone}>{due.text}</Badge>}
+          {!done && <JoinMeet link={task.meet_link} compact />}
           {done && task.due_date && <span>Due {formatDay(task.due_date, today)}</span>}
           {task.approval in APPROVAL_TONE && (
             <Badge tone={APPROVAL_TONE[task.approval]}>{APPROVAL_LABEL[task.approval]}</Badge>

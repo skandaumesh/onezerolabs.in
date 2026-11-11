@@ -10,7 +10,7 @@ export const listUsers = () => sql(`SELECT u.id, u.name, ${avatarVersion()} AS a
 
 const TASK_SELECT = `
   SELECT t.id, t.title, t.notes, t.priority, t.due_date, to_char(t.due_time, 'HH24:MI') AS due_time, t.done_at, t.approval, t.recurrence,
-         t.project_id, t.blocked_by, t.assignee_id, t.for_both,
+         t.project_id, t.blocked_by, t.assignee_id, t.for_both, t.meet_link,
          CASE WHEN t.for_both THEN 'Both' ELSE u.name END AS assignee_name,
          p.name AS project_name,
          c.id AS company_id, c.name AS company_name,
@@ -338,9 +338,10 @@ export const listEarnings = () =>
 export const listBankEntries = () =>
   sql(
     `SELECT b.id, b.direction, b.amount::float8 AS amount, b.entry_date, b.description, b.category,
-            b.agreed_by_both, u.name AS added_by, b.created_at
+            b.agreed_by_both, b.owner_kind, o.name AS owner_name, u.name AS added_by, b.created_at
      FROM bank_entries b
      LEFT JOIN users u ON u.id = b.created_by
+     LEFT JOIN users o ON o.id = b.owner_id
      ORDER BY b.entry_date DESC, b.created_at DESC`
   )
 
@@ -422,7 +423,7 @@ export const listUnreadSince = (userId, since) =>
 /** Open tasks due within the next `days` days, with what a reminder needs to say. */
 export const listTasksToRemind = (days) =>
   sql(
-    `SELECT t.id, t.title, t.due_date, to_char(t.due_time, 'HH24:MI') AS due_time, t.done_at,
+    `SELECT t.id, t.title, t.due_date, to_char(t.due_time, 'HH24:MI') AS due_time, t.done_at, t.meet_link,
             t.assignee_id, t.for_both, t.created_by, p.name AS project_name, c.name AS company_name
      FROM tasks t
      LEFT JOIN projects p ON p.id = t.project_id

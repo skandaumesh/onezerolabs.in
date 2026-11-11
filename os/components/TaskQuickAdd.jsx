@@ -1,4 +1,5 @@
 import { ActionForm, Submit } from '@/components/forms'
+import { MeetField } from '@/components/MeetField'
 import { BUTTON_PRIMARY, Field, Input, Select } from '@/components/ui'
 import { createTask } from '@/lib/actions/tasks'
 import { PRIORITIES } from '@/lib/constants.mjs'
@@ -15,6 +16,7 @@ export function TaskQuickAdd({ users, projectId, projects, defaultAssignee }) {
       <div className="col-span-2">
         <Input name="title" required aria-label="What needs doing" placeholder="What needs doing?" autoComplete="off" data-autofocus />
       </div>
+      <MeetField className="col-span-2" />
       {projects && (
         <div className="col-span-2">
           <Field label="Project">

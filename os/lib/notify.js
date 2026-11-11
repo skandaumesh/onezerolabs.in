@@ -17,7 +17,7 @@ const allUserIds = async () => (await sql('SELECT id FROM users')).map((u) => u.
 export async function taskChanged(actor, task, before = null) {
   const users = await sql('SELECT id, name FROM users')
   const notices = task ? assignmentNotices({ actor, task, before, users }) : []
-  const body = task ? [task.title, whenText(task.due_date, task.due_time, todayIST())].filter(Boolean).join(' · ') : null
+  const body = task ? [task.title, whenText(task.due_date, task.due_time, todayIST()), task.meet_link ? 'Google Meet' : null].filter(Boolean).join(' · ') : null
 
   const saved = []
   for (const n of notices) {

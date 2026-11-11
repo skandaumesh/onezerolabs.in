@@ -1,11 +1,33 @@
-import { ActionForm, Submit } from '@/components/forms'
+'use client'
+
+import { ActionForm, ConfirmSubmit } from '@/components/forms'
 import { BUTTON_PRIMARY, Field, Input, Select, Switch } from '@/components/ui'
 import { addBankEntry } from '@/lib/actions/bank'
-import { SPEND_CATEGORIES } from '@/lib/bank.mjs'
+import { SPEND_CATEGORIES, SPEND_LABEL, whoseOptions } from '@/lib/bank.mjs'
+import { formatDay } from '@/lib/dates.mjs'
+import { formatINR, parseAmount } from '@/lib/money.mjs'
 
-/** Money into or out of the company bank, other than the partners' shares. Goes in a sheet. */
-export function BankEntryForm({ direction, today }) {
+/**
+ * Money into or out of the company bank, other than the partners' shares. Asks
+ * whose money it is, and asks once more, with the amount, before saving.
+ * Goes in a sheet.
+ */
+export function BankEntryForm({ direction, today, users }) {
   const out = direction === 'out'
+  const options = whoseOptions(users)
+
+  const question = (data) => {
+    const amount = formatINR(parseAmount(data.get('amount')) ?? 0)
+    return out ? `Take ${amount} Out of the Bank?` : `Add ${amount} to the Bank?`
+  }
+  const details = (data) => {
+    const whose = options.find((o) => o.value === data.get('whose'))?.label
+    const what = data.get('description')
+    const category = out ? ` (${SPEND_LABEL[data.get('category')]})` : ''
+    const when = data.get('entry_date') ? `, on ${formatDay(data.get('entry_date'), today)}` : ''
+    return `${whose}: ${what}${category}${when}.${out ? ' Both of you agreed to it.' : ''}`
+  }
+
   return (
     <ActionForm
       action={addBankEntry}
@@ -21,6 +43,11 @@ export function BankEntryForm({ direction, today }) {
       <Field label="Date">
         <Input type="date" name="entry_date" required defaultValue={today} />
       </Field>
+      <div className="col-span-2">
+        <Field label="Whose money">
+          <Select name="whose" required blank="Choose…" defaultValue="" options={options} />
+        </Field>
+      </div>
       <div className="col-span-2">
         <Field label={out ? 'What it was spent on' : 'Where it came from'}>
           <Input name="description" required autoComplete="off" placeholder={out ? 'Domain renewal, Canva, camera' : 'Opening balance, client paid the company'} />
@@ -39,7 +66,9 @@ export function BankEntryForm({ direction, today }) {
         </>
       )}
       <div className="col-span-2">
-        <Submit className={`${BUTTON_PRIMARY} w-full`}>{out ? 'Add spending' : 'Add money in'}</Submit>
+        <ConfirmSubmit destructive={false} confirm={out ? 'Take Out' : 'Add'} title={question} message={details} className={`${BUTTON_PRIMARY} w-full`}>
+          {out ? 'Add spending' : 'Add money in'}
+        </ConfirmSubmit>
       </div>
     </ActionForm>
   )

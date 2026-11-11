@@ -70,6 +70,8 @@ The company fund from the partners agreement: each partner pays 25% of what they
 - **Add earning:** who earned it, how much (GST left out), when, and for which client. The 25% is worked out as it is typed and kept with the earning, so a later change of rate never rewrites the past.
 - **Paid in:** on by default, so the share joins the balance straight away. Turned off, the share waits under "To pay into the bank" with its due date, turns red once late, and has a Paid button.
 - **Money in and out:** anything else, such as the opening balance or spending. Money out needs the "both of us agreed" switch, and the database refuses spending without it.
+- **Asks first:** Add earning, Paid, Not paid, Money in and Money out each ask before saving, naming the amount and the person. A share marked Paid by mistake has a **Not paid** button, which puts it back under To pay.
+- **Whose money:** money in and out must say whose it was: one founder's, both, or the company's own. Entries from before this was asked show nothing.
 - **Balance:** shares paid in, plus money in, minus money out. It is a record kept by hand, so check it against the bank statement now and then, and use Money in or Money out to correct any difference.
 
 ## Goals
@@ -92,6 +94,10 @@ Events the founders attend, with photos and notes. Open it from the sidebar or t
 ## Profile photos
 
 Each founder can add their own photo in Profile: tap the circle or "Choose photo". The phone crops it to a square from the middle and shrinks it to 512 px, about 30–60 KB, before upload. It replaces the initial in the sidebar, on Profile and on event posts, for both founders. Nobody can set the other founder's photo. It is served from `/profile/photo/[id]?v=…`, which checks the session; the `v` is when it last changed, so a new photo shows at once.
+
+## Meetings
+
+A task whose name sounds like a meeting (meeting, call, catch-up, demo, interview, sync, standup) asks for a Google Meet link. "New Meet" opens Google Meet to make one. Full links, links without https and bare codes (abc-defg-hij) are tidied into one form; other sites are refused, and the database only accepts Meet links. The task shows Join buttons, repeats keep the link, and notices and reminders say Google Meet.
 
 ## Notifications and the Android app
 

@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { Trash2 } from 'lucide-react'
 import { ActionForm, CheckButton, ConfirmSubmit, Submit } from '@/components/forms'
+import { JoinMeet, MeetField } from '@/components/MeetField'
 import { TaskCheck } from '@/components/TaskRow'
 import {
   BUTTON_DANGER,
@@ -63,6 +64,7 @@ export default async function TaskPage({ params }) {
         }
         eyebrow={task.company_name}
         title={task.title}
+        action={task.meet_link && !task.done_at ? <JoinMeet link={task.meet_link} /> : null}
       />
 
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
@@ -139,6 +141,7 @@ export default async function TaskPage({ params }) {
               <Field label="Title">
                 <Input name="title" required defaultValue={task.title} />
               </Field>
+              <MeetField defaultValue={task.meet_link ?? ''} title={task.title} />
               <Field label="Assigned to">
                 <Select
                   name="assignee_id"

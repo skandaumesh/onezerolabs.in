@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { describe, test } from 'node:test'
-import { dueBy, formatMonth, keepOf, shareOf, shareStatus, summariseBank } from '../lib/bank.mjs'
+import { dueBy, formatMonth, keepOf, shareOf, shareStatus, summariseBank, whoseLabel, whoseOptions } from '../lib/bank.mjs'
 
 describe('the 25% share', () => {
   test('matches the partners agreement examples', () => {
@@ -88,5 +88,18 @@ describe('the bank summary', () => {
   test('months read naturally', () => {
     assert.equal(formatMonth('2026-11'), 'November 2026')
     assert.equal(formatMonth('2027-01'), 'January 2027')
+  })
+})
+
+describe('whose money', () => {
+  const users = [{ id: 's', name: 'Skanda' }, { id: 't', name: 'Tanisha' }]
+  test('each founder, both, or the company', () => {
+    assert.deepEqual(whoseOptions(users).map((o) => o.label), ['Skanda’s money', 'Tanisha’s money', 'Both of ours', 'The company’s money'])
+  })
+  test('an entry says whose it was; older ones say nothing', () => {
+    assert.equal(whoseLabel({ owner_kind: 'person', owner_name: 'Tanisha' }), 'Tanisha’s money')
+    assert.equal(whoseLabel({ owner_kind: 'both' }), 'Both of ours')
+    assert.equal(whoseLabel({ owner_kind: 'company' }), 'The company’s money')
+    assert.equal(whoseLabel({ owner_kind: null }), null)
   })
 })

@@ -1,12 +1,12 @@
-import { ArrowDownLeft, ArrowUpRight, Trash2 } from 'lucide-react'
+import { ArrowDownLeft, ArrowUpRight, RotateCcw, Trash2 } from 'lucide-react'
 import { BankEntryForm } from '@/components/BankEntryForm'
 import { EarningForm } from '@/components/EarningForm'
-import { ActionForm, ConfirmSubmit, Submit } from '@/components/forms'
+import { ActionForm, ConfirmSubmit } from '@/components/forms'
 import { SheetButton } from '@/components/Sheet'
 import { Badge, BUTTON_PRIMARY, BUTTON_SECONDARY, Card, Empty, PageHeader, Tabs } from '@/components/ui'
-import { deleteBankEntry, deleteEarning, markSharePaid } from '@/lib/actions/bank'
+import { deleteBankEntry, deleteEarning, markShareNotPaid, markSharePaid } from '@/lib/actions/bank'
 import { requireUser } from '@/lib/auth'
-import { SHARE_PERCENT, shareStatus, SPEND_LABEL, summariseBank } from '@/lib/bank.mjs'
+import { SHARE_PERCENT, shareStatus, SPEND_LABEL, summariseBank, whoseLabel } from '@/lib/bank.mjs'
 import { formatDay, todayIST } from '@/lib/dates.mjs'
 import { formatINR } from '@/lib/money.mjs'
 import { listBankEntries, listCompanyOptions, listEarnings, listUsers } from '@/lib/queries'
@@ -68,7 +68,7 @@ export default async function BankPage() {
               </>
             }
           >
-            <BankEntryForm direction="in" today={today} />
+            <BankEntryForm direction="in" today={today} users={users} />
           </SheetButton>
           <SheetButton
             title="Money out"
@@ -80,7 +80,7 @@ export default async function BankPage() {
               </>
             }
           >
-            <BankEntryForm direction="out" today={today} />
+            <BankEntryForm direction="out" today={today} users={users} />
           </SheetButton>
         </div>
       </section>
@@ -107,9 +107,16 @@ export default async function BankPage() {
                       </span>
                       <ActionForm action={markSharePaid} errorTitle="Couldn’t Save">
                         <input type="hidden" name="id" value={e.id} />
-                        <Submit aria-label={`Mark ${e.user_name}’s ${formatINR(e.share)} as paid in`} className={`${BUTTON_SECONDARY} whitespace-nowrap`}>
+                        <ConfirmSubmit
+                          destructive={false}
+                          confirm="Paid In"
+                          title="Mark as Paid In?"
+                          message={`${e.user_name}’s ${formatINR(e.share)} is added to the company bank balance. Only do this once it is really in the account.`}
+                          aria-label={`Mark ${e.user_name}’s ${formatINR(e.share)} as paid in`}
+                          className={`${BUTTON_SECONDARY} whitespace-nowrap`}
+                        >
                           Paid
-                        </Submit>
+                        </ConfirmSubmit>
                       </ActionForm>
                     </li>
                   )
@@ -159,6 +166,21 @@ export default async function BankPage() {
                           <Badge tone={status.tone}>{status.text}</Badge>
                         </span>
                       </span>
+                      {e.paid_on && (
+                        <ActionForm action={markShareNotPaid} errorTitle="Couldn’t Save">
+                          <input type="hidden" name="id" value={e.id} />
+                          <ConfirmSubmit
+                            confirm="Not Paid"
+                            title="Mark as Not Paid?"
+                            message={`${e.user_name}’s ${formatINR(e.share)} comes off the company bank balance and waits under “To pay into the bank” again.`}
+                            aria-label={`Mark ${e.user_name}’s ${formatINR(e.share)} as not paid in`}
+                            className="press inline-flex min-h-9 shrink-0 items-center gap-1 rounded-full bg-fill px-3 text-foot font-medium text-ink2 hover:bg-fill-hover"
+                          >
+                            <RotateCcw size={13} aria-hidden="true" />
+                            Not paid
+                          </ConfirmSubmit>
+                        </ActionForm>
+                      )}
                       <ActionForm action={deleteEarning} errorTitle="Couldn’t Delete">
                         <input type="hidden" name="id" value={e.id} />
                         <ConfirmSubmit
@@ -195,6 +217,7 @@ export default async function BankPage() {
                       </span>
                       <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-foot text-muted">
                         <span>{formatDay(b.entry_date, today)}</span>
+                        {whoseLabel(b) && <span className="font-medium text-ink2">{whoseLabel(b)}</span>}
                         {b.category && <span>{SPEND_LABEL[b.category]}</span>}
                         {b.direction === 'out' && <span>Agreed by both</span>}
                         {b.added_by && <span>Added by {b.added_by}</span>}

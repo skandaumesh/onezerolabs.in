@@ -203,6 +203,24 @@ describe('database rules', () => {
     await db.query(`UPDATE users SET avatar = '\xffd8', avatar_updated_at = now() WHERE id = $1`, [id])
   })
 
+  test('a task’s meeting link can only be Google Meet', async () => {
+    await assert.rejects(db.query(`INSERT INTO tasks (title, meet_link) VALUES ('Call', 'https://evil.example/x')`), /meet_link_is_google_meet/)
+    await db.query(`INSERT INTO tasks (title, meet_link) VALUES ('Call', 'https://meet.google.com/abc-defg-hij')`)
+  })
+
+  test('money in or out for one person names that person, and only then', async () => {
+    const [{ id }] = (await db.query(`INSERT INTO users (name, email, password_hash) VALUES ('W', 'w@whose.test', 'a:b') RETURNING id`)).rows
+    await assert.rejects(
+      db.query(`INSERT INTO bank_entries (direction, amount, entry_date, description, owner_kind) VALUES ('in', 10, '2026-11-11', 'x', 'person')`),
+      /a_person_is_named/
+    )
+    await assert.rejects(
+      db.query(`INSERT INTO bank_entries (direction, amount, entry_date, description, owner_kind, owner_id) VALUES ('in', 10, '2026-11-11', 'x', 'both', $1)`, [id]),
+      /a_person_is_named/
+    )
+    await db.query(`INSERT INTO bank_entries (direction, amount, entry_date, description, owner_kind, owner_id) VALUES ('in', 10, '2026-11-11', 'x', 'person', $1)`, [id])
+  })
+
   test('a push token belongs to one person only', async () => {
     const [a, b] = (await db.query(`INSERT INTO users (name, email, password_hash) VALUES ('A', 'a@push.test', 'a:b'), ('B', 'b@push.test', 'a:b') RETURNING id`)).rows
     await db.query(`INSERT INTO devices (user_id, token) VALUES ($1, 'tok-1')`, [a.id])

@@ -79,30 +79,34 @@ export function Submit({ className, children, ...rest }) {
  */
 export function ConfirmSubmit({ title, message, confirm = 'Delete', dismiss = 'Cancel', destructive = true, className, children, ...rest }) {
   const pending = useContext(PendingContext)
-  const [asking, setAsking] = useState(false)
+  const [asking, setAsking] = useState(null)
   const buttonRef = useRef(null)
+
+  // The title and message may be worked out from what is in the form, so the
+  // question names the actual amount or person. Nothing is asked until the
+  // form's own checks pass.
+  const ask = (e) => {
+    e.preventDefault()
+    const form = buttonRef.current?.form
+    if (form && !form.reportValidity()) return
+    const data = form ? new FormData(form) : null
+    setAsking({
+      title: typeof title === 'function' ? title(data) : title,
+      message: typeof message === 'function' ? message(data) : message,
+    })
+  }
 
   return (
     <>
-      <button
-        ref={buttonRef}
-        type="submit"
-        disabled={pending}
-        className={className}
-        onClick={(e) => {
-          e.preventDefault()
-          setAsking(true)
-        }}
-        {...rest}
-      >
+      <button ref={buttonRef} type="submit" disabled={pending} className={className} onClick={ask} {...rest}>
         {children}
       </button>
       {asking && (
         <Alert
-          title={title}
-          message={message}
+          title={asking.title}
+          message={asking.message}
           sheet={destructive}
-          onClose={() => setAsking(false)}
+          onClose={() => setAsking(null)}
           actions={[
             { label: dismiss, bold: destructive },
             {

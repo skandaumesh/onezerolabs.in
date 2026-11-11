@@ -31,7 +31,7 @@ export const remindersFor = (tasks, userId, nowMs) =>
     .filter((t) => !t.done_at && t.due_date && remindsUser(t, userId))
     .map((t) => {
       const at = istMoment(t.due_date, t.due_time ?? MORNING)
-      const where = [t.company_name, t.project_name].filter(Boolean).join(' · ')
+      const where = [t.meet_link ? 'Google Meet' : null, t.company_name, t.project_name].filter(Boolean).join(' · ')
       const when = t.due_time ? `Due now, ${formatTime(t.due_time)}` : 'Due today'
       return { id: numberFor(`${t.id}@${at}`), at, title: t.title, body: where ? `${when} · ${where}` : when, url: `/tasks/${t.id}` }
     })
