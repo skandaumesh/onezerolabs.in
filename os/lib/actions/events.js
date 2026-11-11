@@ -5,14 +5,26 @@ import { redirect } from 'next/navigation'
 import { requireUser } from '@/lib/auth'
 import { sql } from '@/lib/db.mjs'
 import { isJpeg, MAX_PHOTO_BYTES, MAX_PHOTOS_PER_EVENT, MAX_THUMB_BYTES } from '@/lib/events.mjs'
-import { day, text, uuid } from '@/lib/forms'
+import { todayIST } from '@/lib/dates.mjs'
+import { day, text, time, uuid } from '@/lib/forms'
+import { eventChanged } from '@/lib/notify'
 
+const EVENT_FIELDS = `id, title, happened_on, to_char(start_time, 'HH24:MI') AS start_time, place`
+
+/**
+ * An event from the form. An upcoming one can't be in the past, and a completed
+ * one, which is where photos go, can't be in the future.
+ */
 const readEvent = (form) => {
   const title = text(form, 'title')
   const happenedOn = day(form, 'happened_on')
+  const kind = text(form, 'kind')
   if (!title) return { error: 'Give the event a name.' }
   if (!happenedOn) return { error: 'Choose the date of the event.' }
-  return { title, happenedOn, place: text(form, 'place'), description: text(form, 'description') }
+  const today = todayIST()
+  if (kind === 'upcoming' && happenedOn < today) return { error: 'That date has passed. Add it under Completed, with its photos.' }
+  if (kind === 'completed' && happenedOn > today) return { error: 'That date is still to come. Add it under Upcoming, and you’ll both be reminded the day before.' }
+  return { title, happenedOn, startTime: time(form, 'start_time'), place: text(form, 'place'), description: text(form, 'description') }
 }
 
 /** Saves an event and returns its id, so the photos picked with it can follow. */
@@ -21,36 +33,39 @@ export async function createEvent(_prev, form) {
   const event = readEvent(form)
   if (event.error) return event
   const [row] = await sql(
-    `INSERT INTO events (title, happened_on, place, description, created_by) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-    [event.title, event.happenedOn, event.place, event.description, user.id]
+    `INSERT INTO events (title, happened_on, start_time, place, description, created_by) VALUES ($1, $2, $3, $4, $5, $6) RETURNING ${EVENT_FIELDS}`,
+    [event.title, event.happenedOn, event.startTime, event.place, event.description, user.id]
   )
+  await eventChanged(user, row, true)
   revalidatePath('/', 'layout')
   return { ok: true, id: row.id }
 }
 
 export async function updateEvent(_prev, form) {
-  await requireUser()
+  const user = await requireUser()
   const id = uuid(form, 'id')
   const event = readEvent(form)
   if (event.error) return event
   const [row] = id
-    ? await sql(`UPDATE events SET title = $2, happened_on = $3, place = $4, description = $5 WHERE id = $1 RETURNING id`, [
-        id,
-        event.title,
-        event.happenedOn,
-        event.place,
-        event.description,
-      ])
+    ? await sql(
+        `UPDATE events SET title = $2, happened_on = $3, start_time = $4, place = $5, description = $6 WHERE id = $1 RETURNING ${EVENT_FIELDS}`,
+        [id, event.title, event.happenedOn, event.startTime, event.place, event.description]
+      )
     : []
   if (!row) return { error: 'This event no longer exists.' }
+  await eventChanged(user, row, false)
   revalidatePath('/', 'layout')
   return { ok: true }
 }
 
 export async function deleteEvent(_prev, form) {
-  await requireUser()
+  const user = await requireUser()
   const id = uuid(form, 'id')
-  if (id) await sql('DELETE FROM events WHERE id = $1', [id])
+  if (id) {
+    await sql('DELETE FROM events WHERE id = $1', [id])
+    await sql('DELETE FROM notifications WHERE url = $1', [`/events/${id}`])
+    await eventChanged(user, null, false)
+  }
   revalidatePath('/', 'layout')
   redirect('/events')
 }

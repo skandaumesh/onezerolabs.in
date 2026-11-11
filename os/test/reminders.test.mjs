@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { describe, test } from 'node:test'
-import { assignmentNotices, istMoment, numberFor, remindersFor } from '../lib/reminders.mjs'
+import { assignmentNotices, eventRemindersFor, istMoment, numberFor, remindersFor } from '../lib/reminders.mjs'
 
 const SKANDA = { id: 's', name: 'Skanda' }
 const TANISHA = { id: 't', name: 'Tanisha' }
@@ -82,5 +82,34 @@ describe('notices about tasks', () => {
     const before = task({ assignee_id: 't' })
     const notices = assignmentNotices({ actor: TANISHA, task: task({ for_both: true }), before, users: USERS })
     assert.deepEqual(notices.map((n) => n.userId), ['s'])
+  })
+})
+
+describe('event reminders', () => {
+  const now = istMoment('2026-11-11', '10:00')
+  const event = (fields) => ({ id: 'ev-1', title: 'Startup meetup', happened_on: '2026-11-14', start_time: null, place: null, ...fields })
+
+  test('an event with a start time reminds at that time the day before', () => {
+    const [r] = eventRemindersFor([event({ start_time: '18:30', place: 'Koramangala' })], now)
+    assert.equal(r.at, istMoment('2026-11-13', '18:30'))
+    assert.equal(r.title, 'Startup meetup')
+    assert.equal(r.body, 'Tomorrow at 6:30 pm · Koramangala')
+    assert.equal(r.url, '/events/ev-1')
+  })
+
+  test('without a time, it reminds at 9 in the morning the day before', () => {
+    assert.equal(eventRemindersFor([event({})], now)[0].at, istMoment('2026-11-13', '09:00'))
+    assert.equal(eventRemindersFor([event({})], now)[0].body, 'Tomorrow')
+  })
+
+  test('a reminder whose moment has passed is left out', () => {
+    // Tomorrow's event without a time would have reminded at 9 today; it is 10 now.
+    assert.equal(eventRemindersFor([event({ happened_on: '2026-11-12' })], now).length, 0)
+    assert.equal(eventRemindersFor([event({ happened_on: '2026-11-12', start_time: '17:00' })], now).length, 1)
+  })
+
+  test('event and task reminders never share a number', () => {
+    const [e] = eventRemindersFor([event({ id: 'same' })], now)
+    assert.notEqual(e.id, numberFor(`same@${e.at}`))
   })
 })

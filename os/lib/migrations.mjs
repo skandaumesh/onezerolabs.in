@@ -466,4 +466,12 @@ export const migrations = [
       ALTER TABLE users ADD CONSTRAINT avatar_has_a_date CHECK (avatar IS NULL OR avatar_updated_at IS NOT NULL);
     `,
   },
+  {
+    version: 13,
+    sql: `
+      -- Upcoming events have a start time, so the reminder the day before can
+      -- come at that time. Optional: without one it comes at 9 in the morning.
+      ALTER TABLE events ADD COLUMN start_time time;
+    `,
+  },
 ]

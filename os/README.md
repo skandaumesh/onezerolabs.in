@@ -84,6 +84,8 @@ Daily, weekly, monthly and yearly goals, for one founder or both together. Open 
 
 Events the founders attend, with photos and notes. Open it from the sidebar or the Overview card.
 
+- **Upcoming and Completed:** add an event before it happens under Upcoming (date, optional start time, place, notes; no photos). Both phones are reminded the day before, at the start time or 9 am, and the other founder gets a notice. Once the event is over (another day, past its start time, or, with no time, once it has photos) it moves to Completed, where it is a post and asks for photos.
+
 - **Photos:** made smaller on the phone before upload, to 2048 px and a 480 px copy for lists, both JPEG and turned the right way up. A phone photo goes up as roughly 200 KB. They are stored in the database, like Documents, so they count towards Neon's 0.5 GB.
 - **Viewing:** tap a photo for full screen; swipe, arrows or the arrow keys move along. `/events/photo/[id]` checks the session itself.
 

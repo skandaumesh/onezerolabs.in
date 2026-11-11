@@ -378,8 +378,8 @@ const EVENT_PHOTOS = `COALESCE((SELECT json_agg(json_build_object('id', p.id, 'w
 /** Events as a feed, newest first, each with its photos and who added it. */
 export const listEvents = () =>
   sql(
-    `SELECT e.id, e.title, e.happened_on, e.place, e.description, u.id AS added_by_id, u.name AS added_by,
-            ${avatarVersion()} AS added_by_avatar_v, ${EVENT_PHOTOS}
+    `SELECT e.id, e.title, e.happened_on, to_char(e.start_time, 'HH24:MI') AS start_time, e.place, e.description,
+            u.id AS added_by_id, u.name AS added_by, ${avatarVersion()} AS added_by_avatar_v, ${EVENT_PHOTOS}
      FROM events e LEFT JOIN users u ON u.id = e.created_by
      ORDER BY e.happened_on DESC, e.created_at DESC`
   )
@@ -387,8 +387,8 @@ export const listEvents = () =>
 export const getEvent = async (id) =>
   (
     await sql(
-      `SELECT e.id, e.title, e.happened_on, e.place, e.description, u.id AS added_by_id, u.name AS added_by,
-              ${avatarVersion()} AS added_by_avatar_v, ${EVENT_PHOTOS}
+      `SELECT e.id, e.title, e.happened_on, to_char(e.start_time, 'HH24:MI') AS start_time, e.place, e.description,
+              u.id AS added_by_id, u.name AS added_by, ${avatarVersion()} AS added_by_avatar_v, ${EVENT_PHOTOS}
        FROM events e LEFT JOIN users u ON u.id = e.created_by WHERE e.id = $1`,
       [id]
     )
@@ -433,3 +433,11 @@ export const listTasksToRemind = (days) =>
 
 /** A founder's profile photo, or null. */
 export const getAvatar = async (userId) => (await sql('SELECT avatar AS data FROM users WHERE id = $1 AND avatar IS NOT NULL', [userId]))[0] || null
+
+/** Events from today up to `days` ahead, for reminders the day before. */
+export const listEventsToRemind = (days) =>
+  sql(
+    `SELECT id, title, happened_on, to_char(start_time, 'HH24:MI') AS start_time, place
+     FROM events WHERE happened_on BETWEEN $1::date AND $1::date + $2::int`,
+    [todayIST(), days + 1]
+  )

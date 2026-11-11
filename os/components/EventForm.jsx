@@ -9,10 +9,12 @@ import { ActionForm, Submit } from '@/components/forms'
 import { useSheet } from '@/components/Sheet'
 import { BUTTON_PRIMARY, BUTTON_SECONDARY, Field, Input, Textarea } from '@/components/ui'
 import { createEvent, updateEvent } from '@/lib/actions/events'
+import { addDays } from '@/lib/dates.mjs'
 import { photoCount } from '@/lib/events.mjs'
 import { uploadPhotos } from '@/lib/photo-client'
 
-function EventFields({ event, today }) {
+function EventFields({ event, today, kind }) {
+  const upcoming = kind === 'upcoming'
   return (
     <>
       <div className="col-span-2">
@@ -21,14 +23,31 @@ function EventFields({ event, today }) {
         </Field>
       </div>
       <Field label="Date">
-        <Input type="date" name="happened_on" required defaultValue={event?.happened_on ?? today} />
+        <Input
+          type="date"
+          name="happened_on"
+          required
+          defaultValue={event?.happened_on ?? (upcoming ? addDays(today, 1) : today)}
+          min={!event && upcoming ? today : undefined}
+          max={!event && !upcoming ? today : undefined}
+        />
       </Field>
-      <Field label="Place">
-        <Input name="place" autoComplete="off" placeholder="Bengaluru" defaultValue={event?.place ?? ''} />
+      <Field label="Starts at">
+        <Input type="time" name="start_time" defaultValue={event?.start_time ?? ''} />
       </Field>
       <div className="col-span-2">
-        <Field label="What happened">
-          <Textarea name="description" rows={4} placeholder="Who we met, what we learned, what to follow up" defaultValue={event?.description ?? ''} />
+        <Field label="Place">
+          <Input name="place" autoComplete="off" placeholder="Bengaluru" defaultValue={event?.place ?? ''} />
+        </Field>
+      </div>
+      <div className="col-span-2">
+        <Field label={upcoming ? 'Notes' : 'What happened'}>
+          <Textarea
+            name="description"
+            rows={4}
+            placeholder={upcoming ? 'What it’s about, who’s going, what to bring' : 'Who we met, what we learned, what to follow up'}
+            defaultValue={event?.description ?? ''}
+          />
         </Field>
       </div>
     </>
@@ -45,8 +64,13 @@ export function UploadProgress({ progress }) {
   )
 }
 
-/** Adds an event with its photos, then opens it. Goes in a sheet. */
-export function NewEventForm({ today }) {
+/**
+ * Adds an event. An upcoming one has no photos yet, and both founders are
+ * reminded the day before; a completed one is added with its photos, then opens.
+ * Goes in a sheet.
+ */
+export function NewEventForm({ today, kind = 'completed' }) {
+  const upcoming = kind === 'upcoming'
   const router = useRouter()
   const sheet = useSheet()
   const [files, setFiles] = useState([])
@@ -58,6 +82,11 @@ export function NewEventForm({ today }) {
   useEffect(() => {
     if (!state?.ok) {
       if (state?.error) setBusy(false)
+      return
+    }
+    if (upcoming) {
+      showBanner('Event added. You’ll both be reminded the day before.')
+      sheet?.close()
       return
     }
     ;(async () => {
@@ -82,23 +111,26 @@ export function NewEventForm({ today }) {
 
   return (
     <form onSubmit={onSubmit} className="grid grid-cols-2 gap-3 px-4 pb-4 pt-1">
-      <EventFields today={today} />
-      <div className="col-span-2">
-        <input
-          ref={pickRef}
-          type="file"
-          name="photos"
-          accept="image/*"
-          multiple
-          className="sr-only"
-          tabIndex={-1}
-          onChange={(e) => setFiles([...e.target.files])}
-        />
-        <button type="button" onClick={() => pickRef.current?.click()} className={`${BUTTON_SECONDARY} w-full`}>
-          <ImagePlus size={18} aria-hidden="true" />
-          {files.length ? `${photoCount(files.length)} chosen` : 'Choose photos'}
-        </button>
-      </div>
+      <input type="hidden" name="kind" value={kind} />
+      <EventFields today={today} kind={kind} />
+      {!upcoming && (
+        <div className="col-span-2">
+          <input
+            ref={pickRef}
+            type="file"
+            name="photos"
+            accept="image/*"
+            multiple
+            className="sr-only"
+            tabIndex={-1}
+            onChange={(e) => setFiles([...e.target.files])}
+          />
+          <button type="button" onClick={() => pickRef.current?.click()} className={`${BUTTON_SECONDARY} w-full`}>
+            <ImagePlus size={18} aria-hidden="true" />
+            {files.length ? `${photoCount(files.length)} chosen` : 'Choose photos'}
+          </button>
+        </div>
+      )}
       <div className="col-span-2 space-y-2">
         <button type="submit" disabled={busy} className={`${BUTTON_PRIMARY} w-full`}>
           {busy ? 'Saving…' : 'Add event'}
@@ -115,7 +147,7 @@ export function EditEventForm({ event, today }) {
   return (
     <ActionForm action={updateEvent} closeOnSuccess success="Saved" className="grid grid-cols-2 gap-3 px-4 pb-4 pt-1">
       <input type="hidden" name="id" value={event.id} />
-      <EventFields event={event} today={today} />
+      <EventFields event={event} today={today} kind={event.happened_on > today ? 'upcoming' : 'completed'} />
       <div className="col-span-2">
         <Submit className={`${BUTTON_PRIMARY} w-full`}>Save</Submit>
       </div>

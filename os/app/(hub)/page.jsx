@@ -4,12 +4,13 @@ import { TaskRow } from '@/components/TaskRow'
 import { Badge, Card, Empty, PageHeader } from '@/components/ui'
 import { requireUser } from '@/lib/auth'
 import { STAGE_LABEL } from '@/lib/constants.mjs'
-import { dueLabel, formatDay, hourIST, todayIST } from '@/lib/dates.mjs'
+import { dueLabel, formatDay, hourIST, minutesIST, todayIST } from '@/lib/dates.mjs'
 import { formatINR, summariseIncome } from '@/lib/money.mjs'
 import { withBalance } from '@/lib/invoice.mjs'
 import { formatBytes } from '@/lib/documents.mjs'
 import { summariseBank } from '@/lib/bank.mjs'
 import { goalState, periodStart } from '@/lib/goals.mjs'
+import { isUpcoming } from '@/lib/events.mjs'
 import { getDocumentStats, getOverview, getSettings, listBankEntries, listEarnings, listEvents, listGoals, listIncome, listInvoices, listUsers } from '@/lib/queries'
 
 export const metadata = { title: 'Overview' }
@@ -78,6 +79,7 @@ export default async function OverviewPage() {
   const totals = summariseIncome(income)
   const invoices = invoiceRows.map((inv) => withBalance(inv, settings))
   const toCollect = invoices.filter((i) => i.status === 'issued').reduce((sum, i) => sum + i.balance, 0)
+  const nextEvent = events.filter((e) => isUpcoming(e, today, minutesIST())).sort((a, b) => a.happened_on.localeCompare(b.happened_on))[0]
   const goalCount = (goals) => `${goals.filter((g) => goalState(g).done).length} of ${goals.length}`
   const goalDetail = [dayGoals.length && `Today ${goalCount(dayGoals)}`, weekGoals.length && `This week ${goalCount(weekGoals)}`].filter(Boolean).join(' · ')
 
@@ -128,7 +130,7 @@ export default async function OverviewPage() {
         <MoneyLink
           href="/events"
           title="Events"
-          detail={events.length ? `${events.length === 1 ? '1 event' : `${events.length} events`} · latest ${formatDay(events[0].happened_on, today)}` : 'Photos from events we attend'}
+          detail={nextEvent ? `Next: ${nextEvent.title}, ${formatDay(nextEvent.happened_on, today)}` : events.length ? `${events.length === 1 ? '1 event' : `${events.length} events`}` : 'Upcoming and past events'}
         />
       </div>
 

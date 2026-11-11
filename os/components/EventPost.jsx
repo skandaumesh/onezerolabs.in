@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import { Ellipsis } from 'lucide-react'
-import { Caption, PostPhotos } from '@/components/EventPhotos'
-import { Avatar } from '@/components/ui'
+import { AddPhotosButton, Caption, PostPhotos } from '@/components/EventPhotos'
+import { Avatar, BUTTON_SECONDARY } from '@/components/ui'
 import { avatarUrl } from '@/lib/avatar.mjs'
-import { formatDay } from '@/lib/dates.mjs'
+import { formatDay, formatTime } from '@/lib/dates.mjs'
 
 /**
  * An event as a post, as iPhone apps show one, straight on the page with no card:
@@ -12,7 +12,9 @@ import { formatDay } from '@/lib/dates.mjs'
  */
 export function EventPost({ event, today, expanded = false, manage = true, heading: Heading = 'h2' }) {
   const by = event.added_by ?? 'OneZeroLabs'
-  const where = [event.place ? `At ${event.place}` : null, formatDay(event.happened_on, today)].filter(Boolean).join(' · ')
+  const date = `${formatDay(event.happened_on, today)}${event.start_time ? `, ${formatTime(event.start_time)}` : ''}`
+  const where = [event.place ? `At ${event.place}` : null, date].filter(Boolean).join(' · ')
+  const happened = event.happened_on <= today
   return (
     <article aria-label={event.title}>
       <header className="-mr-2 flex items-center gap-3 pb-3">
@@ -30,7 +32,17 @@ export function EventPost({ event, today, expanded = false, manage = true, headi
         )}
       </header>
 
-      {event.photos.length > 0 && <PostPhotos photos={event.photos} title={event.title} />}
+      {event.photos.length > 0 ? (
+        <PostPhotos photos={event.photos} title={event.title} />
+      ) : (
+        happened &&
+        manage && (
+          <div className="flex flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-[color:var(--line)] px-4 py-8 text-center">
+            <p className="text-sub text-muted">No photos from this event yet.</p>
+            <AddPhotosButton eventId={event.id} className={BUTTON_SECONDARY} />
+          </div>
+        )
+      )}
 
       <div className="pt-3">
         <Heading className="break-words text-headline text-ink">{event.title}</Heading>

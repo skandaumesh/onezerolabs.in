@@ -4,7 +4,7 @@
  * alarms from these, so a reminder still goes off without signal.
  */
 
-import { formatTime } from './dates.mjs'
+import { addDays, formatTime } from './dates.mjs'
 
 /** A task with a date but no time is reminded about at 9 in the morning. */
 export const MORNING = '09:00'
@@ -61,3 +61,17 @@ export const assignmentNotices = ({ actor, task, before = null, users }) => {
       : `${actor.name} assigned you a task`
   return recipients.map((userId) => ({ userId, kind: meeting ? 'meeting' : 'task', title, url: `/tasks/${task.id}` }))
 }
+
+/**
+ * Reminders the day before each event still to come, for both founders: at the
+ * event's start time, or 9 in the morning when it has none.
+ */
+export const eventRemindersFor = (events, nowMs) =>
+  events
+    .filter((e) => e.happened_on)
+    .map((e) => {
+      const at = istMoment(addDays(e.happened_on, -1), e.start_time ?? MORNING)
+      const when = e.start_time ? `Tomorrow at ${formatTime(e.start_time)}` : 'Tomorrow'
+      return { id: numberFor(`event:${e.id}@${at}`), at, title: e.title, body: e.place ? `${when} · ${e.place}` : when, url: `/events/${e.id}` }
+    })
+    .filter((r) => r.at > nowMs)

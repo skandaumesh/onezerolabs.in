@@ -4,6 +4,8 @@
  * server only checks that what arrives really is a JPEG of a sensible size.
  */
 
+import { daysBetween, formatDay } from './dates.mjs'
+
 export const FULL_EDGE = 2048
 export const THUMB_EDGE = 480
 export const FULL_QUALITY = 0.82
@@ -24,3 +26,26 @@ export const fitWithin = (width, height, edge) => {
 }
 
 export const photoCount = (n) => (n === 1 ? '1 photo' : `${n} photos`)
+
+/** How soon an upcoming event is: "Today", "Tomorrow", "In 5 days", or its date. */
+export const countdown = (day, today) => {
+  const diff = daysBetween(today, day)
+  if (diff <= 0) return { text: 'Today', tone: 'soon' }
+  if (diff === 1) return { text: 'Tomorrow', tone: 'soon' }
+  if (diff < 14) return { text: `In ${diff} days`, tone: 'plain' }
+  return { text: formatDay(day, today), tone: 'plain' }
+}
+
+/**
+ * Whether an event is still to come. Another day settles it. On the day itself,
+ * an event with a start time is upcoming until that time; one without a time is
+ * upcoming until it has photos, which is how a finished event gets added.
+ */
+export const isUpcoming = (event, today, minutesNow) => {
+  if (event.happened_on !== today) return event.happened_on > today
+  if (event.start_time) {
+    const [h, m] = event.start_time.split(':').map(Number)
+    return h * 60 + m > minutesNow
+  }
+  return !(event.photos?.length > 0)
+}
