@@ -3,6 +3,7 @@ import 'server-only'
 import { cache } from 'react'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { avatarVersion } from '@/lib/avatar.mjs'
 import { sql } from '@/lib/db.mjs'
 import { createSession, readSession, requireSecret, SESSION_COOKIE, SESSION_DAYS } from '@/lib/session.mjs'
 
@@ -11,7 +12,7 @@ export const getUser = cache(async () => {
   const store = await cookies()
   const uid = readSession(store.get(SESSION_COOKIE)?.value, requireSecret())
   if (!uid) return null
-  const rows = await sql('SELECT id, name, email FROM users WHERE id = $1', [uid])
+  const rows = await sql(`SELECT u.id, u.name, u.email, ${avatarVersion()} AS avatar_v FROM users u WHERE u.id = $1`, [uid])
   return rows[0] || null
 })
 

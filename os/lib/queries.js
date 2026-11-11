@@ -1,9 +1,10 @@
 import 'server-only'
 
 import { sql } from '@/lib/db.mjs'
-import { addDays } from '@/lib/dates.mjs'
+import { avatarVersion } from '@/lib/avatar.mjs'
+import { addDays, todayIST } from '@/lib/dates.mjs'
 
-export const listUsers = () => sql('SELECT id, name FROM users ORDER BY name')
+export const listUsers = () => sql(`SELECT u.id, u.name, ${avatarVersion()} AS avatar_v FROM users u ORDER BY u.name`)
 
 // --- tasks -------------------------------------------------------------------
 
@@ -28,22 +29,18 @@ const TASK_ORDER = `
            array_position(ARRAY['critical', 'high', 'medium', 'low'], t.priority),
            t.created_at`
 
-/** Open tasks, optionally one person's, which includes those for both. Grouping by date happens on the page. */
-export const listOpenTasks = (assigneeId = null) =>
-  sql(
-    `${TASK_SELECT}
-     WHERE t.done_at IS NULL AND ($1::uuid IS NULL OR t.assignee_id = $1::uuid OR t.for_both)
-     ${TASK_ORDER}`,
-    [assigneeId]
-  )
+/**
+ * Whose tasks: one person's, which includes those for both; only those for both
+ * (`bothOnly`); or everyone's.
+ */
+const WHOSE = `(CASE WHEN $2::boolean THEN t.for_both ELSE ($1::uuid IS NULL OR t.assignee_id = $1::uuid OR t.for_both) END)`
 
-export const listDoneTasks = (assigneeId = null) =>
-  sql(
-    `${TASK_SELECT}
-     WHERE t.done_at IS NOT NULL AND ($1::uuid IS NULL OR t.assignee_id = $1::uuid OR t.for_both)
-     ORDER BY t.done_at DESC LIMIT 100`,
-    [assigneeId]
-  )
+/** Open tasks. Grouping by date happens on the page. */
+export const listOpenTasks = (assigneeId = null, bothOnly = false) =>
+  sql(`${TASK_SELECT} WHERE t.done_at IS NULL AND ${WHOSE} ${TASK_ORDER}`, [assigneeId, bothOnly])
+
+export const listDoneTasks = (assigneeId = null, bothOnly = false) =>
+  sql(`${TASK_SELECT} WHERE t.done_at IS NOT NULL AND ${WHOSE} ORDER BY t.done_at DESC LIMIT 100`, [assigneeId, bothOnly])
 
 export const listProjectTasks = (projectId) =>
   sql(
@@ -346,3 +343,93 @@ export const listBankEntries = () =>
      LEFT JOIN users u ON u.id = b.created_by
      ORDER BY b.entry_date DESC, b.created_at DESC`
   )
+
+// --- goals -------------------------------------------------------------------
+
+const GOAL_SELECT = `
+  SELECT g.id, g.title, g.period, g.starts_on, g.repeats, g.stopped_on, g.owner_id, g.for_both,
+         g.target::float8 AS target, g.unit,
+         CASE WHEN g.for_both THEN 'Both' ELSE u.name END AS owner_name,
+         COALESCE(p.value, 0)::float8 AS value, COALESCE(p.done, false) AS done
+  FROM goals g
+  LEFT JOIN users u ON u.id = g.owner_id
+  LEFT JOIN goal_progress p ON p.goal_id = g.id AND p.period_start = $2::date`
+
+/** A one-off goal shows only in its own period; a repeating one in every period from its start until it is stopped. */
+const GOAL_IN_PERIOD = `
+  g.period = $1 AND CASE WHEN g.repeats
+    THEN g.starts_on <= $2::date AND (g.stopped_on IS NULL OR g.stopped_on > $2::date)
+    ELSE g.starts_on = $2::date END`
+
+/** The goals for one period, such as the week starting 9 Nov, with that period's progress. */
+export const listGoals = (period, start) =>
+  sql(`${GOAL_SELECT} WHERE ${GOAL_IN_PERIOD} ORDER BY g.for_both DESC, u.name NULLS LAST, g.created_at`, [period, start])
+
+/** One goal as it stands in one period, or null if it does not belong to that period. */
+export const getGoalInPeriod = async (id, period, start) =>
+  (await sql(`${GOAL_SELECT} WHERE g.id = $3 AND ${GOAL_IN_PERIOD}`, [period, start, id]))[0] || null
+
+// --- events ------------------------------------------------------------------
+
+/** The photos of each event, oldest first, as JSON: id, width and height. */
+const EVENT_PHOTOS = `COALESCE((SELECT json_agg(json_build_object('id', p.id, 'width', p.width, 'height', p.height) ORDER BY p.created_at)
+                           FROM event_photos p WHERE p.event_id = e.id), '[]'::json) AS photos`
+
+/** Events as a feed, newest first, each with its photos and who added it. */
+export const listEvents = () =>
+  sql(
+    `SELECT e.id, e.title, e.happened_on, e.place, e.description, u.id AS added_by_id, u.name AS added_by,
+            ${avatarVersion()} AS added_by_avatar_v, ${EVENT_PHOTOS}
+     FROM events e LEFT JOIN users u ON u.id = e.created_by
+     ORDER BY e.happened_on DESC, e.created_at DESC`
+  )
+
+export const getEvent = async (id) =>
+  (
+    await sql(
+      `SELECT e.id, e.title, e.happened_on, e.place, e.description, u.id AS added_by_id, u.name AS added_by,
+              ${avatarVersion()} AS added_by_avatar_v, ${EVENT_PHOTOS}
+       FROM events e LEFT JOIN users u ON u.id = e.created_by WHERE e.id = $1`,
+      [id]
+    )
+  )[0] || null
+
+/** The bytes of one photo, full size or the small copy. */
+export const getEventPhoto = async (id, small) =>
+  (await sql(`SELECT ${small ? 'thumb' : 'data'} AS data FROM event_photos WHERE id = $1`, [id]))[0] || null
+
+// --- notifications -----------------------------------------------------------
+
+export const listNotifications = (userId) =>
+  sql(
+    `SELECT n.id, n.kind, n.title, n.body, n.url, n.created_at, n.read_at
+     FROM notifications n WHERE n.user_id = $1 ORDER BY n.created_at DESC LIMIT 100`,
+    [userId]
+  )
+
+export const countUnread = async (userId) =>
+  (await sql('SELECT count(*)::int AS n FROM notifications WHERE user_id = $1 AND read_at IS NULL', [userId]))[0].n
+
+/** Unread notices since a moment, oldest first, for the phone to show any it has not shown yet. */
+export const listUnreadSince = (userId, since) =>
+  sql(
+    `SELECT id, title, body, url, created_at FROM notifications
+     WHERE user_id = $1 AND read_at IS NULL AND created_at > $2
+     ORDER BY created_at LIMIT 20`,
+    [userId, since]
+  )
+
+/** Open tasks due within the next `days` days, with what a reminder needs to say. */
+export const listTasksToRemind = (days) =>
+  sql(
+    `SELECT t.id, t.title, t.due_date, to_char(t.due_time, 'HH24:MI') AS due_time, t.done_at,
+            t.assignee_id, t.for_both, t.created_by, p.name AS project_name, c.name AS company_name
+     FROM tasks t
+     LEFT JOIN projects p ON p.id = t.project_id
+     LEFT JOIN companies c ON c.id = p.company_id
+     WHERE t.done_at IS NULL AND t.due_date BETWEEN $1::date - 1 AND $1::date + $2::int`,
+    [todayIST(), days]
+  )
+
+/** A founder's profile photo, or null. */
+export const getAvatar = async (userId) => (await sql('SELECT avatar AS data FROM users WHERE id = $1 AND avatar IS NOT NULL', [userId]))[0] || null

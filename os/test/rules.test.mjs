@@ -167,4 +167,45 @@ describe('database rules', () => {
     )
     await db.query(`INSERT INTO tasks (title, for_both) VALUES ('Review', true)`)
   })
+
+  test('a goal is for one person or both, never both at once', async () => {
+    const [{ id }] = (await db.query(`INSERT INTO users (name, email, password_hash) VALUES ('G', 'g@goal.test', 'a:b') RETURNING id`)).rows
+    await assert.rejects(
+      db.query(`INSERT INTO goals (title, period, starts_on, owner_id, for_both) VALUES ('Calls', 'day', '2026-11-11', $1, true)`, [id]),
+      /goal_both_means_no_one_person/
+    )
+    await assert.rejects(db.query(`INSERT INTO goals (title, period, starts_on) VALUES ('Calls', 'fortnight', '2026-11-11')`), /goals_period_check/)
+  })
+
+  test('a goal cannot stop before it starts, and progress is kept once per period', async () => {
+    await assert.rejects(
+      db.query(`INSERT INTO goals (title, period, starts_on, repeats, stopped_on) VALUES ('Gym', 'day', '2026-11-11', true, '2026-11-11')`),
+      /goal_stops_after_it_starts/
+    )
+    const [{ id }] = (await db.query(`INSERT INTO goals (title, period, starts_on, repeats) VALUES ('Gym', 'day', '2026-11-11', true) RETURNING id`)).rows
+    await db.query(`INSERT INTO goal_progress (goal_id, period_start, done) VALUES ($1, '2026-11-11', true)`, [id])
+    await assert.rejects(db.query(`INSERT INTO goal_progress (goal_id, period_start) VALUES ($1, '2026-11-11')`, [id]), /goal_progress_pkey/)
+    await db.query('DELETE FROM goals WHERE id = $1', [id])
+    assert.equal((await db.query('SELECT count(*)::int AS n FROM goal_progress WHERE goal_id = $1', [id])).rows[0].n, 0)
+  })
+
+  test('deleting an event deletes its photos', async () => {
+    const [{ id }] = (await db.query(`INSERT INTO events (title, happened_on) VALUES ('Meetup', '2026-11-11') RETURNING id`)).rows
+    await db.query(`INSERT INTO event_photos (event_id, data, thumb, width, height, bytes) VALUES ($1, '\xffd8', '\xffd8', 10, 10, 2)`, [id])
+    await assert.rejects(db.query(`INSERT INTO events (title, happened_on) VALUES ('  ', '2026-11-11')`), /events_title_check/)
+    await db.query('DELETE FROM events WHERE id = $1', [id])
+    assert.equal((await db.query('SELECT count(*)::int AS n FROM event_photos WHERE event_id = $1', [id])).rows[0].n, 0)
+  })
+
+  test('a profile photo always has the time it was set', async () => {
+    const [{ id }] = (await db.query(`INSERT INTO users (name, email, password_hash) VALUES ('P', 'p@photo.test', 'a:b') RETURNING id`)).rows
+    await assert.rejects(db.query(`UPDATE users SET avatar = '\xffd8' WHERE id = $1`, [id]), /avatar_has_a_date/)
+    await db.query(`UPDATE users SET avatar = '\xffd8', avatar_updated_at = now() WHERE id = $1`, [id])
+  })
+
+  test('a push token belongs to one person only', async () => {
+    const [a, b] = (await db.query(`INSERT INTO users (name, email, password_hash) VALUES ('A', 'a@push.test', 'a:b'), ('B', 'b@push.test', 'a:b') RETURNING id`)).rows
+    await db.query(`INSERT INTO devices (user_id, token) VALUES ($1, 'tok-1')`, [a.id])
+    await assert.rejects(db.query(`INSERT INTO devices (user_id, token) VALUES ($1, 'tok-1')`, [b.id]), /devices_token_key/)
+  })
 })

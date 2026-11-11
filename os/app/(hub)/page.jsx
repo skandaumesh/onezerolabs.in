@@ -9,7 +9,8 @@ import { formatINR, summariseIncome } from '@/lib/money.mjs'
 import { withBalance } from '@/lib/invoice.mjs'
 import { formatBytes } from '@/lib/documents.mjs'
 import { summariseBank } from '@/lib/bank.mjs'
-import { getDocumentStats, getOverview, getSettings, listBankEntries, listEarnings, listIncome, listInvoices, listUsers } from '@/lib/queries'
+import { goalState, periodStart } from '@/lib/goals.mjs'
+import { getDocumentStats, getOverview, getSettings, listBankEntries, listEarnings, listEvents, listGoals, listIncome, listInvoices, listUsers } from '@/lib/queries'
 
 export const metadata = { title: 'Overview' }
 
@@ -60,7 +61,7 @@ function DateRow({ href, title, detail, due }) {
 export default async function OverviewPage() {
   const user = await requireUser()
   const today = todayIST()
-  const [o, income, invoiceRows, settings, files, earnings, bankEntries, users] = await Promise.all([
+  const [o, income, invoiceRows, settings, files, earnings, bankEntries, users, dayGoals, weekGoals, events] = await Promise.all([
     getOverview(user.id, today),
     listIncome(),
     listInvoices(),
@@ -69,11 +70,16 @@ export default async function OverviewPage() {
     listEarnings(),
     listBankEntries(),
     listUsers(),
+    listGoals('day', today),
+    listGoals('week', periodStart('week', today)),
+    listEvents(),
   ])
   const bank = summariseBank({ earnings, entries: bankEntries, users, today })
   const totals = summariseIncome(income)
   const invoices = invoiceRows.map((inv) => withBalance(inv, settings))
   const toCollect = invoices.filter((i) => i.status === 'issued').reduce((sum, i) => sum + i.balance, 0)
+  const goalCount = (goals) => `${goals.filter((g) => goalState(g).done).length} of ${goals.length}`
+  const goalDetail = [dayGoals.length && `Today ${goalCount(dayGoals)}`, weekGoals.length && `This week ${goalCount(weekGoals)}`].filter(Boolean).join(' · ')
 
   return (
     <>
@@ -114,6 +120,15 @@ export default async function OverviewPage() {
           href="/documents"
           title="Documents"
           detail={files.files ? `${files.files === 1 ? '1 file' : `${files.files} files`} · ${formatBytes(files.bytes)}` : 'Agreements and quotations'}
+        />
+      </div>
+
+      <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <MoneyLink href="/goals" title="Goals" detail={goalDetail || 'Daily, weekly, monthly, yearly'} />
+        <MoneyLink
+          href="/events"
+          title="Events"
+          detail={events.length ? `${events.length === 1 ? '1 event' : `${events.length} events`} · latest ${formatDay(events[0].happened_on, today)}` : 'Photos from events we attend'}
         />
       </div>
 

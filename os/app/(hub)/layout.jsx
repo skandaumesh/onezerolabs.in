@@ -1,10 +1,13 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Banners } from '@/components/Banner'
-import { SidebarNav, TabBar } from '@/components/Nav'
+import { AppBridge } from '@/components/AppBridge'
+import { PhoneBell, SidebarNav, TabBar } from '@/components/Nav'
 import { VoiceAdd } from '@/components/VoiceAdd'
 import { requireUser } from '@/lib/auth'
-import { listUsers } from '@/lib/queries'
+import { avatarUrl } from '@/lib/avatar.mjs'
+import { rememberDevice } from '@/lib/devices'
+import { countUnread, listUsers } from '@/lib/queries'
 
 // Every page reads the session and live data. Nothing here may be cached or
 // prerendered at build time.
@@ -12,7 +15,7 @@ export const dynamic = 'force-dynamic'
 
 export default async function HubLayout({ children }) {
   const user = await requireUser()
-  const users = await listUsers()
+  const [users, unread] = await Promise.all([listUsers(), countUnread(user.id), rememberDevice(user.id)])
 
   return (
     <div className="min-h-dvh md:flex">
@@ -22,15 +25,18 @@ export default async function HubLayout({ children }) {
           <span className="text-headline text-ink">OneZeroLabs OS</span>
         </Link>
 
-        <SidebarNav userName={user.name} />
+        <SidebarNav userName={user.name} userPhoto={avatarUrl(user.id, user.avatar_v)} unread={unread} />
       </aside>
 
       {/* The bottom padding lets the last row scroll clear of the tab bar and mic button. */}
       <main className="min-w-0 flex-1 px-4 pb-[calc(env(safe-area-inset-bottom)+10rem)] pt-[calc(env(safe-area-inset-top)+0.5rem)] md:px-10 md:pb-24 md:pt-10">
         <div className="mx-auto max-w-5xl">
-          <Link href="/" aria-label="Overview" className="press mb-2 flex h-11 w-fit items-center md:hidden">
-            <Image src="/logo-print.png" alt="OneZeroLabs" width={28} height={28} className="logo-mark h-6 w-auto" />
-          </Link>
+          <div className="mb-2 flex items-center justify-between md:hidden">
+            <Link href="/" aria-label="Overview" className="press flex h-11 w-fit items-center">
+              <Image src="/logo-print.png" alt="OneZeroLabs" width={28} height={28} className="logo-mark h-6 w-auto" />
+            </Link>
+            <PhoneBell unread={unread} />
+          </div>
 
           <div className="page-in">{children}</div>
         </div>
@@ -39,6 +45,7 @@ export default async function HubLayout({ children }) {
       <TabBar />
       <VoiceAdd users={users} meId={user.id} />
       <Banners />
+      <AppBridge />
     </div>
   )
 }

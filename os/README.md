@@ -72,6 +72,38 @@ The company fund from the partners agreement: each partner pays 25% of what they
 - **Money in and out:** anything else, such as the opening balance or spending. Money out needs the "both of us agreed" switch, and the database refuses spending without it.
 - **Balance:** shares paid in, plus money in, minus money out. It is a record kept by hand, so check it against the bank statement now and then, and use Money in or Money out to correct any difference.
 
+## Goals
+
+Daily, weekly, monthly and yearly goals, for one founder or both together. Open it from the sidebar or the Overview card.
+
+- **Periods:** a week runs Monday to Sunday, a month from the 1st, a year from 1 January. The arrows move between periods and keep each one's result.
+- **Repeat:** a repeating goal comes back every period, starting afresh at 0. Stopping it removes it from the period you are looking at onwards, and earlier results are kept.
+- **Targets:** "20 calls" counts up with + and −. A big target, such as ₹1,00,000, is typed in from the goal's sheet. A goal without a target is ticked.
+
+## Events
+
+Events the founders attend, with photos and notes. Open it from the sidebar or the Overview card.
+
+- **Photos:** made smaller on the phone before upload, to 2048 px and a 480 px copy for lists, both JPEG and turned the right way up. A phone photo goes up as roughly 200 KB. They are stored in the database, like Documents, so they count towards Neon's 0.5 GB.
+- **Viewing:** tap a photo for full screen; swipe, arrows or the arrow keys move along. `/events/photo/[id]` checks the session itself.
+
+## Profile photos
+
+Each founder can add their own photo in Profile: tap the circle or "Choose photo". The phone crops it to a square from the middle and shrinks it to 512 px, about 30–60 KB, before upload. It replaces the initial in the sidebar, on Profile and on event posts, for both founders. Nobody can set the other founder's photo. It is served from `/profile/photo/[id]?v=…`, which checks the session; the `v` is when it last changed, so a new photo shows at once.
+
+## Notifications and the Android app
+
+- **What notifies:** when one founder gives the other a task, or adds a task for both, the other one is told. A task whose name says meeting, meet, catch-up, demo, interview or visit (or "call" when it is for both) reads as a meeting. Your own tasks never notify you, and editing a task you already had doesn't notify you again. The bell (phone) and Notifications (sidebar) list them.
+- **Reminders:** at the task's time, or 9 am on its date if it has no time. They go to whoever the task is assigned to, both founders for a shared task, or whoever added an unassigned one. Only the Android app shows reminders.
+- **The Android app** (`android/`) is the website in a native shell. Alarms on the phone fire the reminders at the exact minute, even without signal. Every 15 minutes it checks for new notices in the background, and after a restart it sets its alarms again. It talks to the server through `/api/app/reminders`, `/api/app/inbox` and `/api/app/devices`, signed in with the same cookie as the website.
+- **Build it:** in `android/`, with Android Studio's Java, run `.\gradlew assembleRelease` (or open the folder in Android Studio). The APK is `android/app/build/outputs/apk/release/app-release.apk`. A debug build installs beside it as "OZL OS Test" and talks to `http://10.0.2.2:3200` (pass `-PozlTestUrl=` for another address).
+- **Signing key:** `android/keystore/` and `android/keystore.properties`, kept out of git. Back them up. Without the same key, a new version can't install over the old one; you'd have to uninstall first and sign in again.
+- **Push (instant notices):** off until Firebase is set up. Until then the app's 15-minute check delivers notices. To turn it on:
+  1. Create a Firebase project and add an Android app with package name `in.onezerolabs.os`.
+  2. Download `google-services.json` into `android/app/` and rebuild the app.
+  3. In Firebase, Project settings → Service accounts → Generate new private key.
+  4. Put that file's contents in the Vercel environment variable `FCM_SERVICE_ACCOUNT` (Production, as a Secret), and redeploy.
+
 ## Design rules
 
 The interface follows Apple's interaction rules on both phone and desktop. New screens should keep to them:

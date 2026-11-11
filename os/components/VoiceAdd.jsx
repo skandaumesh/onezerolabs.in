@@ -11,6 +11,7 @@ import { quickAddTask, undoQuickTask } from '@/lib/actions/tasks'
 import { RECURRENCES } from '@/lib/constants.mjs'
 import { minutesIST, todayIST } from '@/lib/dates.mjs'
 import { parseTask, whenText } from '@/lib/parse-task.mjs'
+import { announceSaved } from '@/components/AppBridge'
 
 const REPEATS = Object.fromEntries(RECURRENCES.map((r) => [r.value, r.label]))
 const EXAMPLE = '“I have meeting today at 7”'
@@ -70,6 +71,7 @@ function Capture({ users, meId }) {
   useEffect(() => {
     if (!result) return
     if (result.ok) {
+      announceSaved()
       setSaved(result)
       setSaid('')
       setNotice(null)

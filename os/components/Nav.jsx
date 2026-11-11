@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CircleUser, Files, FolderKanban, IndianRupee, Landmark, LayoutDashboard, ListChecks, ReceiptText, Users } from 'lucide-react'
+import { Bell, CircleUser, Files, FolderKanban, Images, IndianRupee, Landmark, LayoutDashboard, ListChecks, ReceiptText, Target, Users } from 'lucide-react'
 import { motion, MotionConfig } from 'motion/react'
 import { Avatar } from '@/components/ui'
 
@@ -15,10 +15,13 @@ const ITEMS = [
 ]
 
 // In the desktop sidebar. Phones keep to five tabs, so there they open from Overview.
+const GOALS = { href: '/goals', label: 'Goals', icon: Target }
+const NOTIFICATIONS = { href: '/notifications', label: 'Notifications', icon: Bell }
 const REVENUE = { href: '/revenue', label: 'Revenue', icon: IndianRupee }
 const INVOICES = { href: '/invoices', label: 'Invoices', icon: ReceiptText }
 const BANK = { href: '/bank', label: 'Bank', icon: Landmark }
 const DOCUMENTS = { href: '/documents', label: 'Documents', icon: Files }
+const EVENTS = { href: '/events', label: 'Events', icon: Images }
 
 // Its own tab on phones. On desktop it sits at the foot of the sidebar, as the signed-in person.
 const PROFILE = { href: '/profile', label: 'Profile', icon: CircleUser }
@@ -52,13 +55,13 @@ function SidebarSelection() {
   )
 }
 
-export function SidebarNav({ userName }) {
+export function SidebarNav({ userName, userPhoto = null, unread = 0 }) {
   const { isActive, onNavigate } = useActiveItem()
   const profileActive = isActive(PROFILE.href)
   return (
     <MotionConfig reducedMotion="user">
       <nav aria-label="Main" className="flex min-h-0 flex-1 flex-col gap-0.5 px-3 pb-3">
-        {[...ITEMS, REVENUE, INVOICES, BANK, DOCUMENTS].map(({ href, label, icon: Icon }) => {
+        {[ITEMS[0], NOTIFICATIONS, ...ITEMS.slice(1), GOALS, REVENUE, INVOICES, BANK, DOCUMENTS, EVENTS].map(({ href, label, icon: Icon }) => {
           const active = isActive(href)
           return (
             <Link
@@ -71,6 +74,12 @@ export function SidebarNav({ userName }) {
               {active && <SidebarSelection />}
               <Icon size={18} strokeWidth={1.75} aria-hidden="true" className={`relative ${active ? 'text-accent' : ''}`} />
               <span className="relative">{label}</span>
+              {href === NOTIFICATIONS.href && unread > 0 && (
+                <span className="relative ml-auto min-w-5 rounded-full bg-late px-1.5 text-center text-cap font-semibold leading-5 text-white tabular-nums">
+                  {unread}
+                  <span className="sr-only"> unread</span>
+                </span>
+              )}
             </Link>
           )
         })}
@@ -84,7 +93,7 @@ export function SidebarNav({ userName }) {
         >
           {profileActive && <SidebarSelection />}
           <span className="relative">
-            <Avatar name={userName} />
+            <Avatar name={userName} photo={userPhoto} />
           </span>
           <span className="relative truncate">{userName}</span>
         </Link>
@@ -96,7 +105,7 @@ export function SidebarNav({ userName }) {
 /** The phone's tab bar: a floating glass bar with the page scrolling under it. */
 export function TabBar() {
   // Revenue and Invoices open from Overview on phones, so that tab stays lit on them.
-  const { isActive, onNavigate } = useActiveItem({ '/': [REVENUE.href, INVOICES.href, BANK.href, DOCUMENTS.href] })
+  const { isActive, onNavigate } = useActiveItem({ '/': [NOTIFICATIONS.href, GOALS.href, REVENUE.href, INVOICES.href, BANK.href, DOCUMENTS.href, EVENTS.href] })
   return (
     <MotionConfig reducedMotion="user">
       <nav
@@ -129,5 +138,25 @@ export function TabBar() {
         })}
       </nav>
     </MotionConfig>
+  )
+}
+
+/** The phone's bell, beside the logo, with the unread count. */
+export function PhoneBell({ unread = 0 }) {
+  const pathname = usePathname()
+  if (pathname === NOTIFICATIONS.href) return null
+  return (
+    <Link
+      href={NOTIFICATIONS.href}
+      aria-label={unread ? `Notifications, ${unread} unread` : 'Notifications'}
+      className="press relative -mr-2 flex h-11 w-11 items-center justify-center rounded-full text-ink md:hidden"
+    >
+      <Bell size={22} strokeWidth={1.75} aria-hidden="true" />
+      {unread > 0 && (
+        <span aria-hidden="true" className="absolute right-1 top-1 min-w-[1.125rem] rounded-full bg-late px-1 text-center text-[0.6875rem] font-semibold leading-[1.125rem] text-white tabular-nums">
+          {unread > 9 ? '9+' : unread}
+        </span>
+      )}
+    </Link>
   )
 }

@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache'
 import { requireUser } from '@/lib/auth'
 import { sql } from '@/lib/db.mjs'
 import { text } from '@/lib/forms'
+import { MAX_AVATAR_BYTES } from '@/lib/avatar.mjs'
+import { isJpeg } from '@/lib/events.mjs'
 import { hashPassword, MIN_PASSWORD_LENGTH, verifyPassword } from '@/lib/session.mjs'
 
 const MAX_FAILURES = 5
@@ -54,5 +56,24 @@ export async function changePassword(_prev, form) {
 
   await sql('UPDATE users SET password_hash = $2 WHERE id = $1', [user.id, hashPassword(next)])
   await sql('DELETE FROM login_attempts WHERE email = $1', [user.email])
+  return { ok: true }
+}
+
+/** Your own profile photo, already cropped and shrunk on the phone. Nobody can set another founder's. */
+export async function setProfilePhoto(_prev, form) {
+  const user = await requireUser()
+  const file = form.get('photo')
+  const bytes = file && typeof file === 'object' && 'arrayBuffer' in file ? Buffer.from(await file.arrayBuffer()) : null
+  if (!bytes || !isJpeg(bytes)) return { error: 'That photo could not be read. Try another one.' }
+  if (bytes.length > MAX_AVATAR_BYTES) return { error: 'That photo is too large.' }
+  await sql('UPDATE users SET avatar = $2, avatar_updated_at = now() WHERE id = $1', [user.id, bytes])
+  revalidatePath('/', 'layout')
+  return { ok: true }
+}
+
+export async function removeProfilePhoto() {
+  const user = await requireUser()
+  await sql('UPDATE users SET avatar = NULL, avatar_updated_at = NULL WHERE id = $1', [user.id])
+  revalidatePath('/', 'layout')
   return { ok: true }
 }

@@ -300,3 +300,9 @@ input {
     border-color: rgb(var(--ink));
   }
 }
+
+/* Edge adds its own eye to password fields; PasswordInput has one already. */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}

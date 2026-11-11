@@ -360,4 +360,110 @@ export const migrations = [
         CHECK (recurrence IN ('none', 'daily', 'weekly', 'monthly', 'yearly'));
     `,
   },
+  {
+    version: 9,
+    sql: `
+      -- Goals for a day, a week, a month or a year. A goal belongs to the period
+      -- starting on starts_on; a repeating one also to every later period, until
+      -- it is stopped. Each period's progress is kept separately, so last week's
+      -- result stays as it was when this week starts afresh.
+      CREATE TABLE goals (
+        id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        title      text NOT NULL CHECK (length(btrim(title)) > 0),
+        period     text NOT NULL CHECK (period IN ('day', 'week', 'month', 'year')),
+        starts_on  date NOT NULL,
+        repeats    boolean NOT NULL DEFAULT false,
+        stopped_on date,
+        owner_id   uuid REFERENCES users (id) ON DELETE SET NULL,
+        for_both   boolean NOT NULL DEFAULT false,
+        target     numeric(12, 2) CHECK (target IS NULL OR target > 0),
+        unit       text,
+        created_by uuid REFERENCES users (id) ON DELETE SET NULL,
+        created_at timestamptz NOT NULL DEFAULT now(),
+        CONSTRAINT goal_both_means_no_one_person CHECK (NOT for_both OR owner_id IS NULL),
+        CONSTRAINT goal_stops_after_it_starts CHECK (stopped_on IS NULL OR stopped_on > starts_on)
+      );
+      CREATE INDEX goals_period_idx ON goals (period, starts_on);
+
+      CREATE TABLE goal_progress (
+        goal_id      uuid NOT NULL REFERENCES goals (id) ON DELETE CASCADE,
+        period_start date NOT NULL,
+        value        numeric(12, 2) NOT NULL DEFAULT 0 CHECK (value >= 0),
+        done         boolean NOT NULL DEFAULT false,
+        updated_by   uuid REFERENCES users (id) ON DELETE SET NULL,
+        updated_at   timestamptz NOT NULL DEFAULT now(),
+        PRIMARY KEY (goal_id, period_start)
+      );
+    `,
+  },
+  {
+    version: 10,
+    sql: `
+      -- Events the founders attend, with photos. Photos are resized on the phone
+      -- before upload, and kept twice: a full copy and a small one for lists.
+      CREATE TABLE events (
+        id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        title       text NOT NULL CHECK (length(btrim(title)) > 0),
+        happened_on date NOT NULL,
+        place       text,
+        description text,
+        created_by  uuid REFERENCES users (id) ON DELETE SET NULL,
+        created_at  timestamptz NOT NULL DEFAULT now()
+      );
+      CREATE INDEX events_day_idx ON events (happened_on DESC);
+
+      CREATE TABLE event_photos (
+        id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        event_id   uuid NOT NULL REFERENCES events (id) ON DELETE CASCADE,
+        data       bytea NOT NULL,
+        thumb      bytea NOT NULL,
+        width      integer NOT NULL CHECK (width > 0),
+        height     integer NOT NULL CHECK (height > 0),
+        bytes      integer NOT NULL CHECK (bytes > 0),
+        created_by uuid REFERENCES users (id) ON DELETE SET NULL,
+        created_at timestamptz NOT NULL DEFAULT now()
+      );
+      CREATE INDEX event_photos_event_idx ON event_photos (event_id, created_at);
+    `,
+  },
+  {
+    version: 11,
+    sql: `
+      -- What each founder should hear about: a task the other one gave them, or a
+      -- meeting set for both. Shown in the app and sent to their phones.
+      CREATE TABLE notifications (
+        id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id    uuid NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+        kind       text NOT NULL,
+        title      text NOT NULL,
+        body       text,
+        url        text,
+        actor_id   uuid REFERENCES users (id) ON DELETE SET NULL,
+        created_at timestamptz NOT NULL DEFAULT now(),
+        read_at    timestamptz
+      );
+      CREATE INDEX notifications_user_idx ON notifications (user_id, created_at DESC);
+
+      -- Phones with the Android app, by their push token. A token moves to
+      -- whoever signed in on that phone last.
+      CREATE TABLE devices (
+        id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id      uuid NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+        token        text NOT NULL UNIQUE,
+        platform     text NOT NULL DEFAULT 'android',
+        created_at   timestamptz NOT NULL DEFAULT now(),
+        last_seen_at timestamptz NOT NULL DEFAULT now()
+      );
+    `,
+  },
+  {
+    version: 12,
+    sql: `
+      -- A founder's profile photo: a small square JPEG, made on the phone. When
+      -- it changed is part of its address, so browsers fetch a new photo at once.
+      ALTER TABLE users ADD COLUMN avatar bytea;
+      ALTER TABLE users ADD COLUMN avatar_updated_at timestamptz;
+      ALTER TABLE users ADD CONSTRAINT avatar_has_a_date CHECK (avatar IS NULL OR avatar_updated_at IS NOT NULL);
+    `,
+  },
 ]

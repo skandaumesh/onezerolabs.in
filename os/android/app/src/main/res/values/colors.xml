@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The app's page colour, so there is no white flash before the first page draws. -->
+    <color name="page">#F5F5F7</color>
+    <color name="icon_background">#FFFFFF</color>
+    <color name="accent">#0066CC</color>
+</resources>

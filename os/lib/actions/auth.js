@@ -5,6 +5,7 @@ import { endSession, startSession } from '@/lib/auth'
 import { sql } from '@/lib/db.mjs'
 import { hashPassword, verifyPassword } from '@/lib/session.mjs'
 import { text } from '@/lib/forms'
+import { forgetDevice } from '@/lib/devices'
 
 const MAX_FAILURES = 5
 const WINDOW_MINUTES = 15
@@ -41,6 +42,7 @@ export async function signIn(_prev, form) {
 }
 
 export async function signOut() {
+  await forgetDevice()
   await endSession()
   redirect('/login')
 }

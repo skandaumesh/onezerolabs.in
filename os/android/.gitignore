@@ -1,0 +1,17 @@
+# Built output and this computer's settings.
+.gradle/
+build/
+app/build/
+.idea/
+*.iml
+local.properties
+
+# The signing key and its passwords. Losing the key means the app can't be
+# updated in place, so keep a copy somewhere safe, never in this public repo.
+keystore.properties
+keystore/
+*.jks
+*.keystore
+
+# Firebase settings for push. Not secret, but specific to our project.
+app/google-services.json

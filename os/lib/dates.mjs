@@ -70,3 +70,16 @@ export const dueLabel = (day, today = todayIST(), time = null, minutesNow = minu
   if (diff === 1) return { text: `Tomorrow${at}`, tone: 'soon' }
   return { text: `${formatDay(day, today)}${at}`, tone: 'plain' }
 }
+
+/** How long ago a moment was: "Just now", "5 min ago", "4:30 pm", "Yesterday", or the date. */
+export const ago = (value, now = new Date()) => {
+  const then = new Date(value)
+  const minutes = Math.floor((now - then) / 60000)
+  if (minutes < 1) return 'Just now'
+  if (minutes < 60) return `${minutes} min ago`
+  const day = todayIST(then)
+  const today = todayIST(now)
+  if (day === today) return formatDateTime(then).split(', ').pop()
+  if (daysBetween(day, today) === 1) return 'Yesterday'
+  return formatDay(day, today)
+}

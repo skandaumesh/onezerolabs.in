@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
 import { ActionForm, Submit } from '@/components/forms'
+import { PasswordInput } from '@/components/PasswordInput'
 import { BUTTON_PRIMARY, Field, Input } from '@/components/ui'
 import { signIn } from '@/lib/actions/auth'
 import { getUser } from '@/lib/auth'
@@ -34,7 +35,7 @@ export default async function LoginPage() {
               <Input type="email" name="email" required autoComplete="username" autoCapitalize="none" autoFocus />
             </Field>
             <Field label="Password">
-              <Input type="password" name="password" required autoComplete="current-password" />
+              <PasswordInput name="password" required autoComplete="current-password" />
             </Field>
             <Submit className={`${BUTTON_PRIMARY} w-full`}>Sign in</Submit>
           </ActionForm>

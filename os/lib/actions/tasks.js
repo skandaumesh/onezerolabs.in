@@ -6,6 +6,7 @@ import { requireUser } from '@/lib/auth'
 import { APPROVALS, PRIORITIES, RECURRENCES } from '@/lib/constants.mjs'
 import { minutesIST, todayIST } from '@/lib/dates.mjs'
 import { sql, tx } from '@/lib/db.mjs'
+import { taskChanged, tasksMoved } from '@/lib/notify'
 import { day, oneOf, text, time, uuid } from '@/lib/forms'
 import { parseTask, whenText } from '@/lib/parse-task.mjs'
 
@@ -16,6 +17,8 @@ const TIME_NEEDS_DATE = 'Choose a date to go with that time.'
 const assignment = (form) =>
   text(form, 'assignee_id') === 'both' ? { assigneeId: null, forBoth: true } : { assigneeId: uuid(form, 'assignee_id'), forBoth: false }
 const INTERVAL = { daily: '1 day', weekly: '1 week', monthly: '1 month', yearly: '1 year' }
+// What a notice about a task needs to know.
+const NOTICE_FIELDS = `id, title, assignee_id, for_both, due_date, to_char(due_time, 'HH24:MI') AS due_time`
 
 export async function createTask(_prev, form) {
   const user = await requireUser()
@@ -28,9 +31,9 @@ export async function createTask(_prev, form) {
   if (dueTime && !dueDate) return { error: TIME_NEEDS_DATE }
   const { assigneeId, forBoth } = assignment(form)
 
-  await sql(
+  const [task] = await sql(
     `INSERT INTO tasks (project_id, title, assignee_id, for_both, created_by, priority, due_date, due_time, recurrence)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING ${NOTICE_FIELDS}`,
     [
       uuid(form, 'project_id'),
       title,
@@ -43,6 +46,7 @@ export async function createTask(_prev, form) {
       recurrence,
     ]
   )
+  await taskChanged(user, task)
   revalidatePath('/', 'layout')
   return { ok: true }
 }
@@ -60,9 +64,10 @@ export async function quickAddTask(_prev, form) {
 
   const [row] = await sql(
     `INSERT INTO tasks (title, assignee_id, for_both, created_by, priority, due_date, due_time, recurrence)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING ${NOTICE_FIELDS}`,
     [task.title, task.assigneeId, task.forBoth, user.id, task.priority, task.dueDate, task.dueTime, task.recurrence]
   )
+  await taskChanged(user, row)
   revalidatePath('/', 'layout')
   return {
     ok: true,
@@ -75,10 +80,15 @@ export async function quickAddTask(_prev, form) {
 /** Takes back a task just saved by voice. Only the person who added it can. */
 export async function undoQuickTask(_prev, form) {
   const user = await requireUser()
-  await sql('DELETE FROM tasks WHERE id = $1 AND created_by = $2', [uuid(form, 'id'), user.id])
+  const [gone] = await sql('DELETE FROM tasks WHERE id = $1 AND created_by = $2 RETURNING id', [uuid(form, 'id'), user.id])
+  if (gone) await forgetNotices(gone.id)
+  await tasksMoved()
   revalidatePath('/', 'layout')
   return { ok: true }
 }
+
+/** A deleted task's notices go too, so nobody taps one into a missing page. */
+const forgetNotices = (taskId) => sql('DELETE FROM notifications WHERE url = $1', [`/tasks/${taskId}`])
 
 /** Would making `taskId` wait on `blockerId` form a loop? Walks up the blocker chain. */
 const wouldCycle = async (taskId, blockerId) => {
@@ -94,7 +104,7 @@ const wouldCycle = async (taskId, blockerId) => {
 }
 
 export async function updateTask(_prev, form) {
-  await requireUser()
+  const user = await requireUser()
   const id = uuid(form, 'id')
   const title = text(form, 'title')
   const dueDate = day(form, 'due_date')
@@ -110,11 +120,13 @@ export async function updateTask(_prev, form) {
     return { error: 'Those two tasks would end up waiting on each other.' }
   }
 
-  await sql(
+  const [before] = await sql(`SELECT ${NOTICE_FIELDS} FROM tasks WHERE id = $1`, [id])
+  if (!before) return { error: 'This task no longer exists.' }
+  const [task] = await sql(
     `UPDATE tasks
      SET title = $2, notes = $3, assignee_id = $4, priority = $5, due_date = $6,
          approval = $7, recurrence = $8, blocked_by = $9, due_time = $10, for_both = $11
-     WHERE id = $1`,
+     WHERE id = $1 RETURNING ${NOTICE_FIELDS}`,
     [
       id,
       title,
@@ -129,6 +141,7 @@ export async function updateTask(_prev, form) {
       forBoth,
     ]
   )
+  if (task) await taskChanged(user, task, before)
   revalidatePath('/', 'layout')
   return { ok: true }
 }
@@ -181,6 +194,7 @@ export async function toggleTask(_prev, form) {
     })
   }
 
+  await tasksMoved()
   revalidatePath('/', 'layout')
   return { ok: true }
 }
@@ -190,6 +204,8 @@ export async function deleteTask(_prev, form) {
   const id = uuid(form, 'id')
   const [task] = await sql('SELECT project_id FROM tasks WHERE id = $1', [id])
   await sql('DELETE FROM tasks WHERE id = $1', [id])
+  if (task) await forgetNotices(id)
+  await tasksMoved()
   revalidatePath('/', 'layout')
   redirect(task?.project_id ? `/projects/${task.project_id}` : '/tasks')
 }

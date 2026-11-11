@@ -6,3 +6,6 @@
 .neon
 .next
 node_modules
+
+# The Android app is built on this computer, not on Vercel.
+android

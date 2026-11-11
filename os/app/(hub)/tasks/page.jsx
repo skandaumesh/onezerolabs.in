@@ -28,14 +28,15 @@ export default async function TasksPage({ searchParams }) {
   const params = await searchParams
   const today = todayIST()
 
-  const who = params.who === 'all' || isUuid(params.who) ? params.who : 'me'
+  const who = params.who === 'all' || params.who === 'both' || isUuid(params.who) ? params.who : 'me'
   const show = params.show === 'done' ? 'done' : 'open'
-  const assigneeId = who === 'me' ? user.id : who === 'all' ? null : who
+  const assigneeId = who === 'me' ? user.id : who === 'all' || who === 'both' ? null : who
+  const bothOnly = who === 'both'
 
   const [users, projects, tasks] = await Promise.all([
     listUsers(),
     listProjectOptions(),
-    show === 'done' ? listDoneTasks(assigneeId) : listOpenTasks(assigneeId),
+    show === 'done' ? listDoneTasks(assigneeId, bothOnly) : listOpenTasks(assigneeId, bothOnly),
   ])
 
   const link = (next) => {
@@ -45,6 +46,7 @@ export default async function TasksPage({ searchParams }) {
   const people = [
     { value: 'me', label: 'Mine', href: link({ who: 'me' }) },
     ...users.filter((u) => u.id !== user.id).map((u) => ({ value: u.id, label: u.name, href: link({ who: u.id }) })),
+    { value: 'both', label: 'Both', href: link({ who: 'both' }) },
     { value: 'all', label: 'Everyone', href: link({ who: 'all' }) },
   ]
 
@@ -54,7 +56,7 @@ export default async function TasksPage({ searchParams }) {
         title="Tasks"
         action={
           <SheetButton label="New task" title="New task" className={BUTTON_PRIMARY}>
-            <TaskQuickAdd users={users} projects={projects} defaultAssignee={user.id} />
+            <TaskQuickAdd users={users} projects={projects} defaultAssignee={bothOnly ? 'both' : user.id} />
           </SheetButton>
         }
       />
@@ -73,7 +75,9 @@ export default async function TasksPage({ searchParams }) {
 
       {!tasks.length ? (
         <Card>
-          <Empty title={show === 'done' ? 'Nothing finished yet' : 'No open tasks'} />
+          <Empty title={show === 'done' ? 'Nothing finished yet' : bothOnly ? 'No open tasks for both of you' : 'No open tasks'}>
+            {bothOnly && show === 'open' ? 'Choose Both under Assign to and the task shows here, and in each of your lists.' : null}
+          </Empty>
         </Card>
       ) : show === 'done' ? (
         <Card title="Recently finished">

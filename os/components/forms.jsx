@@ -3,6 +3,7 @@
 import { createContext, startTransition, useActionState, useContext, useEffect, useOptimistic, useRef, useState } from 'react'
 import { Check } from 'lucide-react'
 import { ActionErrorAlert, Alert } from '@/components/Alert'
+import { announceSaved } from '@/components/AppBridge'
 import { showBanner } from '@/components/Banner'
 import { useSheet } from '@/components/Sheet'
 
@@ -24,6 +25,7 @@ export function ActionForm({ action, reset = false, closeOnSuccess = false, succ
 
   useEffect(() => {
     if (!state?.ok) return
+    announceSaved()
     if (success) showBanner(success)
     if (closeOnSuccess) sheet?.close()
     if (reset) {
@@ -138,6 +140,9 @@ export function AutoSubmitSelect({ options, className, ...rest }) {
 export function CheckButton({ action, id, done, label, blockedBy, square = false }) {
   const [state, run] = useActionState(action, null)
   const [shown, setShown] = useOptimistic(Boolean(done))
+  useEffect(() => {
+    if (state?.ok) announceSaved()
+  }, [state])
   const wouldBeRefused = !shown && Boolean(blockedBy)
 
   const onSubmit = (e) => {

@@ -93,15 +93,20 @@ const TONES = {
   good: 'bg-good-soft text-good',
 }
 
-/** A person's first initial in a circle. */
-export function Avatar({ name, large = false }) {
+const AVATAR_SIZE = {
+  small: 'h-8 w-8 text-sub',
+  medium: 'h-10 w-10 text-body',
+  large: 'h-16 w-16 text-title',
+}
+
+/** A person's profile photo in a circle, or their first initial if they have none. */
+export function Avatar({ name, photo = null, large = false, size = large ? 'large' : 'small' }) {
+  const box = `flex shrink-0 items-center justify-center overflow-hidden rounded-full ${AVATAR_SIZE[size]}`
+  if (photo) {
+    return <img src={photo} alt="" aria-hidden="true" className={`${box} bg-fill object-cover`} />
+  }
   return (
-    <span
-      aria-hidden="true"
-      className={`flex shrink-0 items-center justify-center rounded-full bg-accent-fill font-semibold text-white ${
-        large ? 'h-16 w-16 text-title' : 'h-8 w-8 text-sub'
-      }`}
-    >
+    <span aria-hidden="true" className={`${box} bg-accent-fill font-semibold text-white`}>
       {name.trim().charAt(0).toUpperCase()}
     </span>
   )
