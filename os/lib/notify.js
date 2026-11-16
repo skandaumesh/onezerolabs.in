@@ -65,3 +65,9 @@ export async function eventChanged(actor, event, isNew) {
     await pushTo(users.map((u) => u.id), { type: 'sync' })
   })
 }
+
+/** After the content calendar changes: phones set their 5 pm reminders again. */
+export async function contentChanged() {
+  const ids = await allUserIds()
+  after(() => pushTo(ids, { type: 'sync' }))
+}

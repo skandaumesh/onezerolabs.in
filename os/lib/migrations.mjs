@@ -495,4 +495,37 @@ export const migrations = [
         CHECK ((owner_kind = 'person') = (owner_id IS NOT NULL));
     `,
   },
+  {
+    version: 16,
+    sql: `
+      -- The social media content calendar: one row per planned post, like a
+      -- Notion database, each with its own checklist of steps.
+      CREATE TABLE content_posts (
+        id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        post_date  date NOT NULL,
+        format     text NOT NULL CHECK (format IN ('reel', 'carousel', 'post', 'story')),
+        topic      text NOT NULL CHECK (length(btrim(topic)) > 0),
+        theme      text,
+        owner_id   uuid REFERENCES users (id) ON DELETE SET NULL,
+        for_both   boolean NOT NULL DEFAULT false,
+        caption    text,
+        notes      text,
+        link       text CHECK (link IS NULL OR link ~ '^https?://'),
+        done_at    timestamptz,
+        created_by uuid REFERENCES users (id) ON DELETE SET NULL,
+        created_at timestamptz NOT NULL DEFAULT now(),
+        CONSTRAINT content_both_means_no_one_person CHECK (NOT for_both OR owner_id IS NULL)
+      );
+      CREATE INDEX content_posts_date_idx ON content_posts (post_date);
+
+      CREATE TABLE content_steps (
+        id       uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        post_id  uuid NOT NULL REFERENCES content_posts (id) ON DELETE CASCADE,
+        title    text NOT NULL CHECK (length(btrim(title)) > 0),
+        done     boolean NOT NULL DEFAULT false,
+        position integer NOT NULL DEFAULT 0
+      );
+      CREATE INDEX content_steps_post_idx ON content_steps (post_id, position);
+    `,
+  },
 ]

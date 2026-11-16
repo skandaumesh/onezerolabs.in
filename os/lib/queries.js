@@ -442,3 +442,35 @@ export const listEventsToRemind = (days) =>
      FROM events WHERE happened_on BETWEEN $1::date AND $1::date + $2::int`,
     [todayIST(), days + 1]
   )
+
+// --- content calendar --------------------------------------------------------
+
+const CONTENT_SELECT = `
+  SELECT c.id, c.post_date, c.format, c.topic, c.theme, c.owner_id, c.for_both, c.caption, c.notes, c.link, c.done_at,
+         CASE WHEN c.for_both THEN 'Both' ELSE u.name END AS owner_name,
+         (SELECT count(*)::int FROM content_steps s WHERE s.post_id = c.id) AS step_count,
+         (SELECT count(*)::int FROM content_steps s WHERE s.post_id = c.id AND s.done) AS steps_done
+  FROM content_posts c
+  LEFT JOIN users u ON u.id = c.owner_id`
+
+/** Every planned post, oldest first, optionally one founder's (which includes those for both) or only shared ones. */
+export const listContentPosts = (ownerId = null, bothOnly = false) =>
+  sql(
+    `${CONTENT_SELECT}
+     WHERE CASE WHEN $2::boolean THEN c.for_both ELSE ($1::uuid IS NULL OR c.owner_id = $1::uuid OR c.for_both) END
+     ORDER BY c.post_date, c.created_at`,
+    [ownerId, bothOnly]
+  )
+
+export const getContentPost = async (id) => (await sql(`${CONTENT_SELECT} WHERE c.id = $1`, [id]))[0] || null
+
+export const listContentSteps = (postId) =>
+  sql('SELECT id, title, done FROM content_steps WHERE post_id = $1 ORDER BY position, title', [postId])
+
+/** Posts not yet done from today on, for the 5 pm reminders. */
+export const listContentToRemind = (days) =>
+  sql(
+    `SELECT id, post_date, format, topic, owner_id, for_both, done_at FROM content_posts
+     WHERE done_at IS NULL AND post_date BETWEEN $1::date AND $1::date + $2::int`,
+    [todayIST(), days]
+  )

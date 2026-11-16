@@ -95,6 +95,15 @@ Events the founders attend, with photos and notes. Open it from the sidebar or t
 
 Each founder can add their own photo in Profile: tap the circle or "Choose photo". The phone crops it to a square from the middle and shrinks it to 512 px, about 30–60 KB, before upload. It replaces the initial in the sidebar, on Profile and on event posts, for both founders. Nobody can set the other founder's photo. It is served from `/profile/photo/[id]?v=…`, which checks the session; the `v` is when it last changed, so a new photo shows at once.
 
+## Content calendar
+
+The social media plan, like a Notion database. Open it from the sidebar or the Overview card.
+
+- **Posts:** each has a day, format (Reel, Carousel, Post, Story), owner (a founder or both), topic and week heading, plus a caption, notes and the link once posted. The row's tick marks it done; its page has a checklist that starts from the format's usual steps and can be changed.
+- **Views:** a list grouped by week, filtered by whose posts, and a month calendar. Posts done more than a week ago leave the list but stay on the calendar.
+- **Import plan:** paste rows of Day, Format, Owner and Topic (tabs, pipes or wide spaces), with headings such as "Week 1 — …", and choose the date of Day 1. It shows what it found and asks before adding them.
+- **Reminders:** the Android app reminds both founders at 5 pm on every day with a post not yet done: the owner to create it, the other so nothing is missed.
+
 ## Meetings
 
 A task whose name sounds like a meeting (meeting, call, catch-up, demo, interview, sync, standup) asks for a Google Meet link. "New Meet" opens Google Meet to make one. Full links, links without https and bare codes (abc-defg-hij) are tidied into one form; other sites are refused, and the database only accepts Meet links. The task shows Join buttons, repeats keep the link, and notices and reminders say Google Meet.

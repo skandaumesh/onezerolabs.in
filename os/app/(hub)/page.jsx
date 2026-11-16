@@ -11,7 +11,7 @@ import { formatBytes } from '@/lib/documents.mjs'
 import { summariseBank } from '@/lib/bank.mjs'
 import { goalState, periodStart } from '@/lib/goals.mjs'
 import { isUpcoming } from '@/lib/events.mjs'
-import { getDocumentStats, getOverview, getSettings, listBankEntries, listEarnings, listEvents, listGoals, listIncome, listInvoices, listUsers } from '@/lib/queries'
+import { getDocumentStats, getOverview, getSettings, listBankEntries, listContentPosts, listEarnings, listEvents, listGoals, listIncome, listInvoices, listUsers } from '@/lib/queries'
 
 export const metadata = { title: 'Overview' }
 
@@ -62,7 +62,7 @@ function DateRow({ href, title, detail, due }) {
 export default async function OverviewPage() {
   const user = await requireUser()
   const today = todayIST()
-  const [o, income, invoiceRows, settings, files, earnings, bankEntries, users, dayGoals, weekGoals, events] = await Promise.all([
+  const [o, income, invoiceRows, settings, files, earnings, bankEntries, users, dayGoals, weekGoals, events, content] = await Promise.all([
     getOverview(user.id, today),
     listIncome(),
     listInvoices(),
@@ -74,12 +74,19 @@ export default async function OverviewPage() {
     listGoals('day', today),
     listGoals('week', periodStart('week', today)),
     listEvents(),
+    listContentPosts(),
   ])
   const bank = summariseBank({ earnings, entries: bankEntries, users, today })
   const totals = summariseIncome(income)
   const invoices = invoiceRows.map((inv) => withBalance(inv, settings))
   const toCollect = invoices.filter((i) => i.status === 'issued').reduce((sum, i) => sum + i.balance, 0)
   const nextEvent = events.filter((e) => isUpcoming(e, today, minutesIST())).sort((a, b) => a.happened_on.localeCompare(b.happened_on))[0]
+  const todaysPost = content.find((p) => p.post_date === today && !p.done_at)
+  const contentDetail = todaysPost
+    ? `Today: ${todaysPost.topic}`
+    : content.length
+      ? `${content.filter((p) => p.done_at).length} of ${content.length} posts done`
+      : 'Social media calendar'
   const goalCount = (goals) => `${goals.filter((g) => goalState(g).done).length} of ${goals.length}`
   const goalDetail = [dayGoals.length && `Today ${goalCount(dayGoals)}`, weekGoals.length && `This week ${goalCount(weekGoals)}`].filter(Boolean).join(' · ')
 
@@ -127,6 +134,7 @@ export default async function OverviewPage() {
 
       <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <MoneyLink href="/goals" title="Goals" detail={goalDetail || 'Daily, weekly, monthly, yearly'} />
+        <MoneyLink href="/content" title="Content" detail={contentDetail} />
         <MoneyLink
           href="/events"
           title="Events"

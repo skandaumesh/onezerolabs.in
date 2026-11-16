@@ -221,6 +221,20 @@ describe('database rules', () => {
     await db.query(`INSERT INTO bank_entries (direction, amount, entry_date, description, owner_kind, owner_id) VALUES ('in', 10, '2026-11-11', 'x', 'person', $1)`, [id])
   })
 
+  test('a planned post is for one person or both, and its checklist goes with it', async () => {
+    const [{ id: u }] = (await db.query(`INSERT INTO users (name, email, password_hash) VALUES ('C', 'c@content.test', 'a:b') RETURNING id`)).rows
+    await assert.rejects(
+      db.query(`INSERT INTO content_posts (post_date, format, topic, owner_id, for_both) VALUES ('2026-11-16', 'reel', 'x', $1, true)`, [u]),
+      /content_both_means_no_one_person/
+    )
+    await assert.rejects(db.query(`INSERT INTO content_posts (post_date, format, topic) VALUES ('2026-11-16', 'tiktok', 'x')`), /content_posts_format_check/)
+    await assert.rejects(db.query(`INSERT INTO content_posts (post_date, format, topic, link) VALUES ('2026-11-16', 'reel', 'x', 'javascript:alert(1)')`), /content_posts_link_check/)
+    const [{ id }] = (await db.query(`INSERT INTO content_posts (post_date, format, topic) VALUES ('2026-11-16', 'reel', 'Demo') RETURNING id`)).rows
+    await db.query(`INSERT INTO content_steps (post_id, title) VALUES ($1, 'Shoot')`, [id])
+    await db.query('DELETE FROM content_posts WHERE id = $1', [id])
+    assert.equal((await db.query('SELECT count(*)::int AS n FROM content_steps WHERE post_id = $1', [id])).rows[0].n, 0)
+  })
+
   test('a push token belongs to one person only', async () => {
     const [a, b] = (await db.query(`INSERT INTO users (name, email, password_hash) VALUES ('A', 'a@push.test', 'a:b'), ('B', 'b@push.test', 'a:b') RETURNING id`)).rows
     await db.query(`INSERT INTO devices (user_id, token) VALUES ($1, 'tok-1')`, [a.id])
