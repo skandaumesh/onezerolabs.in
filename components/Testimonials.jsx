@@ -13,24 +13,14 @@ import Image from "next/image"
 
 const testimonials = [
   {
-    company: "Praasa Consultancy",
-    sector: "Research consultancy",
-    logo: { src: "/clients/svg/praasa.svg", w: 935, h: 840 },
+    company: "VAAYU Chest & Sleep Specialists",
+    sector: "Healthcare · Bengaluru",
+    logo: { src: "/clients/svg/vaayu.svg", w: 1125, h: 1105 },
     quote:
-      "Collaborating with One Zero Labs to build the Praasa Consultancy website was a phenomenal experience. They translated our mission into a professional, user-friendly platform where researchers can easily access our services. Skanda's technical expertise and attention to detail ensured every feature works flawlessly. The communication was prompt and transparent throughout. I highly recommend them to anyone looking for a talented team that brings a vision to life.",
-    author: "Dr. Sandesh Bhat",
-    role: "Founder, Praasa Consultancy",
-    image: "/testimonials/praasa.webp",
-  },
-  {
-    company: "MLA Academy of Higher Learning",
-    sector: "Higher education · Bengaluru",
-    logo: { src: "/clients/svg/mla.svg", w: 1077, h: 1053 },
-    quote:
-      "The AI-Powered Academic Management Platform developed by OneZeroLabs has brought a remarkable improvement in the way attendance is managed within the department and the institution. The system is simple, efficient, and well-designed to meet the practical needs of faculty members. It has helped reduce manual effort, improved accuracy in attendance tracking, and made the overall process much more organized and reliable.",
-    author: "Ms. Kamala S",
-    role: "HOD & Assistant Professor, Dept. of Computer Applications",
-    image: "/testimonials/kamala.webp",
+      "OneZero labs is run by 2 very young and enthusiastic people. Skanda and Tanisha. We've worked with them for a few of our projects related to website design, app building, payment solutions and social media management and data analytics and we are nothing but praise. Skanda's proactive approach and out of the box solutions to make life easier in the long term are much appreciated and we keep coming back for any of our tech needs.",
+    author: "Dr. Sameer Bansal",
+    role: "Senior Consultant & Clinical Head, VAAYU Chest & Sleep Specialists",
+    image: "/testimonials/sameer.webp",
   },
   {
     company: "Vetaas Education Foundation",
@@ -43,14 +33,24 @@ const testimonials = [
     image: "/testimonials/kirti.webp",
   },
   {
-    company: "VAAYU Chest & Sleep Specialists",
-    sector: "Healthcare · Bengaluru",
-    logo: { src: "/clients/svg/vaayu.svg", w: 1125, h: 1105 },
+    company: "MLA Academy of Higher Learning",
+    sector: "Higher education · Bengaluru",
+    logo: { src: "/clients/svg/mla.svg", w: 1077, h: 1053 },
     quote:
-      "OneZero labs is run by 2 very young and enthusiastic people. Skanda and Tanisha. We've worked with them for a few of our projects related to website design, app building, payment solutions and social media management and data analytics and we are nothing but praise. Skanda's proactive approach and out of the box solutions to make life easier in the long term are much appreciated and we keep coming back for any of our tech needs.",
-    author: "Dr. Sameer Bansal",
-    role: "Senior Consultant & Clinical Head, VAAYU Chest & Sleep Specialists",
-    image: "/testimonials/sameer.webp",
+      "The AI-Powered Academic Management Platform developed by OneZeroLabs has brought a remarkable improvement in the way attendance is managed within the department and the institution. The system is simple, efficient, and well-designed to meet the practical needs of faculty members. It has helped reduce manual effort, improved accuracy in attendance tracking, and made the overall process much more organized and reliable.",
+    author: "Ms. Kamala S",
+    role: "HOD & Assistant Professor, Dept. of Computer Applications",
+    image: "/testimonials/kamala.webp",
+  },
+  {
+    company: "Praasa Consultancy",
+    sector: "Research consultancy",
+    logo: { src: "/clients/svg/praasa.svg", w: 935, h: 840 },
+    quote:
+      "Collaborating with One Zero Labs to build the Praasa Consultancy website was a phenomenal experience. They translated our mission into a professional, user-friendly platform where researchers can easily access our services. Skanda's technical expertise and attention to detail ensured every feature works flawlessly. The communication was prompt and transparent throughout. I highly recommend them to anyone looking for a talented team that brings a vision to life.",
+    author: "Dr. Sandesh Bhat",
+    role: "Founder, Praasa Consultancy",
+    image: "/testimonials/praasa.webp",
   },
 ]
 
