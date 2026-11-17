@@ -199,7 +199,7 @@ const siteSchema = {
         })),
       },
       owns: { '@id': SAAME_ID },
-      sameAs: ['https://www.linkedin.com/company/onezerolabs'],
+      sameAs: ['https://www.linkedin.com/company/onezerolabs', 'https://www.instagram.com/onezerolabs.in/'],
     },
     {
       '@type': 'WebSite',

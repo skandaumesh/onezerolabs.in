@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
-import { Linkedin, Mail } from 'lucide-react'
+import { Instagram, Linkedin, Mail } from 'lucide-react'
 
 const sans = Inter({
     subsets: ['latin'],
@@ -107,6 +107,15 @@ export default function Footer() {
                                 className="text-ozl-muted transition-colors hover:text-ozl-ink"
                             >
                                 <Linkedin size={18} />
+                            </a>
+                            <a
+                                href="https://www.instagram.com/onezerolabs.in/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="OneZeroLabs on Instagram"
+                                className="text-ozl-muted transition-colors hover:text-ozl-ink"
+                            >
+                                <Instagram size={18} />
                             </a>
                             <a
                                 href="mailto:hello@onezerolabs.in"

@@ -379,6 +379,7 @@ export default function Navbar() {
             >
               <div className="flex items-center gap-6">
                 <a href="https://www.linkedin.com/company/onezerolabs" target="_blank" rel="noopener noreferrer" className="hover:text-ozl-ink transition-colors">LinkedIn</a>
+                <a href="https://www.instagram.com/onezerolabs.in/" target="_blank" rel="noopener noreferrer" className="hover:text-ozl-ink transition-colors">Instagram</a>
               </div>
               <div>© 2026 OneZeroLabs · Bengaluru</div>
             </motion.div>
